@@ -2,10 +2,14 @@
 
 @theme {
   --background-image-cyberpunk: linear-gradient(170deg, #e3aec2 1%, #f4e3e9 29%, #fcd1db 58%);
-  --color-brand-primary: #e3aec2;
-  --color-brand-secondary: #fcd1db;
-  --color-brand-tertiary: #f4e3e9;
-  --color-brand-accent: #632b30;
+  /* --color-brand-primary: #e3aec2; */
+  /* --color-brand-secondary: #fcd1db; */
+  --color-brand-primary: white/50;
+  --color-brand-secondary: #f4e3e9;
+  --color-brand-accent-primary: #303030;
+  --color-brand-accent-secondary: #ff7a99;
+  --color-brand-accent-tertiary: #898989;
+  --color-brand-accent-fourth: #aeaeb2;
 }
 
 :root {
@@ -41,9 +45,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
+    --text: #303030;
+    --text-h: #898989;
+    --bg: #ffffff;
     --border: #2e303a;
     --code-bg: #1f2028;
     --accent: #c084fc;
