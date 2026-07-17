@@ -25,5 +25,17 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "@/hooks/use-composed-ref.ts",
+    "@/hooks/use-cursor-visibility.ts",
+    "@/hooks/use-element-rect.ts",
+    "@/hooks/use-is-breakpoint.ts",
+    "@/hooks/use-menu-navigation.ts",
+    "@/hooks/use-scrolling.ts",
+    "@/hooks/use-throttled-callback.ts",
+    "@/hooks/use-tiptap-editor.ts",
+    "@/hooks/use-unmount.ts",
+    "@/hooks/use-window-size.ts"
+  ]
 }

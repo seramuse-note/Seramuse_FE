@@ -2,7 +2,7 @@ import Avatar from '../common/Avatar';
 
 function Header() {
   return (
-    <div className="w-full h-fit  min-h-1 rounded-tl-4xl rounded-br-4xl  rounded-bl-xl rounded-tr-xl">
+    <div className="w-full h-fit  min-h-1 rounded-tl-4xl rounded-br-4xl  rounded-bl-xl rounded-tr-xl text-brand-accent-primary">
       <div className="w-full h-fit px-5 py-2 bg-white/50 rounded-tl-4xl rounded-br-4xl rounded-bl-xl rounded-tr-xl flex justify-center items-center gap-5">
         <Avatar className="shrink-0"></Avatar>
         <div className="flex flex-col grow min-w-0">

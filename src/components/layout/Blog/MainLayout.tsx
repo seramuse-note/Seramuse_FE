@@ -1,3 +1,4 @@
+// import Tiptap from '@/components/common/Tiptap';
 import { Navbar } from './Navbar';
 import { NoteDetail } from './NoteDetail';
 import { Sidebar } from './Sidebar';

@@ -1,6 +1,6 @@
 import { Dropdown } from '@/components/common/Dropdown';
 import { Tag } from '../../common/Tag';
-import { ChevronLeft, Mic, Plus } from 'lucide-react';
+import { ChevronLeft, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 
 export const NoteDetail = () => {
@@ -80,18 +80,7 @@ export const NoteDetail = () => {
           </ScrollContainer>
         </div>
       </div>
-      <div className="relative flex flex-col gap-5">
-        <div className="bg-white/50 flex flex-col flex-1 gap-5 rounded-xl p-5 ">
-          <textarea
-            className="w-full min-h-[150px] outline-0 overflow-y-scroll scrollbar-none pb-20 resize-none"
-            placeholder="Viết ghi chú ở đây hoặc bấm micro để nói..."
-          ></textarea>
-        </div>
-        <div className="w-full box-border sticky bottom-0 self-center flex items-center gap-3 bg-white/50 backdrop-blur-sm rounded-xl px-2 py-2 shadow-md z-50">
-          <div className="w-full  "></div>
-          <Mic className="bg-brand-accent-primary text-white w-fit h-fit p-1 box-border rounded-full cursor-pointer"></Mic>
-        </div>
-      </div>
+      <div className="relative flex flex-col gap-5">{/* <Tiptap></Tiptap> */}</div>
     </div>
   );
 };
