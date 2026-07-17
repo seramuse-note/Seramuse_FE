@@ -2,6 +2,7 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { Tag } from '../../common/Tag';
 import { ChevronLeft, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
+import { Editor } from '@/components/common/Editor';
 
 export const NoteDetail = () => {
   return (
@@ -78,6 +79,8 @@ export const NoteDetail = () => {
             <Tag></Tag>
             <Tag></Tag>
           </ScrollContainer>
+
+          <Editor />
         </div>
       </div>
       <div className="relative flex flex-col gap-5">{/* <Tiptap></Tiptap> */}</div>
