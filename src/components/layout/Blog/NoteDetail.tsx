@@ -1,10 +1,11 @@
 import { Dropdown } from '@/components/common/Dropdown';
 import { Tag } from '../../common/Tag';
 import { ChevronLeft, Plus } from 'lucide-react';
+import ScrollContainer from 'react-indiana-drag-scroll';
 
 export const NoteDetail = () => {
   return (
-    <div className="py-4 px-3 flex flex-col gap-3 bg-white/30 -hidden">
+    <div className="py-4 px-3 flex flex-col gap-3 bg-white/30 rounded-tr-xl rounded-br-xl overflow-x-hidden">
       <div className="flex text-sm gap-1 text-brand-accent-fourth">
         <ChevronLeft />
         <div>Ghi chú của tôi</div>
@@ -42,8 +43,8 @@ export const NoteDetail = () => {
         <Dropdown></Dropdown>
         <div
           className="flex flex-col
-        //  grow gap-2 max-w-full max-h-full justify-evenly bg-white/50 p-2 
-         rounded-md"
+         grow gap-2 max-w-full max-h-full justify-evenly bg-white/50 p-2 overflow-x-hidden
+         rounded-xl"
         >
           <div className=" flex gap-3">
             <form
@@ -53,14 +54,17 @@ export const NoteDetail = () => {
               <input
                 type="text"
                 placeholder="Add tag"
-                className="outline-0 w-full bg-white/90 rounded-sm px-2"
+                className="outline-0 w-full bg-white/90 rounded-xl px-2"
               />
               <div className="lucide lucide-plus-icon lucide-plus bg-brand-accent-primary text-white px-2 p w-fit rounded-sm cursor-pointer hover:opacity-70">
                 <Plus className="w-3 min-h-5 h-full"></Plus>
               </div>
             </form>
           </div>
-          <div className="flex overflow-x-auto min-w-0">
+          <ScrollContainer
+            vertical={false} // Khóa cuộn dọc, chỉ cho cuộn ngang
+            className="flex overflow-x-auto min-w-0 scrollbar-none cursor-grabbing"
+          >
             <Tag></Tag>
             <Tag></Tag>
             <Tag></Tag>
@@ -68,12 +72,10 @@ export const NoteDetail = () => {
             <Tag></Tag>
             <Tag></Tag>
             <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-          </div>
+          </ScrollContainer>
         </div>
       </div>
+      <div className="bg-white/50 flex-1 rounded-xl"></div>
     </div>
   );
 };
