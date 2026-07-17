@@ -1,11 +1,11 @@
 import { Dropdown } from '@/components/common/Dropdown';
 import { Tag } from '../../common/Tag';
-import { ChevronLeft, Plus } from 'lucide-react';
+import { ChevronLeft, Mic, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 
 export const NoteDetail = () => {
   return (
-    <div className="py-4 px-3 flex flex-col gap-3 bg-white/30 rounded-tr-xl rounded-br-xl overflow-x-hidden">
+    <div className=" py-4 px-3 flex flex-col gap-3 bg-red/30 rounded-tr-xl rounded-br-xl overflow-x-hidden">
       <div className="flex text-sm gap-1 text-brand-accent-fourth">
         <ChevronLeft />
         <div>Ghi chú của tôi</div>
@@ -38,13 +38,18 @@ export const NoteDetail = () => {
           <div>Save</div>
         </div>
       </div>
-      <div className="text-brand-accent-primary font-light text-[15px]">Đang lưu...</div>
-      <div className="bg-white/50 w-full rounded-xl p-3 flex gap-3">
+      <div className="flex gap-3 text-brand-accent-primary font-light text-[15px]">
+        <div>Created: 20/08/2025</div>
+        <div>Updated: 20/08/2025</div>
+        <div>Đang lưu...</div>
+      </div>
+
+      <div className="bg-white/50 w-full rounded-xl p-3 flex gap-5">
         <Dropdown></Dropdown>
         <div
           className="flex flex-col
          grow gap-2 max-w-full max-h-full justify-evenly bg-white/50 p-2 overflow-x-hidden
-         rounded-xl"
+         rounded-xl col-span-"
         >
           <div className=" flex gap-3">
             <form
@@ -62,7 +67,7 @@ export const NoteDetail = () => {
             </form>
           </div>
           <ScrollContainer
-            vertical={false} // Khóa cuộn dọc, chỉ cho cuộn ngang
+            vertical={false}
             className="flex overflow-x-auto min-w-0 scrollbar-none cursor-grabbing"
           >
             <Tag></Tag>
@@ -75,7 +80,18 @@ export const NoteDetail = () => {
           </ScrollContainer>
         </div>
       </div>
-      <div className="bg-white/50 flex-1 rounded-xl"></div>
+      <div className="relative flex flex-col gap-5">
+        <div className="bg-white/50 flex flex-col flex-1 gap-5 rounded-xl p-5 ">
+          <textarea
+            className="w-full min-h-[150px] outline-0 overflow-y-scroll scrollbar-none pb-20 resize-none"
+            placeholder="Viết ghi chú ở đây hoặc bấm micro để nói..."
+          ></textarea>
+        </div>
+        <div className="w-full box-border sticky bottom-0 self-center flex items-center gap-3 bg-white/50 backdrop-blur-sm rounded-xl px-2 py-2 shadow-md z-50">
+          <div className="w-full  "></div>
+          <Mic className="bg-brand-accent-primary text-white w-fit h-fit p-1 box-border rounded-full cursor-pointer"></Mic>
+        </div>
+      </div>
     </div>
   );
 };

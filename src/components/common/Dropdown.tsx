@@ -11,7 +11,7 @@ export const Dropdown = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <div
-      className="relative shrink-0 flex min-w-[150px] bg-white text-brand-accent-primary rounded-md box-border   "
+      className="relative shrink-0 flex max-w-[150px]  bg-white text-brand-accent-primary rounded-md box-border   "
       onClick={() => setIsOpen(!isOpen)}
     >
       <button className="flex w-full items-center min-h-5 justify-evenly px-2 box-border rounded-md text-sm cursor-pointer">
@@ -43,7 +43,7 @@ export const Dropdown = () => {
                 setIsOpen(false);
               }}
               className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
+                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer '
               }
               // ${isSelected ?
               // : 'bg-white/50'}`}
