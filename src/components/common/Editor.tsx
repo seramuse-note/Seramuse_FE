@@ -4,11 +4,33 @@ import {
   posToDOMRect,
   useEditor,
   useEditorState,
-  Editor as TiptapEditor, // Import type Editor của Tiptap để thay thế cho any
+  Editor as TiptapEditor,
 } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
+import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
+  Baseline,
+  Bold,
+  FileText,
+  Image,
+  Italic,
+  List,
+  ListOrdered,
+  LucideProvider,
+  Quote,
+  RotateCcw,
+  Strikethrough,
+  Table,
+  Underline,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyleKit } from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
 
 // Định nghĩa interface rõ ràng cho cấu trúc của một dòng lệnh Slash
 interface CommandItem {
@@ -23,11 +45,19 @@ export const Editor = () => {
   const [slashQuery, setSlashQuery] = useState('');
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right', 'justify'],
+        defaultAlignment: 'left',
+      }),
+      TextStyleKit,
+      Color,
+    ],
     editable: isEditable,
     content: `
-      <p>Hệ thống hỗ trợ gõ dấu gạch chéo "/" ở đầu dòng trống để mở menu giống Notion.</p>
-      <p>/</p>
+      <p>Khu vuc ghi noi dung</p>
     `,
     onUpdate: ({ editor }) => {
       const { state } = editor;
@@ -51,12 +81,34 @@ export const Editor = () => {
     }
   }, [isEditable, editor]);
 
-  const { isBold, isItalic, isStrikethrough } = useEditorState({
+  const {
+    isBold,
+    isItalic,
+    isStrikethrough,
+    isUnder,
+    // isList,
+    // isOrderedList,
+    isAlignLeft,
+    isAlignCenter,
+    isAlignRight,
+    isAlignJustify,
+    isQuote,
+    currentColor,
+  } = useEditorState({
     editor,
     selector: (ctx) => ({
       isBold: ctx.editor.isActive('bold') ?? false,
       isItalic: ctx.editor.isActive('italic') ?? false,
       isStrikethrough: ctx.editor.isActive('strike') ?? false,
+      isUnder: ctx.editor.isActive('underline') ?? false,
+      isList: ctx.editor.isActive('bulletList') ?? false,
+      isOrderedList: ctx.editor.isActive('orderedList') ?? false,
+      isAlignLeft: ctx.editor.isActive({ textAlign: 'left' }) ?? false,
+      isAlignCenter: ctx.editor.isActive({ textAlign: 'center' }) ?? false,
+      isAlignRight: ctx.editor.isActive({ textAlign: 'right' }) ?? false,
+      isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' }) ?? false,
+      isQuote: ctx.editor.isActive('blockquote') ?? false,
+      currentColor: ctx.editor.getAttributes('textStyle').color ?? '#000000',
     }),
   });
 
@@ -111,6 +163,13 @@ export const Editor = () => {
     setSlashQuery('');
   };
 
+  const handleAlign = (type: string, isActive: boolean) => {
+    if (isActive) {
+      editor.chain().focus().unsetTextAlign().run();
+    } else {
+      editor.chain().focus().setTextAlign(type).run();
+    }
+  };
   return (
     <>
       <button
@@ -119,8 +178,80 @@ export const Editor = () => {
           setShowMenu((old) => !old);
           editor?.commands.focus();
         }}
+        className="flex gap-3 p-2 box-border items-center"
       >
-        Toggle menu
+        <LucideProvider size={20} className="flex gap-2 cursor-pointer items-center">
+          <Bold
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={`${isBold ? 'is-active stroke-3' : ''} `}
+          />
+          <Italic
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={isItalic ? 'is-active stroke-3' : ''}
+          />
+          <Underline
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            className={isUnder ? 'is-active stroke-3' : ''}
+          />
+          <Strikethrough
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={isStrikethrough ? 'is-active stroke-3' : ''}
+          />
+          <List
+          // onClick={() => editor.chain().focus().toggleBulletList().run()}
+          // className={isList ? 'stroke-3' : ''}
+          />
+          <ListOrdered
+          // onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          // className={isOrderedList ? 'is-active stroke-3' : ''}
+          />
+          <AlignLeft
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            className={isAlignLeft ? 'stroke-3' : ''}
+          />
+          <AlignCenter
+            onClick={() => handleAlign('center', isAlignCenter)}
+            className={isAlignCenter ? 'stroke-3' : ''}
+          />
+          <AlignRight
+            onClick={() => handleAlign('right', isAlignRight)}
+            className={isAlignRight ? 'stroke-3' : ''}
+          />
+          <AlignJustify
+            onClick={() => handleAlign('justify', isAlignJustify)}
+            className={isAlignJustify ? 'stroke-3' : ''}
+          />
+          <Quote
+            values={currentColor}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            className={isQuote ? 'is-active stroke-3' : ''}
+          />
+          <Table />
+          <Image />
+          <FileText />
+          <div className="flex items-center  rounded-md bg-white/50 box-border">
+            <label
+              htmlFor="tiptap-color-picker"
+              className="box-border hover:bg-white rounded-l-sm  p-1 "
+            >
+              <Baseline style={{ color: currentColor }} />
+            </label>
+            <input
+              id="tiptap-color-picker"
+              type="color"
+              value={currentColor}
+              onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+              className="absolute w-0 h-0 opacity-0 pointer-events-none"
+            />
+            <div className="box-border hover:bg-white rounded-r-sm  p-1 ">
+              <RotateCcw
+                size={10}
+                onClick={() => editor.chain().focus().unsetColor().run()}
+                className="cursor-pointer flex justify-center text-gray-400  h-4"
+              />
+            </div>
+          </div>
+        </LucideProvider>
       </button>
       <div className="control-group">
         <label>
@@ -132,30 +263,41 @@ export const Editor = () => {
       {editor && showMenu && (
         <>
           {/* 1. BUBBLE MENU TEXT FORMAT */}
-          <BubbleMenu editor={editor} options={{ placement: 'bottom', offset: 8, flip: true }}>
-            <div className="bubble-menu">
-              <button
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                className={isBold ? 'is-active' : ''}
-                type="button"
-              >
-                Bold
-              </button>
-              <button
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                className={isItalic ? 'is-active' : ''}
-                type="button"
-              >
-                Italic
-              </button>
-              <button
-                onClick={() => editor.chain().focus().toggleStrike().run()}
-                className={isStrikethrough ? 'is-active' : ''}
-                type="button"
-              >
-                Strike
-              </button>
-            </div>
+          <BubbleMenu
+            editor={editor}
+            options={{ placement: 'bottom', offset: 8, flip: true }}
+            className="text-sm bg-white border border-[#ccc] rounded-sm p-1 px-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
+          >
+            <button
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={`${isBold ? 'is-active' : ''} flex items-center cursor-pointer gap-2`}
+              type="button"
+            >
+              <Bold size={15} />
+              Bold
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={`isItalic ? 'is-active' : '' flex items-center cursor-pointer gap-2`}
+              type="button"
+            >
+              <Italic size={15} />
+              Italic
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              className={`${isUnder ? 'is-active' : ''} flex items-center cursor-pointer gap-2`}
+              type="button"
+            >
+              <Underline size={15} /> Underline
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              className={`isStrikethrough ? 'is-active' : ''  flex items-center cursor-pointer gap-2`}
+              type="button"
+            >
+              <Strikethrough size={15} /> Strike through
+            </button>
           </BubbleMenu>
 
           {/* 2. BUBBLE MENU CHO ĐOẠN LISTS */}
@@ -193,9 +335,7 @@ export const Editor = () => {
                   chain.run();
                 }}
                 type="button"
-              >
-                Toggle list type
-              </button>
+              ></button>
             </div>
           </BubbleMenu>
 

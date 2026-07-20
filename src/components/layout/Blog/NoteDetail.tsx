@@ -79,11 +79,11 @@ export const NoteDetail = () => {
             <Tag></Tag>
             <Tag></Tag>
           </ScrollContainer>
-
-          <Editor />
         </div>
       </div>
-      <div className="relative flex flex-col gap-5">{/* <Tiptap></Tiptap> */}</div>
+      <div className="relative flex flex-col gap-5">
+        <Editor />
+      </div>
     </div>
   );
 };

@@ -113,3 +113,12 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.tiptap blockquote {
+  border-left: 4px solid #4b5563a1;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #4b5563;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
