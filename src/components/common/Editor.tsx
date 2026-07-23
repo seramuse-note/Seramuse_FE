@@ -285,7 +285,12 @@ export const Editor = () => {
             </div>
           </LucideProvider>
         </button>
-        <Mic className="bg-brand-accent-primary text-white rounded-full p-1"></Mic>
+        <button
+          className="bg-brand-accent-primary  rounded-full p-2 cursor-pointer"
+          title="Use voice chat"
+        >
+          <Mic className="text-white w-4 h-4" />
+        </button>
       </div>
       <div className="control-group">
         <label>

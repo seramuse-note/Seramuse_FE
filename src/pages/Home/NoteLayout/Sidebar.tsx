@@ -1,20 +1,29 @@
 import { Ellipsis, Funnel, Mic, Plus, Star } from 'lucide-react';
 
-export const Sidebar = () => {
+interface EditorPanelProps {
+  showRecentList: boolean;
+}
+export const Sidebar = ({ showRecentList }: EditorPanelProps) => {
   return (
-    <div className="relative py-4 px-3 flex flex-col gap-4  bg-white/45 backdrop-blur-lg border-r border-white/50">
+    <div
+      className={`relative flex flex-col gap-4 bg-white/45 transition-all duration-700 overflow-hidden
+     ${showRecentList ? 'py-4 px-3 backdrop-blur-lg border-r border-white/50 ' : 'bg-white/80 backdrop-blur-none py-0  border-0 opacity-0 pointer-events-none'}`}
+    >
       <div className="flex justify-between items-center px-1">
-        <div className=" items-start text-base font-bold">Recent</div>
+        <div className=" items-start text-base font-bold flex-1">Recent</div>
         <div className="flex gap-1.5">
-          <div className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80 transition-all text-brand-accent-primary cursor-pointer ">
+          <div
+            className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80 transition-all text-brand-accent-primary cursor-pointer"
+            title="Use voice chat"
+          >
             <Mic className="w-4 h-4"></Mic>
           </div>
-          <div className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80 transition-all text-brand-accent-primary cursor-pointer ">
+          <div
+            className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80 transition-all text-brand-accent-primary cursor-pointer "
+            title="Create a new note"
+          >
             <Plus className="w-4 h-4" />
           </div>
-          {/* <button className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80 transition-all text-brand-accent-primary cursor-pointer ">
-            <PanelLeftClose className="w-4 h-4" />
-          </button> */}
         </div>
       </div>
       <form
@@ -31,8 +40,8 @@ export const Sidebar = () => {
           <Funnel className="w-4 h-4" />
         </div>
       </form>
-      <div className="bg-white/30 backdrop-blur-md hover:bg-white/80 border border-white/40 shadow-sm transition-all gap-1.5 flex items-center justify-between rounded-2xl">
-        <div className="flex-1 flex items-center justify-center py-1.5 gap-1 bg-brand-accent-primary text-white shadow-sm font-medium text-xs rounded-xl cursor-pointer">
+      <div className="bg-white/30 backdrop-blur-md hover:bg-white/80 border border-white/40 shadow-sm transition-all px-2.5 py-2 gap-1.5 flex items-center justify-between rounded-2xl overflow-hidden ">
+        <div className="flex-1 flex items-center justify-center p-1.5 gap-1 bg-brand-accent-primary text-white shadow-sm font-medium text-xs rounded-xl cursor-pointer">
           <span>All</span>
         </div>
         <div className="flex-1 flex items-center justify-center py-1.5 gap-1 text-brand-accent-tertiary  hover:text-brand-accent-primary font-medium text-xs rounded-xl hover:bg-white/50 cursor-pointer transition-all">
@@ -51,7 +60,7 @@ export const Sidebar = () => {
          shadow-[0_10px_20px_-5px_rgba(134,0,60,0.06)]
          hover:bg-white/85  hover:-translate-y-1
          hover:shadow-[0_15px_25px_-5px_rgba(134,0,60,0.12)] 
-         transition-all duration-300  cursor-pointer
+         transition-all duration-700  cursor-pointer
         "
           >
             <div className="flex relative ">
@@ -83,7 +92,7 @@ export const Sidebar = () => {
          shadow-[0_10px_20px_-5px_rgba(134,0,60,0.06)]
          hover:bg-white/85  hover:-translate-y-1
          hover:shadow-[0_15px_25px_-5px_rgba(134,0,60,0.12)] 
-         transition-all duration-300  cursor-pointer
+         transition-all duration-700  cursor-pointer
         "
           >
             <div className="flex relative ">
@@ -110,11 +119,11 @@ export const Sidebar = () => {
       </div>
       <div
         className="flex justify-center items-center
-        mt-auto w-full py-2.5 bg-white/50
+        mt-auto w-full p-2.5 bg-white/50
         hover:bg-white/80 backdrop-blur-md rounded-2xl border
         border-white/70 text-xs font-medium text-brand-accent-primary
-        hover:to-brand-accent-tertiary shadow-sm transition-all
-        cursor-pointer"
+        hover:text-brand-accent-secondary shadow-sm transition-all
+        cursor-pointer whitespace-nowrap truncate "
       >
         All post
       </div>

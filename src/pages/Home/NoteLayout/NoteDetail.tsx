@@ -1,15 +1,36 @@
 import { Dropdown } from '@/components/common/Dropdown';
-import { ChevronLeft, PanelLeftClose, Plus } from 'lucide-react';
+import { ChevronLeft, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
 
-export const NoteDetail = () => {
+interface EditorPanelProps {
+  showRecentList: boolean;
+  onToggleRecentList: () => void;
+}
+
+export const NoteDetail = ({ showRecentList, onToggleRecentList }: EditorPanelProps) => {
   return (
-    <div className=" py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto">
+    <div
+      className={`py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
+     overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 
+     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto transition-all duration-700
+     ${showRecentList ? 'w-full' : ''}`}
+    >
       <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
-        <PanelLeftClose className="w-4 h-4" />
-        <ChevronLeft />
+        <button
+          onClick={onToggleRecentList}
+          title={showRecentList ? 'Collapse the list' : 'Open list'}
+        >
+          {showRecentList ? (
+            <PanelLeftClose className="w-4 h-4 cursor-pointer" />
+          ) : (
+            <PanelLeftOpen className="w-4 h-4 cursor-pointer" />
+          )}
+        </button>
+        <button title="Go back" className="cursor-pointer">
+          <ChevronLeft />
+        </button>
         <div>Ghi chú của tôi</div>
         <div>/</div>
         <div className="text-brand-accent-tertiary">Ghi chú tâm trạng hôm nay</div>
@@ -64,7 +85,7 @@ export const NoteDetail = () => {
                 className="outline-0 w-full bg-white/90 rounded-xl px-2"
               />
               <div className="lucide lucide-plus-icon lucide-plus bg-brand-accent-primary text-white px-2 p w-fit rounded-sm cursor-pointer hover:opacity-70">
-                <Plus className="w-3 min-h-5 h-full"></Plus>
+                <Plus className="w-3" />
               </div>
             </form>
           </div>
