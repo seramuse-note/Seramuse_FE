@@ -7,14 +7,15 @@ import { Tag } from '@/components/common/Tag';
 interface EditorPanelProps {
   showRecentList: boolean;
   onToggleRecentList: () => void;
+  onClose: () => void;
 }
 
-export const NoteDetail = ({ showRecentList, onToggleRecentList }: EditorPanelProps) => {
+export const NoteDetail = ({ showRecentList, onToggleRecentList, onClose }: EditorPanelProps) => {
   return (
     <div
-      className={`py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
+      className={`h-full py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
      overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 
-     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto transition-all duration-700
+     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto transition-all duration-300
      ${showRecentList ? 'w-full' : ''}`}
     >
       <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
@@ -28,7 +29,7 @@ export const NoteDetail = ({ showRecentList, onToggleRecentList }: EditorPanelPr
             <PanelLeftOpen className="w-4 h-4 cursor-pointer" />
           )}
         </button>
-        <button title="Go back" className="cursor-pointer">
+        <button onClick={onClose} title="Go back" className={`cursor-pointer  ${onClose} `}>
           <ChevronLeft />
         </button>
         <div>Ghi chú của tôi</div>
@@ -106,8 +107,6 @@ export const NoteDetail = ({ showRecentList, onToggleRecentList }: EditorPanelPr
       <div className="relative flex flex-col flex-1 text-sm leading-relaxed  ">
         <Editor />
       </div>
-
-      {/* <SecondaryLayout></SecondaryLayout> */}
     </div>
   );
 };
