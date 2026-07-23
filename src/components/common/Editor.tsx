@@ -5,6 +5,7 @@ import {
   useEditor,
   useEditorState,
   Editor as TiptapEditor,
+  type ChainedCommands,
 } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -21,6 +22,7 @@ import {
   List,
   ListOrdered,
   LucideProvider,
+  Mic,
   Quote,
   RotateCcw,
   Strikethrough,
@@ -39,22 +41,31 @@ interface CommandItem {
   action: (editor: TiptapEditor) => void;
 }
 
+const BUBBLE_MENU_OPTIONS = {
+  placement: 'bottom' as const,
+  offset: 8,
+  flip: true,
+};
+
+const EXTENSIONS = [
+  StarterKit,
+  TextAlign.configure({
+    types: ['heading', 'paragraph'],
+    alignments: ['left', 'center', 'right', 'justify'],
+    defaultAlignment: 'left',
+  }),
+  TextStyleKit,
+  Color,
+];
+
 export const Editor = () => {
+  // eslint-disable-next-bg-line no-unused-vars
   const [showMenu, setShowMenu] = useState(true);
   const [isEditable, setIsEditable] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
-        defaultAlignment: 'left',
-      }),
-      TextStyleKit,
-      Color,
-    ],
+    extensions: EXTENSIONS,
     editable: isEditable,
     content: `
       <p>Khu vuc ghi noi dung</p>
@@ -163,96 +174,119 @@ export const Editor = () => {
     setSlashQuery('');
   };
 
-  const handleAlign = (type: string, isActive: boolean) => {
-    if (isActive) {
-      editor.chain().focus().unsetTextAlign().run();
-    } else {
-      editor.chain().focus().setTextAlign(type).run();
+  /**
+   * Hàm thực thi chuỗi lệnh Tiptap với vị trí động
+   * @param {Object} editor - Instance của Tiptap editor
+   * @param {Function} commandFn - Hàm nhận vào chain builder và gọi phương thức cần dùng
+   */
+
+  const executeCommand = (
+    editor: TiptapEditor | null,
+    commandFn: (chain: ChainedCommands) => ChainedCommands | boolean
+  ): boolean | undefined => {
+    if (!editor) return;
+    const result = commandFn(editor.chain().focus());
+
+    if (typeof result === 'boolean') {
+      return result;
     }
+
+    return result.run();
   };
+
+  type Alignment = 'left' | 'center' | 'right' | 'justify';
+  const handleAlign = (type: Alignment, isActive: boolean) => {
+    executeCommand(editor, (chain) =>
+      isActive ? chain.unsetTextAlign() : chain.setTextAlign(type)
+    );
+  };
+
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setShowMenu((old) => !old);
-          editor?.commands.focus();
-        }}
-        className="flex gap-3 p-2 box-border items-center"
-      >
-        <LucideProvider size={20} className="flex gap-2 cursor-pointer items-center">
-          <Bold
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`${isBold ? 'is-active stroke-3' : ''} `}
-          />
-          <Italic
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={isItalic ? 'is-active stroke-3' : ''}
-          />
-          <Underline
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={isUnder ? 'is-active stroke-3' : ''}
-          />
-          <Strikethrough
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={isStrikethrough ? 'is-active stroke-3' : ''}
-          />
-          <List
-          // onClick={() => editor.chain().focus().toggleBulletList().run()}
-          // className={isList ? 'stroke-3' : ''}
-          />
-          <ListOrdered
-          // onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          // className={isOrderedList ? 'is-active stroke-3' : ''}
-          />
-          <AlignLeft
-            onClick={() => editor.chain().focus().setTextAlign('left').run()}
-            className={isAlignLeft ? 'stroke-3' : ''}
-          />
-          <AlignCenter
-            onClick={() => handleAlign('center', isAlignCenter)}
-            className={isAlignCenter ? 'stroke-3' : ''}
-          />
-          <AlignRight
-            onClick={() => handleAlign('right', isAlignRight)}
-            className={isAlignRight ? 'stroke-3' : ''}
-          />
-          <AlignJustify
-            onClick={() => handleAlign('justify', isAlignJustify)}
-            className={isAlignJustify ? 'stroke-3' : ''}
-          />
-          <Quote
-            values={currentColor}
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={isQuote ? 'is-active stroke-3' : ''}
-          />
-          <Table />
-          <Image />
-          <FileText />
-          <div className="flex items-center  rounded-md bg-white/50 box-border">
-            <label
-              htmlFor="tiptap-color-picker"
-              className="box-border hover:bg-white rounded-l-sm  p-1 "
-            >
-              <Baseline style={{ color: currentColor }} />
-            </label>
-            <input
-              id="tiptap-color-picker"
-              type="color"
-              value={currentColor}
-              onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-              className="absolute w-0 h-0 opacity-0 pointer-events-none"
+      <div className="flex justify-between items-center">
+        <button
+          type="button"
+          onClick={() => {
+            setShowMenu((old) => !old);
+            editor?.commands.focus();
+          }}
+          className="flex p-2 gap-3 box-border items-center"
+        >
+          <LucideProvider size={20} className="">
+            <Bold
+              onClick={() => executeCommand(editor, (chain) => chain.toggleBold())}
+              className={`${isBold ? ' stroke-3' : ''} border-white/60 border `}
             />
-            <div className="box-border hover:bg-white rounded-r-sm  p-1 ">
-              <RotateCcw
-                size={10}
-                onClick={() => editor.chain().focus().unsetColor().run()}
-                className="cursor-pointer flex justify-center text-gray-400  h-4"
+            <Italic
+              onClick={() => executeCommand(editor, (chain) => chain.toggleItalic())}
+              className={isItalic ? ' stroke-3' : ''}
+            />
+            <Underline
+              onClick={() => executeCommand(editor, (chain) => chain.toggleUnderline())}
+              className={isUnder ? 'stroke-3' : ''}
+            />
+            <Strikethrough
+              onClick={() => executeCommand(editor, (chain) => chain.toggleStrike())}
+              className={isStrikethrough ? ' stroke-3' : ''}
+            />
+            <List
+            // onClick={() => editor.chain().focus().toggleBulletList().run()}
+            // className={isList ? 'stroke-3' : ''}
+            />
+            <ListOrdered
+            // onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            // className={isOrderedList ? 'is-active stroke-3' : ''}
+            />
+            <AlignLeft
+              onClick={() => executeCommand(editor, (chain) => chain.setTextAlign('left'))}
+              className={isAlignLeft ? 'is-active stroke-3' : ''}
+            />
+            <AlignCenter
+              onClick={() => handleAlign('center', isAlignCenter)}
+              className={isAlignCenter ? 'is-active stroke-3' : ''}
+            />
+            <AlignRight
+              onClick={() => handleAlign('right', isAlignRight)}
+              className={isAlignRight ? 'is-active stroke-3' : ''}
+            />
+            <AlignJustify
+              onClick={() => handleAlign('justify', isAlignJustify)}
+              className={isAlignJustify ? 'is-active stroke-3' : ''}
+            />
+            <Quote
+              values={currentColor}
+              onClick={() => executeCommand(editor, (chain) => chain.toggleBlockquote())}
+              className={isQuote ? 'stroke-3' : ''}
+            />
+            <Table />
+            <Image />
+            <FileText />
+            <div className="flex items-center  rounded-md bg-white/50 box-border">
+              <label
+                htmlFor="tiptap-color-picker"
+                className="box-border hover:bg-white rounded-l-sm  p-1 "
+              >
+                <Baseline style={{ color: currentColor }} />
+              </label>
+              <input
+                id="tiptap-color-picker"
+                type="color"
+                value={currentColor}
+                onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+                className="absolute w-0 h-0 opacity-0 pointer-events-none"
               />
+              <div className="box-border hover:bg-white rounded-r-sm  p-1 ">
+                <RotateCcw
+                  size={10}
+                  onClick={() => editor.chain().focus().unsetColor().run()}
+                  className="cursor-pointer flex justify-center text-gray-400  h-4"
+                />
+              </div>
             </div>
-          </div>
-        </LucideProvider>
-      </button>
+          </LucideProvider>
+        </button>
+        <Mic className="bg-brand-accent-primary text-white rounded-full p-1"></Mic>
+      </div>
       <div className="control-group">
         <label>
           <input type="checkbox" checked={isEditable} onChange={() => setIsEditable(!isEditable)} />
@@ -261,12 +295,16 @@ export const Editor = () => {
       </div>
 
       {editor && showMenu && (
-        <>
+        <div className="block">
           {/* 1. BUBBLE MENU TEXT FORMAT */}
           <BubbleMenu
+            key="tiptap-bubble-menu"
             editor={editor}
-            options={{ placement: 'bottom', offset: 8, flip: true }}
-            className="text-sm bg-white border border-[#ccc] rounded-sm p-1 px-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
+            options={BUBBLE_MENU_OPTIONS}
+            shouldShow={({ editor, from, to }) => {
+              return !editor.view.state.selection.empty && from !== to;
+            }}
+            className="text-sm bg-white/60 backdrop-blur-md border border-[#ccc] rounded-sm p-1 px-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
           >
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -378,9 +416,8 @@ export const Editor = () => {
               ))}
             </div>
           </FloatingMenu>
-        </>
+        </div>
       )}
-
       <EditorContent editor={editor} />
     </>
   );

@@ -11,7 +11,7 @@ export const Dropdown = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <div
-      className="relative shrink-0 flex max-w-[150px]  bg-white text-brand-accent-primary rounded-md box-border   "
+      className="relative shrink-0 flex max-w-[150px]  bg-white/60 back text-brand-accent-primary rounded-md box-border   "
       onClick={() => setIsOpen(!isOpen)}
     >
       <button className="flex w-full items-center min-h-5 justify-evenly px-2 box-border rounded-md text-sm cursor-pointer">
@@ -20,7 +20,7 @@ export const Dropdown = () => {
       </button>
 
       {isOpen && (
-        <ul className="absolute top-full mt-2 left-0 z-50 w-full bg-white/70 border-0 rounded-md flex flex-col">
+        <ul className="absolute top-full mt-2 left-0 z-50 w-full bg-white/60 backdrop-blur-md border-0 rounded-md flex flex-col">
           <li className="">
             <button
               onClick={() => {
@@ -28,7 +28,7 @@ export const Dropdown = () => {
                 setIsOpen(false);
               }}
               className={
-                'w-full h-min-h-5 h-8 border-b border-gray-300 text-[15px] box-border rounded-md bg-brand-accent-secondary hover:opacity-80 cursor-pointer'
+                'w-full h-min-h-5 h-8 border-b border-gray-300 text-[15px] box-border rounded-md bg-brand-accent-primary text-white hover:opacity-80 cursor-pointer'
               }
               // ${isSelected ?
               // : 'bg-white/50'}`}
@@ -48,7 +48,7 @@ export const Dropdown = () => {
               // ${isSelected ?
               // : 'bg-white/50'}`}
             >
-              1212sssssssssssssss
+              1212
             </button>
           </li>{' '}
           <li>

@@ -1,13 +1,13 @@
 import { Dropdown } from '@/components/common/Dropdown';
-import { Tag } from '../../common/Tag';
 import { ChevronLeft, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Editor } from '@/components/common/Editor';
+import { Tag } from '@/components/common/Tag';
 
 export const NoteDetail = () => {
   return (
-    <div className=" py-4 px-3 flex flex-col gap-3 bg-red/30 rounded-tr-xl rounded-br-xl overflow-x-hidden">
-      <div className="flex text-sm gap-1 text-brand-accent-fourth">
+    <div className=" py-4 px-3 flex flex-col gap-3 rounded-tr-xl rounded-br-xl overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto">
+      <div className="flex text-xs gap-1 text-brand-accent-fourth">
         <ChevronLeft />
         <div>Ghi chú của tôi</div>
         <div>/</div>
@@ -45,12 +45,12 @@ export const NoteDetail = () => {
         <div>Đang lưu...</div>
       </div>
 
-      <div className="bg-white/50 w-full rounded-xl p-3 flex gap-5">
+      <div className="bg-white/60 backdrop-blur-md border-white/70 mb-6 w-full rounded-xl p-3 flex gap-2">
         <Dropdown></Dropdown>
         <div
           className="flex flex-col
-         grow gap-2 max-w-full max-h-full justify-evenly bg-white/50 p-2 overflow-x-hidden
-         rounded-xl col-span-"
+         grow gap-2 max-w-full max-h-full justify-evenly p-2 overflow-x-hidden
+         rounded-xl bg-white/50 border border-white"
         >
           <div className=" flex gap-3">
             <form
@@ -81,9 +81,11 @@ export const NoteDetail = () => {
           </ScrollContainer>
         </div>
       </div>
-      <div className="relative flex flex-col gap-5">
+      <div className="relative flex flex-col flex-1 text-sm leading-relaxed  ">
         <Editor />
       </div>
+
+      {/* <SecondaryLayout></SecondaryLayout> */}
     </div>
   );
 };
