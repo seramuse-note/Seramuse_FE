@@ -1,13 +1,14 @@
 import { Dropdown } from '@/components/common/Dropdown';
-import { ChevronLeft, Plus } from 'lucide-react';
+import { ChevronLeft, PanelLeftClose, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
 
 export const NoteDetail = () => {
   return (
-    <div className=" py-4 px-3 flex flex-col gap-3 rounded-tr-xl rounded-br-xl overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto">
-      <div className="flex text-xs gap-1 text-brand-accent-fourth">
+    <div className=" py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto">
+      <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
+        <PanelLeftClose className="w-4 h-4" />
         <ChevronLeft />
         <div>Ghi chú của tôi</div>
         <div>/</div>
