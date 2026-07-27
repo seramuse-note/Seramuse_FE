@@ -122,3 +122,53 @@ code {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
 }
+
+/* Kích thước tổng thể của thanh cuộn */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Đường ray (Khung chứa con trượt cuộn) */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  /* Kính trong suốt nhẹ */
+  backdrop-filter: blur(10px);
+  /* Hiệu ứng làm mờ hậu cảnh */
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Viền kính mờ nhẹ */
+}
+
+/* Con trượt thanh cuộn (Thumb) */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  /* Kính phản quang nhẹ */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* Tạo hiệu ứng nổi và viền kính */
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.2);
+
+  /* Mẹo: Tạo khoảng cách nhỏ với viền đường ray */
+  background-clip: padding-box;
+}
+
+/* Hiệu ứng khi rê chuột vào con trượt (Hover) */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Hiệu ứng khi đang nhấn giữ con trượt (Active) */
+::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Góc giao nhau giữa cuộn dọc và cuộn ngang */
+::-webkit-scrollbar-corner {
+  background: rgba(255, 255, 255, 0.05);
+}

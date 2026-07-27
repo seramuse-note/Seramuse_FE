@@ -1,23 +1,39 @@
 // import Tiptap from '@/components/common/Tiptap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navbar } from './Navbar';
 import { NoteDetail } from './NoteDetail';
 import { Sidebar } from './Sidebar';
+// import { useGetNotesQuery } from '@/services/notesApi';
+
+export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
 export const MainLayout = () => {
-  const [selectedNoteId, setSeletedNoteId] = useState<string | null>(null);
-  const [showRecentList, setShowRecentList] = useState<boolean>(true);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('FULL_SIDEBAR');
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const showEditor = Boolean(selectedNoteId);
 
+  const handleSelectNote = (id: string) => {
+    setSelectedNoteId(id);
+    setLayoutMode('SPLIT');
+  };
+
   const handleToggleRecentList = () => {
-    setShowRecentList((prev) => !prev);
+    setLayoutMode((prev) => (prev === 'FULL_EDITOR' ? 'SPLIT' : 'FULL_EDITOR'));
   };
 
   const handleCloseEditor = () => {
-    setSeletedNoteId(null);
-    setShowRecentList(true);
+    setLayoutMode('FULL_SIDEBAR');
+    setSelectedNoteId(null);
   };
 
+  useEffect(() => {
+    console.log('selectedNoteId', selectedNoteId);
+    console.log('showEditor', showEditor);
+  }, [selectedNoteId]);
+
+  useEffect(() => {
+    console.log('layoutMode', layoutMode);
+  }, [layoutMode]);
   return (
     <div
       className={`flex h-full w-full bg-modern-glow/5  
@@ -31,40 +47,41 @@ export const MainLayout = () => {
         <Navbar></Navbar>
       </div>
       <div
-        className={`h-full transition-all 
-        duration-300 ease-in-out overflow-hidden 
-        transform-gpu min-w-0
-       ${
-         !showEditor
-           ? 'flex-1 opacity-100'
-           : showRecentList
-             ? 'w-80 shrink-0 opacity-100'
-             : 'w-0 shrink-0 opacity-0 pointer-events-none'
-       }`}
+        className={`h-full 
+        overflow-hidden 
+        transform-gpu 
+        min-w-0
+       ${layoutMode === 'FULL_SIDEBAR' ? 'w-full' : ''}
+       ${layoutMode === 'SPLIT' ? 'w-70 border-r border-white/50 opacity-100' : ''}
+       ${layoutMode === 'FULL_EDITOR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : ''}
+      `}
       >
-        <div className="h-full justify-center">
+        <div className="h-full w-full min-w-70 ">
           <Sidebar
-            showRecentList={showRecentList}
-            onSelectNote={(id) => setSeletedNoteId(id)}
-            selectedNoteId={'note-1'}
-            isFullWidth={!showEditor}
+            layoutMode={layoutMode}
+            selectedNoteId={selectedNoteId}
+            onSelectNote={handleSelectNote}
             // notesList={MOCK_NOTES}
           />
         </div>
       </div>
-      <div
-        className={`h-full transition-all duration-300 ease-in-out overflow-hidden min-w-0 
-        ${showEditor ? 'flex-1 opacity-100' : 'w-0 shrink-0 opacity-0 pointer-events-none'}
-        `}
-      >
-        {showEditor && (
+      {showEditor && (
+        <div
+          className={`h-full
+              overflow-hidden 
+       ${layoutMode === 'SPLIT' ? 'flex-1' : ''}
+       ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
+       ${layoutMode === 'FULL_SIDEBAR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : 'opacity-100'}
+      `}
+        >
           <NoteDetail
-            showRecentList={showRecentList}
+            layoutMode={layoutMode}
+            // selectedNoteId={selectedNoteId}
             onToggleRecentList={handleToggleRecentList}
-            onClose={handleCloseEditor}
+            onCloseEditor={handleCloseEditor}
           ></NoteDetail>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

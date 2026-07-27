@@ -3,33 +3,59 @@ import { ChevronLeft, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
+import type { LayoutMode } from './MainLayout';
 
 interface EditorPanelProps {
-  showRecentList: boolean;
+  layoutMode?: LayoutMode;
+  // selectedNoteId: string;
   onToggleRecentList: () => void;
-  onClose: () => void;
+  onCloseEditor: () => void;
 }
 
-export const NoteDetail = ({ showRecentList, onToggleRecentList, onClose }: EditorPanelProps) => {
+export const NoteDetail = ({
+  layoutMode,
+  // selectedNoteId,
+  onToggleRecentList,
+  onCloseEditor,
+}: EditorPanelProps) => {
   return (
     <div
-      className={`h-full py-4 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
-     overflow-x-hidden bg-white/80 backdrop-blur-xl border border-white/80 
-     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto transition-all duration-300
-     ${showRecentList ? 'w-full' : ''}`}
+      className={`h-full py-5 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
+     overflow-x-hidden box-border bg-white/80 backdrop-blur-xl  
+     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto 
+     ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
+     `}
     >
       <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
         <button
           onClick={onToggleRecentList}
-          title={showRecentList ? 'Collapse the list' : 'Open list'}
+          title={
+            layoutMode === 'SPLIT'
+              ? 'Collapse the list'
+              : layoutMode === 'FULL_EDITOR'
+                ? 'Open list'
+                : ''
+          }
         >
-          {showRecentList ? (
+          {layoutMode === 'SPLIT' ? (
             <PanelLeftClose className="w-4 h-4 cursor-pointer" />
-          ) : (
+          ) : layoutMode === 'FULL_EDITOR' ? (
             <PanelLeftOpen className="w-4 h-4 cursor-pointer" />
+          ) : (
+            ''
           )}
+          {/* ${
+            <{PanelLeftClose className="w-4 h-4 cursor-pointer" />
+           :            layoutMode === 'FULL_EDITOR' ?
+          
+            (<PanelLeftOpen className="w-4 h-4 cursor-pointer" />)
+           } */}
         </button>
-        <button onClick={onClose} title="Go back" className={`cursor-pointer  ${onClose} `}>
+        <button
+          onClick={onCloseEditor}
+          title="Go back"
+          className={`cursor-pointer  ${onCloseEditor} `}
+        >
           <ChevronLeft />
         </button>
         <div>Ghi chú của tôi</div>
@@ -42,7 +68,11 @@ export const NoteDetail = ({ showRecentList, onToggleRecentList, onClose }: Edit
           className="text-2xl font-bold to-brand-accent-primary outline-0 flex-1"
           placeholder="Ghi chú tâm trạng hôm nay"
         />
-        <div className="flex items-center gap-1 text-[10px] h-fit bg-brand-accent-primary text-white rounded-md px-2 cursor-pointer hover:opacity-80">
+        <div
+          className="flex items-center gap-1 text-[10px] h-fit
+         bg-brand-accent-primary text-white rounded-md px-2
+          cursor-pointer hover:opacity-80"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10"
