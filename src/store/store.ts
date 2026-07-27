@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 // import authReducer from '../features/auth/authSlice';
 import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { notesApi } from '../services/notesApi';
+import notesApi from '../services/notesApi';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 export const store = configureStore({
