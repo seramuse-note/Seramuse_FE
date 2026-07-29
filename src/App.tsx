@@ -1,11 +1,14 @@
-import Header from './components/layout/Header';
-import { MainLayout } from './pages/Home/NoteLayout/MainLayout';
+import Header from './components/layout/HeaderLayout';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
-    <div className="h-screen w-screen overflow-auto bg-modern-glow flex justify-center px-8 py-4 flex-col flex-2 box-border gap-4">
-      <Header></Header>
-      <MainLayout></MainLayout>
+    <div
+      className="h-screen w-screen overflow-hidden bg-modern-glow 
+    flex flex-col justify-center px-8 py-4 gap-4 box-border "
+    >
+      <Header />
+      <HomePage />
     </div>
   );
 }

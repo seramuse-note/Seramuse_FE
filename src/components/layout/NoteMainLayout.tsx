@@ -1,13 +1,12 @@
 // import Tiptap from '@/components/common/Tiptap';
 import { useEffect, useState } from 'react';
-import { Navbar } from './Navbar';
-import { NoteDetail } from './NoteDetail';
-import { Sidebar } from './Sidebar';
+import { NoteSidebar } from '../notes/NoteSidebar';
+import { NoteEditor } from '../notes/NoteEditor';
 // import { useGetNotesQuery } from '@/services/notesApi';
 
 export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
-export const MainLayout = () => {
+export const NoteMainLayout = () => {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('FULL_SIDEBAR');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const showEditor = Boolean(selectedNoteId);
@@ -34,52 +33,44 @@ export const MainLayout = () => {
   useEffect(() => {
     console.log('layoutMode', layoutMode);
   }, [layoutMode]);
+
   return (
     <div
-      className={`flex h-full w-full bg-modern-glow/5  
-    border border-white/40 border-b-white/15 
-    backdrop box-border backdrop-blur-md rounded-xl 
+      className={`flex h-full w-full bg-modern-glow/15  
+    border border-white/40 border-b-white/15  box-border
+    backdrop backdrop-blur-md rounded-r-xl 
     shadow-[0_25px_50px_-12px_rgba(134,0,60,0.15)] 
     transition-all duration-300 overflow-hidden
    `}
     >
-      <div className="w-16 h-full shrink-0 z-20">
-        <Navbar></Navbar>
-      </div>
       <div
-        className={`h-full 
-        overflow-hidden 
-        transform-gpu 
-        min-w-0
+        className={`h-full min-h-0 min-w-0 overflow-hidden transform-gpu
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-full' : ''}
        ${layoutMode === 'SPLIT' ? 'w-70 border-r border-white/50 opacity-100' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : ''}
       `}
       >
-        <div className="h-full w-full min-w-70 ">
-          <Sidebar
-            layoutMode={layoutMode}
-            selectedNoteId={selectedNoteId}
-            onSelectNote={handleSelectNote}
-            // notesList={MOCK_NOTES}
-          />
-        </div>
+        <NoteSidebar
+          layoutMode={layoutMode}
+          selectedNoteId={selectedNoteId}
+          onSelectNote={handleSelectNote}
+          // notesList={MOCK_NOTES}
+        />
       </div>
       {showEditor && (
         <div
-          className={`h-full
-              overflow-hidden 
+          className={`h-full overflow-auto min-w-0 min-h-0
        ${layoutMode === 'SPLIT' ? 'flex-1' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : 'opacity-100'}
       `}
         >
-          <NoteDetail
+          <NoteEditor
             layoutMode={layoutMode}
             // selectedNoteId={selectedNoteId}
             onToggleRecentList={handleToggleRecentList}
             onCloseEditor={handleCloseEditor}
-          ></NoteDetail>
+          />
         </div>
       )}
     </div>

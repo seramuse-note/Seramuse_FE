@@ -29,7 +29,7 @@ import {
   Table,
   Underline,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
@@ -61,12 +61,10 @@ const EXTENSIONS = [
 export const Editor = () => {
   // eslint-disable-next-bg-line no-unused-vars
   const [showMenu, setShowMenu] = useState(true);
-  const [isEditable, setIsEditable] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
 
   const editor = useEditor({
     extensions: EXTENSIONS,
-    editable: isEditable,
     content: `
       <p>Khu vuc ghi noi dung</p>
     `,
@@ -85,12 +83,6 @@ export const Editor = () => {
       }
     },
   });
-
-  useEffect(() => {
-    if (editor) {
-      editor.setEditable(isEditable);
-    }
-  }, [isEditable, editor]);
 
   const {
     isBold,
@@ -202,15 +194,18 @@ export const Editor = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-between items-center">
-        <button
-          type="button"
+    <div className="flex flex-col h-full min-h-0 w-full">
+      <div
+        className="flex items-center justify-between  box-border
+          w-full p-2 shrink-0 bg-white rounded-xl
+          border border-gray-200 overflow-x-auto overflow-y-auto gap-1"
+      >
+        <div
           onClick={() => {
             setShowMenu((old) => !old);
             editor?.commands.focus();
           }}
-          className="flex p-2 gap-3 box-border items-center"
+          className="flex gap-3 box-border items-center"
         >
           <LucideProvider size={20} className="">
             <Bold
@@ -261,10 +256,11 @@ export const Editor = () => {
             <Table />
             <Image />
             <FileText />
-            <div className="flex items-center  rounded-md bg-white/50 box-border">
+            <div className="flex items-center  rounded-md border border-gray-200 p-1 box-border">
               <label
                 htmlFor="tiptap-color-picker"
-                className="box-border hover:bg-white rounded-l-sm  p-1 "
+                className="box-border hover:bg-white hover:cursor-pointer rounded-l-sm"
+                title="Set text color"
               >
                 <Baseline style={{ color: currentColor }} />
               </label>
@@ -275,7 +271,7 @@ export const Editor = () => {
                 onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
                 className="absolute w-0 h-0 opacity-0 pointer-events-none"
               />
-              <div className="box-border hover:bg-white rounded-r-sm  p-1 ">
+              <div className="box-border hover:bg-white rounded-r-sm  ">
                 <RotateCcw
                   size={10}
                   onClick={() => editor.chain().focus().unsetColor().run()}
@@ -284,24 +280,17 @@ export const Editor = () => {
               </div>
             </div>
           </LucideProvider>
-        </button>
+        </div>
         <button
-          className="bg-brand-accent-primary  rounded-full p-2 cursor-pointer"
+          className="bg-brand-accent-primary hover: opacity-90 
+           rounded-full p-2 cursor-pointer"
           title="Use voice chat"
         >
           <Mic className="text-white w-4 h-4" />
         </button>
       </div>
-      <div className="control-group">
-        <label>
-          <input type="checkbox" checked={isEditable} onChange={() => setIsEditable(!isEditable)} />
-          Editable
-        </label>
-      </div>
-
       {editor && showMenu && (
         <div className="block">
-          {/* 1. BUBBLE MENU TEXT FORMAT */}
           <BubbleMenu
             key="tiptap-bubble-menu"
             editor={editor}
@@ -309,7 +298,7 @@ export const Editor = () => {
             shouldShow={({ editor, from, to }) => {
               return !editor.view.state.selection.empty && from !== to;
             }}
-            className="text-sm bg-white/60 backdrop-blur-md border border-[#ccc] rounded-sm p-1 px-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
+            className="text-sm bg-white/60 backdrop-blur-md border border-[#ccc] rounded-sm px-2 shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
           >
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -321,7 +310,7 @@ export const Editor = () => {
             </button>
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`isItalic ? 'is-active' : '' flex items-center cursor-pointer gap-2`}
+              className={`${isItalic ? 'is-active' : ''} flex items-center cursor-pointer gap-2`}
               type="button"
             >
               <Italic size={15} />
@@ -423,7 +412,12 @@ export const Editor = () => {
           </FloatingMenu>
         </div>
       )}
-      <EditorContent editor={editor} />
-    </>
+      <div
+        className="flex-1 min-h-0 w-full h-full overflow-y-auto
+       bg-white mt-3 rounded-xl border border-gray-100"
+      >
+        <EditorContent editor={editor} className="h-full" />
+      </div>
+    </div>
   );
 };

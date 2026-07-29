@@ -3,7 +3,7 @@ import { ChevronLeft, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
-import type { LayoutMode } from './MainLayout';
+import type { LayoutMode } from '../layout/NoteMainLayout';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
@@ -12,7 +12,7 @@ interface EditorPanelProps {
   onCloseEditor: () => void;
 }
 
-export const NoteDetail = ({
+export const NoteEditor = ({
   layoutMode,
   // selectedNoteId,
   onToggleRecentList,
@@ -20,11 +20,14 @@ export const NoteDetail = ({
 }: EditorPanelProps) => {
   return (
     <div
-      className={`h-full py-5 px-3 z-0 flex flex-col gap-3 rounded-tr-xl rounded-br-xl
-     overflow-x-hidden box-border bg-white/80 backdrop-blur-xl  
-     shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] overflow-y-auto 
-     ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
-     `}
+      className={` flex-1 h-full min-w-0 min-h-0 flex flex-col
+         overflow-x-auto overflow-y-hidden
+          py-5 px-3 z-0 gap-3 
+          rounded-tr-xl rounded-br-xl box-border 
+        bg-white/80 backdrop-blur-xl  
+        shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] 
+        ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
+        `}
     >
       <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
         <button
@@ -45,17 +48,13 @@ export const NoteDetail = ({
             ''
           )}
           {/* ${
-            <{PanelLeftClose className="w-4 h-4 cursor-pointer" />
-           :            layoutMode === 'FULL_EDITOR' ?
-          
-            (<PanelLeftOpen className="w-4 h-4 cursor-pointer" />)
-           } */}
+              <{PanelLeftClose className="w-4 h-4 cursor-pointer" />
+            :            layoutMode === 'FULL_EDITOR' ?
+            
+              (<PanelLeftOpen className="w-4 h-4 cursor-pointer" />)
+            } */}
         </button>
-        <button
-          onClick={onCloseEditor}
-          title="Go back"
-          className={`cursor-pointer  ${onCloseEditor} `}
-        >
+        <button onClick={onCloseEditor} title="Go back" className={`cursor-pointer `}>
           <ChevronLeft />
         </button>
         <div>Ghi chú của tôi</div>
@@ -70,8 +69,8 @@ export const NoteDetail = ({
         />
         <div
           className="flex items-center gap-1 text-[10px] h-fit
-         bg-brand-accent-primary text-white rounded-md px-2
-          cursor-pointer hover:opacity-80"
+          bg-brand-accent-primary text-white rounded-md px-2
+            cursor-pointer hover:opacity-80"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -98,12 +97,12 @@ export const NoteDetail = ({
         <div>Đang lưu...</div>
       </div>
 
-      <div className="bg-white/60 backdrop-blur-md border-white/70 mb-6 w-full rounded-xl p-3 flex gap-2">
+      <div className="bg-white/60 backdrop-blur-md border-white/70 mb-2 w-full rounded-xl p-3 flex gap-2">
         <Dropdown></Dropdown>
         <div
           className="flex flex-col
-         grow gap-2 max-w-full max-h-full justify-evenly p-2 overflow-x-hidden
-         rounded-xl bg-white/50 border border-white"
+          grow gap-2 max-w-full max-h-full justify-evenly p-2 overflow-x-hidden
+          rounded-xl bg-white/50 border border-white"
         >
           <div className=" flex gap-3">
             <form
@@ -122,19 +121,15 @@ export const NoteDetail = ({
           </div>
           <ScrollContainer
             vertical={false}
-            className="flex overflow-x-auto min-w-0 scrollbar-none cursor-grabbing"
+            className="flex overflow-x-scroll min-w-0 scrollbar-none cursor-grabbing"
           >
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
             <Tag></Tag>
             <Tag></Tag>
             <Tag></Tag>
           </ScrollContainer>
         </div>
       </div>
-      <div className="relative flex flex-col flex-1 text-sm leading-relaxed  ">
+      <div className="flex flex-col flex-1 min-h-0 w-full">
         <Editor />
       </div>
     </div>

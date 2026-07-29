@@ -1,6 +1,6 @@
 import Avatar from '../common/Avatar';
 
-function Header() {
+function HeaderLayout() {
   return (
     <div className="w-full h-fit  min-h-1 rounded-tl-4xl rounded-br-4xl  rounded-bl-xl rounded-tr-xl text-brand-accent-primary">
       <div className="w-full h-fit px-5 py-2 bg-white/50 rounded-tl-4xl rounded-br-4xl rounded-bl-xl rounded-tr-xl flex justify-center items-center gap-5">
@@ -35,4 +35,4 @@ function Header() {
     </div>
   );
 }
-export default Header;
+export default HeaderLayout;
