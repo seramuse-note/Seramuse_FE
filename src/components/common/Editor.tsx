@@ -194,10 +194,16 @@ export const Editor = () => {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 w-full">
+    <div className="flex flex-col h-full min-h-0 w-full gap-2">
+      <div
+        className="flex-1 min-h-0 w-full h-full overflow-y-auto
+       bg-white rounded-xl border border-gray-100"
+      >
+        <EditorContent editor={editor} className="h-full " />
+      </div>{' '}
       <div
         className="flex items-center justify-between  box-border
-          w-full p-2 shrink-0 bg-white rounded-xl
+          w-full p-1 px-2 shrink-0 bg-white rounded-xl
           border border-gray-200 overflow-x-auto overflow-y-auto gap-1"
       >
         <div
@@ -205,24 +211,24 @@ export const Editor = () => {
             setShowMenu((old) => !old);
             editor?.commands.focus();
           }}
-          className="flex gap-3 box-border items-center"
+          className="flex gap-2 box-border items-center"
         >
-          <LucideProvider size={20} className="">
+          <LucideProvider size={15} className="">
             <Bold
               onClick={() => executeCommand(editor, (chain) => chain.toggleBold())}
-              className={`${isBold ? ' stroke-3' : ''} border-white/60 border `}
+              className={`${isBold ? ' stroke-3' : ''} border-white/60 border cursor-pointer`}
             />
             <Italic
               onClick={() => executeCommand(editor, (chain) => chain.toggleItalic())}
-              className={isItalic ? ' stroke-3' : ''}
+              className={`${isItalic ? ' stroke-3' : ''} cursor-pointer`}
             />
             <Underline
               onClick={() => executeCommand(editor, (chain) => chain.toggleUnderline())}
-              className={isUnder ? 'stroke-3' : ''}
+              className={`${isUnder ? 'stroke-3' : ''} cursor-pointer`}
             />
             <Strikethrough
               onClick={() => executeCommand(editor, (chain) => chain.toggleStrike())}
-              className={isStrikethrough ? ' stroke-3' : ''}
+              className={`${isStrikethrough ? ' stroke-3' : ''} cursor-pointer`}
             />
             <List
             // onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -234,24 +240,26 @@ export const Editor = () => {
             />
             <AlignLeft
               onClick={() => executeCommand(editor, (chain) => chain.setTextAlign('left'))}
-              className={isAlignLeft ? 'is-active stroke-3' : ''}
+              className={`${isAlignLeft ? 'is-active stroke-3' : ''} cursor-pointer`}
             />
             <AlignCenter
               onClick={() => handleAlign('center', isAlignCenter)}
-              className={isAlignCenter ? 'is-active stroke-3' : ''}
+              className={`${isAlignCenter ? 'is-active stroke-3' : ''}cursor-pointer`}
+              cursor-pointer
             />
             <AlignRight
               onClick={() => handleAlign('right', isAlignRight)}
-              className={isAlignRight ? 'is-active stroke-3' : ''}
+              className={`${isAlignRight ? 'is-active stroke-3' : ''}`}
+              cursor-pointer
             />
             <AlignJustify
               onClick={() => handleAlign('justify', isAlignJustify)}
-              className={isAlignJustify ? 'is-active stroke-3' : ''}
+              className={`${isAlignJustify ? 'is-active stroke-3' : ''}cursor-pointer`}
             />
             <Quote
               values={currentColor}
               onClick={() => executeCommand(editor, (chain) => chain.toggleBlockquote())}
-              className={isQuote ? 'stroke-3' : ''}
+              className={`${isQuote ? 'stroke-3' : ''} cursor-pointer`}
             />
             <Table />
             <Image />
@@ -290,7 +298,7 @@ export const Editor = () => {
         </button>
       </div>
       {editor && showMenu && (
-        <div className="block">
+        <>
           <BubbleMenu
             key="tiptap-bubble-menu"
             editor={editor}
@@ -410,14 +418,8 @@ export const Editor = () => {
               ))}
             </div>
           </FloatingMenu>
-        </div>
+        </>
       )}
-      <div
-        className="flex-1 min-h-0 w-full h-full overflow-y-auto
-       bg-white mt-3 rounded-xl border border-gray-100"
-      >
-        <EditorContent editor={editor} className="h-full" />
-      </div>
     </div>
   );
 };
