@@ -2,6 +2,7 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { ChevronLeft, PanelLeftClose, PanelLeftOpen, Plus, TagIcon } from 'lucide-react';
 import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
+import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 
 interface EditorPanelProps {
@@ -96,42 +97,48 @@ export const NoteEditor = ({
         <div>Đang lưu...</div>
       </div>
 
-      <div className="flex  z-20 gap-2 ">
-        <div className="flex z-20 gap-2 ">
-          <Dropdown></Dropdown>
+      <div className="flex z-20 gap-3.5 text-sm items-center w-full">
+        <div className="shrink-0 z-20">
+          <Dropdown />
+        </div>
+        <div className="flex flex-1 min-w-0  gap-3 shadow-sm  px-3 py-1.5 rounded-2xl">
           <div className=" flex gap-3 ">
             <div
-              className="flex items-center bg-white border border-brand-accent-secondary rounded-lg px-2 py-1 shadow-sm shrink-0 
-            focus-within:ring-2 focus-within:ring-brand-accent-secondary/20
-             focus-within:border-brand-accent-secondary transition-all  overflow-x-hidden"
+              className=" flex shrink-0 gap-2 items-center px-3 py-1 text-[12px] text-brand-accent-primary font-medium
+              bg-white/60 outline-none backdrop-blur-md  shadow-sm hover:bg-white/70 
+              border border-white/60 rounded-xl active:scale-98
+              box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
+              overflow-x-hidden"
             >
               <TagIcon className="w-3.5 h-3.5 text-brand-accent-secondary mr-1.5" />
               <input
                 type="text"
                 placeholder="Add tag..."
-                className="bg-transparent outline-none text-xs w-20 placeholder:text-gray-400 text-gray-700"
+                className="bg-transparent outline-none text-xs w-20 placeholder:text-brand-accent-tertiary text-brand-accent-primary"
               />
-              <button
-                type="button"
-                className="p-0.5 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700 transition-colors"
-                title="Add"
-              >
-                <Plus className="w-3.5 h-3.5" />
+              <button type="button" className="px-3 py-1 rounded-lg cursor-pointer" title="Add">
+                <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
               </button>
             </div>
           </div>
-        </div>
-        <div
-          className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1 p-1
-         bg-white border border-gray-200 rounded-lg "
-        >
-          <Tag></Tag>
-          <Tag></Tag>
-          <Tag></Tag>
-          <Tag></Tag>
+
+          <ScrollContainer
+            vertical={false}
+            className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1 px-3 py-1 box-border  
+            scrollbar-none 
+             hover:cursor-grab active:cursor-grabbing"
+          >
+            <Tag></Tag>
+            <Tag></Tag>
+            <Tag></Tag>
+            <Tag></Tag>
+            <Tag></Tag>
+            <Tag></Tag>
+            <Tag></Tag>
+          </ScrollContainer>
         </div>
       </div>
-      <div className="flex flex-col flex-1 min-h-0 w-full">
+      <div className="flex flex-col flex-1 min-h-0 w-full z-1">
         <Editor />
       </div>
     </div>

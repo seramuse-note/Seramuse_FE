@@ -1,187 +1,80 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-// interface DropdownOption {
-//   value: string;
-//   label: string;
-// }
+interface DropdownOption {
+  value: string;
+  label: string;
+}
 
-// export const Dropdown = ({ options }: { options: DropdownOption[] }) => {
-export const Dropdown = () => {
+const DEFAULT_OPTIONS: DropdownOption[] = [
+  { value: 'Sad', label: 'Sad' },
+  { value: 'Normal', label: 'Normal' },
+  { value: 'Happy', label: 'Happy' },
+  { value: 'Excited', label: 'Excited' },
+];
+
+interface DropdownProps {
+  options?: DropdownOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export const Dropdown = ({ options = DEFAULT_OPTIONS, value, onChange }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string>(value || options[0]?.value);
+  // const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (value: string) => {
+    setSelected(value);
+    setIsOpen(!isOpen);
+    onChange?.(value);
+  };
+
+  const selectedLabel = options.find((opt) => opt.value === selected)?.label || 'Trạng thái';
+
   return (
-    <div
-      className="relative shrink-0 flex max-w-37.5
-        bg-white text-brand-accent-primary border
-        border-brand-accent-secondary shadow-sm rounded-md box-border
-        focus-within:ring-brand-accent-primary/20  transition-all"
-      onClick={() => setIsOpen(!isOpen)}
-    >
+    <div className="relative flex gap-2 min-h-0  shrink-0 " onClick={() => setIsOpen(!isOpen)}>
       <button
-        className="flex w-full items-center min-h-0
-      justify-evenly px-2 box-border rounded-md text-[12px] cursor-pointer
-      hover:bg-gray-100/80 transition-all "
+        className="flex shrink-0 items-center px-4.5 py-2 text-[12px]  text-brand-accent-primary font-medium
+       bg-white/50 backdrop-blur-md hover:bg-white/70
+        border border-white/60 shadow-sm rounded-xl active:scale-95 active:shadow-md
+        box-border transition-all duration-200 cursor-pointer"
       >
-        <div> Trạng thái</div>
-        <ChevronDown className="w-3 h-3 flex" />
+        <div className=" w-15"> {selectedLabel}</div>
+        <ChevronDown
+          className={`w-3.5 h-3.5  text-gray-400  min-w-0 transition-transform duration-300 ${
+            isOpen ? 'rotate-180 text-brand-accent-primary' : ''
+          }`}
+        />
       </button>
 
       {isOpen && (
         <ul
-          className="absolute top-full mt-2 left-0 w-full
-         bg-white border border-gray-200 backdrop-blur-md rounded-md
-          flex flex-col min-h-0 h-50 overflow-y-auto"
+          className="absolute top-full mt-2  left-0 w-full
+         bg-transparent backdrop-blur-md text-[13px]
+        border border-white/60 shadow-md rounded-2xl box-border
+          flex flex-col min-h-0 overflow-y-auto cursor-pointer justify-center"
         >
-          <li className="">
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 border-b border-gray-300 text-[15px] box-border rounded-md bg-brand-accent-primary text-white hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer '
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>{' '}
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                // setIsSelected();
-                setIsOpen(false);
-              }}
-              className={
-                'w-full h-min-h-5 h-8 text-[15px] rounded-md hover:opacity-80 cursor-pointer'
-              }
-              // ${isSelected ?
-              // : 'bg-white/50'}`}
-            >
-              1212
-            </button>
-          </li>
+          {options.map((op) => {
+            const isSelected = op.value === selected;
+            return (
+              <li
+                className={`px-2 py-1 flex justify-center items-center-safe
+                 ${isSelected ? 'text-brand-accent-secondary font-medium hover:shadow-none' : 'hover:font-medium hover:shadow-sm'}`}
+              >
+                <button
+                  key={op.value}
+                  type="button"
+                  onClick={() => {
+                    handleSelect(op.value);
+                  }}
+                  className={` ${selected ? '' : 'bg-white/50'}  w-15 cursor-pointer  active:scale-95`}
+                >
+                  {op.value}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
