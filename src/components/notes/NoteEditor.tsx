@@ -4,6 +4,7 @@ import { Editor } from '@/components/common/Editor';
 import { Tag } from '@/components/common/Tag';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
+import { useState } from 'react';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
@@ -12,12 +13,58 @@ interface EditorPanelProps {
   onCloseEditor: () => void;
 }
 
+interface TagItem {
+  id: string;
+  label: string;
+  color: string;
+}
+
 export const NoteEditor = ({
   layoutMode,
   // selectedNoteId,
   onToggleRecentList,
   onCloseEditor,
 }: EditorPanelProps) => {
+  const [value, setValue] = useState('');
+  const [tags, setTags] = useState<TagItem[]>([
+    { id: '1', label: 'Học tập', color: 'red' },
+    { id: '2', label: 'Công việc', color: 'red' },
+    { id: '3', label: 'Dự án Glass', color: 'red' },
+  ]);
+
+  const getRandomColor = () => {
+    const hue = Math.floor(Math.random() * 360);
+    return `hsl(${hue}, 95%, 30%)`;
+  };
+
+  const handleRemoveTag = (idToRemove: string) => {
+    setTags((prevTags) => prevTags.filter((tag) => tag.id !== idToRemove));
+  };
+
+  const handleAddTag = () => {
+    const isExist = tags.some(
+      (tag) => value.trim().toUpperCase() === tag.label.trim().toUpperCase()
+    );
+    const randomColor = getRandomColor();
+
+    if (!value.trim() || isExist) return;
+
+    const newTag: TagItem = {
+      id: Date.now().toString(),
+      label: value.toUpperCase(),
+      color: randomColor,
+    };
+    setTags((prevTags) => [...prevTags, newTag]);
+    setValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
   return (
     <div
       className={` flex-1 h-full min-w-0 min-h-0 flex flex-col
@@ -97,26 +144,34 @@ export const NoteEditor = ({
         <div>Đang lưu...</div>
       </div>
 
-      <div className="flex z-20 gap-3.5 text-sm items-center w-full">
+      <div className="flex z-20 gap-2 text-sm items-center w-full">
         <div className="shrink-0 z-20">
           <Dropdown />
         </div>
-        <div className="flex flex-1 min-w-0  gap-3 shadow-sm  px-3 py-1.5 rounded-2xl">
-          <div className=" flex gap-3 ">
+        <div className="flex flex-1 min-w-0  gap-2 rounded-2xl items-center">
+          <div className="gap-3 shrink-0">
             <div
               className=" flex shrink-0 gap-2 items-center px-3 py-1 text-[12px] text-brand-accent-primary font-medium
-              bg-white/60 outline-none backdrop-blur-md  shadow-sm hover:bg-white/70 
-              border border-white/60 rounded-xl active:scale-98
+              outline-none backdrop-blur-md  shadow-sm hover:bg-white/70 
+              rounded-xl active:scale-98
               box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
               overflow-x-hidden"
             >
-              <TagIcon className="w-3.5 h-3.5 text-brand-accent-secondary mr-1.5" />
+              <TagIcon className="w-3.5 h-3.5 text-brand-accent-secondary mr-1" />
               <input
                 type="text"
                 placeholder="Add tag..."
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="bg-transparent outline-none text-xs w-20 placeholder:text-brand-accent-tertiary text-brand-accent-primary"
               />
-              <button type="button" className="px-3 py-1 rounded-lg cursor-pointer" title="Add">
+              <button
+                type="button"
+                className="px-3 py-1 rounded-lg cursor-pointer"
+                title="Add"
+                onClick={handleAddTag}
+              >
                 <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
               </button>
             </div>
@@ -124,17 +179,16 @@ export const NoteEditor = ({
 
           <ScrollContainer
             vertical={false}
-            className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1 px-3 py-1 box-border  
-            scrollbar-none 
-             hover:cursor-grab active:cursor-grabbing"
+            className={`flex items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
+    ${
+      tags.length > 0
+        ? 'p-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
+        : 'p-0 bg-transparent border-transparent shadow-none'
+    }`}
           >
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
-            <Tag></Tag>
+            {tags.map((tag) => (
+              <Tag id={tag.id} tag={tag} onRemove={handleRemoveTag} />
+            ))}
           </ScrollContainer>
         </div>
       </div>
