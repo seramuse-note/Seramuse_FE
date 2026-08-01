@@ -79,6 +79,7 @@ export const NoteEditor = ({
       <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
         <button
           onClick={onToggleRecentList}
+          className="block-0 hidden md:block md:w-fit md:h-fit "
           title={
             layoutMode === 'SPLIT'
               ? 'Collapse the list'
@@ -108,14 +109,15 @@ export const NoteEditor = ({
         <div>/</div>
         <div className="text-brand-accent-tertiary">Ghi chú tâm trạng hôm nay</div>
       </div>
-      <div className="flex justify-between gap-50">
+      <div className="flex justify-between gap-2 md:gap-50 shirnk-0">
         <input
           type="text"
-          className="text-xl font-bold to-brand-accent-primary outline-0 flex-1"
+          className=" font-bold to-brand-accent-primary outline-0 flex-1 shrink-0 text-xs 
+          md:text-xl"
           placeholder="Ghi chú tâm trạng hôm nay"
         />
         <div
-          className="flex items-center gap-1 text-[10px] h-fit
+          className="flex items-center gap-1 text-[10px] h-fit shrink-0
           bg-brand-accent-primary text-white rounded-md px-2
             cursor-pointer hover:opacity-80"
         >
@@ -138,53 +140,54 @@ export const NoteEditor = ({
           <div>Save</div>
         </div>
       </div>
-      <div className="flex gap-3 text-brand-accent-primary font-light text-[10px]">
+      <div className="flex gap-3 shirnk-0 text-brand-accent-primary font-light text-[10px]">
         <div>Created: 20/08/2025</div>
         <div>Updated: 20/08/2025</div>
         <div>Đang lưu...</div>
       </div>
 
-      <div className="flex z-20 gap-2 text-sm items-center w-full">
+      <div className="flex z-20 gap-2 text-sm items-center w-full h-10 shrink-0 ">
         <div className="shrink-0 z-20">
           <Dropdown />
         </div>
-        <div className="flex flex-1 min-w-0  gap-2 rounded-2xl items-center">
+        <div className="flex flex-1 min-w-0 gap-2 rounded-2xl items-center shrink-0">
           <div className="gap-3 shrink-0">
             <div
-              className=" flex shrink-0 gap-2 items-center px-3 py-1 text-[12px] text-brand-accent-primary font-medium
-              outline-none backdrop-blur-md  shadow-sm hover:bg-white/70 
-              rounded-xl active:scale-98
-              box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
+              className="flex shrink-0 gap-2 items-center justify-center md:px-3 md:py-1 px-3 py-1.5 text-[12px] text-brand-accent-primary font-medium
+              outline-none backdrop-blur-md shadow-sm hover:bg-white/70 
+              rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
               overflow-x-hidden"
             >
-              <TagIcon className="w-3.5 h-3.5 text-brand-accent-secondary mr-1" />
-              <input
-                type="text"
-                placeholder="Add tag..."
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="bg-transparent outline-none text-xs w-20 placeholder:text-brand-accent-tertiary text-brand-accent-primary"
-              />
-              <button
-                type="button"
-                className="px-3 py-1 rounded-lg cursor-pointer"
-                title="Add"
-                onClick={handleAddTag}
-              >
-                <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
-              </button>
+              <TagIcon className="w-5 h-5 md:w-3.5 md:h-3.5 text-brand-accent-secondary mr-1 self-center" />
+              <div className="hidden md:flex shrink-0 gap-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Add tag..."
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="hidden md:block w-full bg-transparent outline-none text-[12px] placeholder:text-brand-accent-tertiary"
+                />
+                <button
+                  type="button"
+                  className="py-1 rounded-lg cursor-pointer px-3"
+                  title="Add"
+                  onClick={handleAddTag}
+                >
+                  <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
+                </button>
+              </div>
             </div>
           </div>
 
           <ScrollContainer
             vertical={false}
-            className={`flex items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
-    ${
-      tags.length > 0
-        ? 'p-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
-        : 'p-0 bg-transparent border-transparent shadow-none'
-    }`}
+            className={`hidden  sm:flex shrink-0 items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
+            ${
+              tags.length > 0
+                ? 'p-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
+                : 'p-0 bg-transparent border-transparent shadow-none'
+            }`}
           >
             {tags.map((tag) => (
               <Tag id={tag.id} tag={tag} onRemove={handleRemoveTag} />

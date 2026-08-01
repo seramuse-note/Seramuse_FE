@@ -5,7 +5,7 @@ import { TabNavbar } from '@/components/navigation/TabNavbar';
 function HomePage() {
   return (
     <div
-      className="flex flex-1 min-w-0 min-h-0  
+      className="flex flex-1 min-w-0 min-h-0  shirnk-0
       bg-white/30 backdrop-blur-md rounded-xl
       border border-white/10 box-border overflow-hidden"
     >

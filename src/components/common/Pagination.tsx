@@ -72,7 +72,7 @@ export const Pagination = ({ totalPages = 50, onPageChange }: PaginationProps) =
 
   return (
     <div className="flex justify-between items-center px-2 py-2 shrink-0 border-t border-white/40 w-full">
-      <span className="text-xs text-brand-accent-tertiary font-medium">
+      <span className="text-xs text-brand-accent-tertiary font-medium ">
         Page {currentPage} of {totalPages}
       </span>
       <div className="flex items-center gap-1.5">

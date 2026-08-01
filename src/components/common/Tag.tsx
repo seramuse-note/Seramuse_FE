@@ -19,7 +19,7 @@ export const Tag = ({ id, tag, onRemove }: TagProps) => (
      bg-white/90 border border-white/30 shadow-md font-medium
      hover:shadow-sm
       rounded-xl text-[10px] whitespace-nowrap 
-      transition-all shrink-0 select-none`}
+      transition-all shrink-0  `}
   >
     <span style={{ color: tag.color ? `${tag.color}` : '' }} className="truncate max-w-30">
       {tag.label}

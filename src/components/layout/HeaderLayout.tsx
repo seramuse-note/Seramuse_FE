@@ -3,7 +3,7 @@ import Avatar from '../common/Avatar';
 function HeaderLayout() {
   return (
     <div className="w-full h-fit  min-h-1 rounded-tl-4xl rounded-br-4xl  rounded-bl-xl rounded-tr-xl text-brand-accent-primary">
-      <div className="w-full h-fit px-5 py-2 bg-white/50 rounded-tl-4xl rounded-br-4xl rounded-bl-xl rounded-tr-xl flex justify-center items-center gap-5">
+      <div className="w-full h-fit shrink-0 px-5 py-2 bg-white/50 rounded-tl-4xl rounded-br-4xl rounded-bl-xl rounded-tr-xl flex justify-center items-center gap-5">
         <Avatar className="shrink-0"></Avatar>
         <div className="flex flex-col grow min-w-0">
           <div className="w-fit py-1 px-2 rounded-4xl  bg-white/50 text-xs flex justify-center items-center text-brand-accent text-[10px] font-semibold ">
