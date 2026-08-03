@@ -11,6 +11,8 @@ export const NoteMainLayout = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const showEditor = Boolean(selectedNoteId);
 
+  // const { data: notes } = useGetNotesQuery();
+
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
     setLayoutMode('SPLIT');

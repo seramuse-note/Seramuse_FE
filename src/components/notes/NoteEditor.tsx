@@ -5,6 +5,8 @@ import { Tag } from '@/components/common/Tag';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useState } from 'react';
+// import { useCreateNoteMutation } from '@/services/notesApi';
+// import type { Note } from '@/types/notes.types';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
@@ -31,6 +33,27 @@ export const NoteEditor = ({
     { id: '2', label: 'Công việc', color: 'red' },
     { id: '3', label: 'Dự án Glass', color: 'red' },
   ]);
+  // const [createNote, { isLoading, isError }] = useCreateNoteMutation();
+
+  // const handleSaveNote = async () => {
+  //   const newNote: Partial<Note> = {
+  //     title: 'Ghi chú mới',
+  //     blocks: [
+  //       {
+  //         type: 'paragraph',
+  //         properties: { text: 'Nội dung ghi chú mới' },
+  //         order_index: 0,
+  //       },
+  //     ],
+  //   };
+
+  //   try {
+  //     // Gọi API để lưu ghi chú mới
+  //     const response = await createNote(newNote);
+  //   } catch (error) {
+  //     console.error('Error saving note:', error);
+  //   }
+  // };
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -120,6 +143,8 @@ export const NoteEditor = ({
           className="flex items-center gap-1 text-[10px] h-fit shrink-0
           bg-brand-accent-primary text-white rounded-md px-2
             cursor-pointer hover:opacity-80"
+
+          // onClick={handleSaveNote}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

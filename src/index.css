@@ -126,7 +126,6 @@ code {
 /* Kích thước tổng thể của thanh cuộn */
 ::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
 }
 
 /* Đường ray (Khung chứa con trượt cuộn) */
@@ -135,7 +134,6 @@ code {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Con trượt thanh cuộn (Thumb) */

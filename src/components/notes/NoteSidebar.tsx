@@ -1,9 +1,176 @@
 import { Pagination } from '@/components/common/Pagination';
-import { Ellipsis, Funnel, Mic, Plus, Heart, X } from 'lucide-react';
+import { Ellipsis, Mic, Plus, Heart, X, Funnel } from 'lucide-react';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useState } from 'react';
 import type { Note } from '@/types/notes.types';
+import FilterPopover from './FilterSection';
+// import FilterPopover from './FilterSection';
 // import { Preview } from '@/components/common/Preview';
+
+const mockListNote: Note[] = [
+  {
+    id: 'note-001',
+    title: 'Học React & Tailwind CSS cơ bản',
+    mood_id: 'mood-happy',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Tìm hiểu về State, Props, Hooks (useState, useEffect, useMemo) và cách cấu hình Tailwind CSS tối ưu giao diện UI.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-20T08:30:00.000Z',
+    updated_at: '2026-07-20T09:15:00.000Z',
+    tags: [
+      {
+        id: 'tag-1',
+        name: 'frontend',
+        color: '3B82F6', // Blue
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+      {
+        id: 'tag-2',
+        name: 'hoc tap',
+        color: '10B981', // Green
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+    ],
+    isFavorite: true,
+  },
+  {
+    id: 'note-002',
+    title: 'Lên danh sách đi siêu thị cuối tuần',
+    mood_id: 'mood-normal',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Mua thịt bò, rau cải, sữa tươi nguyên kem, 1 kg cam sành, nước giặt xả và mớ hành tây.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-21T14:20:00.000Z',
+    updated_at: '2026-07-21T14:20:00.000Z',
+    tags: [
+      {
+        id: 'tag-3',
+        name: 'ca nhan',
+        color: 'F59E0B', // Yellow/Orange
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+    ],
+    isFavorite: false,
+  },
+  {
+    id: 'note-003',
+    title: 'Ý tưởng ứng dụng Quản lý Ghi chú (Note App 2026)',
+    mood_id: 'mood-inspired',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Tích hợp AI tự động phân loại ghi chú, hỗ trợ giọng nói thành văn bản và đồng bộ dữ liệu đám mây siêu tốc.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-22T10:00:00.000Z',
+    updated_at: '2026-07-22T11:45:00.000Z',
+    tags: [
+      {
+        id: 'tag-4',
+        name: 'du an',
+        color: '8B5CF6', // Purple
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+      {
+        id: 'tag-5',
+        name: 'ai feature',
+        color: 'EC4899', // Pink
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+    ],
+    isFavorite: true,
+  },
+  {
+    id: 'note-004',
+    title: 'Biên bản cuộc họp Sprint Planning Q3',
+    mood_id: 'mood-serious',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Phân công công việc: Nam phụ trách Fix bug giao diện, Hải viết API Backend cho thanh toán, Mai kiểm thử hệ thống.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-23T02:00:00.000Z',
+    updated_at: '2026-07-23T03:30:00.000Z',
+    tags: [
+      {
+        id: 'tag-6',
+        name: 'cong viec',
+        color: 'EF4444', // Red
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+    ],
+    isFavorite: false,
+  },
+  {
+    id: 'note-005',
+    title: 'Công thức nấu Phở Bò Gia Truyền',
+    mood_id: 'mood-excited',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Hầm xương ống trong 8 tiếng, thêm gừng nướng, hoa hồi, thảo quả, quế và sá sùng để nước dùng ngọt thanh đậm đà.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-24T11:10:00.000Z',
+    updated_at: '2026-07-24T11:10:00.000Z',
+    tags: [
+      {
+        id: 'tag-7',
+        name: 'am thuc',
+        color: '14B8A6', // Teal
+        created_at: '2026-07-01T00:00:00.000Z',
+        updated_at: '2026-07-01T00:00:00.000Z',
+      },
+    ],
+    isFavorite: true,
+  },
+  {
+    id: 'note-006',
+    title: 'Ghi chú rỗng không có tags',
+    mood_id: 'mood-quiet',
+    blocks: [
+      {
+        type: 'paragraph',
+        properties: {
+          text: 'Đây là ghi chú thử nghiệm trường hợp không gán tag nào cả để kiểm tra giao diện hiển thị bọc tag.',
+        },
+        order_index: 1,
+      },
+    ],
+    created_at: '2026-07-25T16:45:00.000Z',
+    updated_at: '2026-07-25T16:45:00.000Z',
+    tags: [],
+    isFavorite: false,
+  },
+];
 
 interface EditorPanelProps {
   layoutMode: LayoutMode;
@@ -20,52 +187,7 @@ export const NoteSidebar = ({
   // const [currentPage, setCurrentPage] = useState(1);
   // const itemsPerPage = 3;
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
-  const [listNote, setListNote] = useState<Note[]>([
-    {
-      id: 'b470ac42-597e-42d7-bab0-be294f59f9ae',
-      title: 'Ghi chú học React & Tailwind  & Tailwind  & Tailwind & Tailwind & Tailwind & THư',
-      mood_id: '76c7a3c6-b37b-4996-948b-0cbacc0c5100',
-      blocks: [
-        {
-          type: 'paragraph',
-          properties: {
-            text: 'Đây là phần nội dung xem trước của ghi chú. Khi dài quá 2 dòng sẽ tự động xuất hiện dấu ba chấm ở cuối,  Đây là phần nội dung xem trước của ghi chú. Khi dài quá 2 dòng sẽ tự động xuất hiện dấu ba chấm ở cuối, Đây là phần nội dung xem trước của ghi chú. Khi dài quá 2 dòng sẽ tự động xuất hiện dấu ba chấm ở cuối,',
-          },
-          order_index: 2,
-        },
-      ],
-      created_at: '2026-07-14T05:28:46.257504+00:00',
-      updated_at: '2026-07-18T17:41:55.007111+00:00',
-      tags: [],
-      isFavorite: true,
-    },
-    {
-      id: 'b470ac42-597e-42d7',
-      title: 'Ghi chú học React & Tailwind',
-      mood_id: '76c7a3c6-b37b-4996-948b-0cbacc0c5100',
-      blocks: [
-        {
-          type: 'paragraph',
-          properties: {
-            text: 'Đây là phần nội dung xem trước của ghi chú. Khi Thâ dài quá 2 dòng sẽ tự động xuất hiện dấu ba chấm ở cuối',
-          },
-          order_index: 2,
-        },
-      ],
-      created_at: '2026-07-14T05:28:46.257504+00:00',
-      updated_at: '2026-07-18T17:41:55.007111+00:00',
-      tags: [
-        {
-          id: 'd4492ff8-edce-4e66-bb27-40a0601e8958',
-          name: 'cong viec',
-          color: '92D',
-          created_at: '2026-07-14T05:27:12.333338+00:00',
-          updated_at: '2026-07-14T05:27:12.333338+00:00',
-        },
-      ],
-      isFavorite: false,
-    },
-  ]);
+  const [listNote, setListNote] = useState<Note[]>(mockListNote);
   const [searchQuery, setSearchQuery] = useState('');
 
   //MOCK_NOTES=notesList
@@ -89,8 +211,6 @@ export const NoteSidebar = ({
       prevNotes.map((note) => (note.id === id ? { ...note, isFavorite: !note.isFavorite } : note))
     );
   };
-
-  // bien chua danh sach hien thi
   const displayNotes = listNote.filter((note) => {
     const matchesTab = activeTab === 'favorite' ? note.isFavorite : true;
 
@@ -130,11 +250,7 @@ export const NoteSidebar = ({
               </button>
             </div>
           </div>
-          <form
-            action=""
-            method="post"
-            className="relative flex items-center  gap-2 shrink-0 w-full"
-          >
+          <div className="relative flex items-center  gap-2 shrink-0 w-full">
             <div className="relative flex-1 flex items-center">
               <input
                 type="text"
@@ -156,14 +272,17 @@ export const NoteSidebar = ({
                 </button>
               )}
             </div>
-            <button
-              type="button"
-              className="px-2.5 py-2.5 bg-white/90 hover:bg-white rounded-xl border
+            <div className="relative">
+              <button
+                type="button"
+                className="px-2.5 py-2.5 bg-white/90 hover:bg-white rounded-xl border
               border-white/80  text-brand-accent-tertiary shadow-sm cursor-pointer"
-            >
-              <Funnel className="w-4 h-4" />
-            </button>
-          </form>
+              >
+                <Funnel className="w-4 h-4" />
+              </button>
+              <FilterPopover />
+            </div>
+          </div>
           <div
             className="min-w-0 min-h-0 overflow-hidden
             px-2.5 py-2 bg-white/30 backdrop-blur-md
@@ -253,14 +372,14 @@ export const NoteSidebar = ({
                             handleFavoriteNote(note.id);
                           }}
                           className="p-2 cursor-pointer transition-transform active:scale-90"
-                          title={isFavorite ? 'Unstarred' : 'Starred'}
+                          title={isFavorite ? 'Unlike' : 'Like'}
                         >
                           <Heart
                             className={`w-3  transition-colors duration-300
                             ${
                               isFavorite
                                 ? 'fill-pink-500 text-pink-500'
-                                : `fill-brand-accent-tertiary text-brand-accent-tertiary`
+                                : 'fill-brand-accent-tertiary text-brand-accent-tertiary'
                             }`}
                           />
                         </button>
