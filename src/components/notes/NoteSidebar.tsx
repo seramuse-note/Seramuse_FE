@@ -171,6 +171,8 @@ const mockListNote: Note[] = [
     isFavorite: false,
   },
 ];
+const TAG_OPTIONS = ['Work', 'Personal', 'Study', 'Code'];
+const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
 
 interface EditorPanelProps {
   layoutMode: LayoutMode;
@@ -189,7 +191,17 @@ export const NoteSidebar = ({
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
   const [listNote, setListNote] = useState<Note[]>(mockListNote);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
+    tags: [],
+    moods: [],
+  });
 
+  const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
+    setFilters(selectedData);
+    setIsOpen(!isOpen);
+    console.log('Giá trị Filter nhận được:', selectedData);
+  };
   //MOCK_NOTES=notesList
   // const totalPages = Math.ceil(notesList.length / itemsPerPage) || 1;
   // const indexOfLastItem = currentPage * itemsPerPage;
@@ -275,12 +287,23 @@ export const NoteSidebar = ({
             <div className="relative">
               <button
                 type="button"
+                onClick={() => setIsOpen((prev) => !prev)}
                 className="px-2.5 py-2.5 bg-white/90 hover:bg-white rounded-xl border
               border-white/80  text-brand-accent-tertiary shadow-sm cursor-pointer"
               >
                 <Funnel className="w-4 h-4" />
               </button>
-              <FilterPopover />
+              {isOpen && (
+                <FilterPopover
+                  key={JSON.stringify(filters.tags) + JSON.stringify(filters.moods)}
+                  tagOptions={TAG_OPTIONS}
+                  moodOptions={MOOD_OPTIONS}
+                  initialTags={filters.tags}
+                  initialMoods={filters.moods}
+                  onClose={() => setIsOpen(false)}
+                  onApply={handleApplyFilter}
+                />
+              )}
             </div>
           </div>
           <div
