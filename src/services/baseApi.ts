@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const baseApi = createApi({
-  reducerPath: 'api', // Tên key lưu trạng thái trong Redux Store
+  reducerPath: 'notesApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://seramuse-be.onrender.com', // Thay bằng URL API backend của bạn
+    baseUrl: 'https://seramuse-be.onrender.com/',
     prepareHeaders: (headers) => {
       // Lấy token từ localStorage
       const token = localStorage.getItem('token');

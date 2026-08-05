@@ -1,20 +1,22 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
+  total?: number;
+  limit?: number;
+  isLoading?: boolean;
   onPageChange: (page: number) => void;
 }
 
 function getPageNumbers(currentPage: number, totalPages: number, siblingCount = 1) {
-  // siblingCount: số lượng trang hiển thị bên cạnh currentPage (mặc định là 1)
+  // siblingCount: số lượng trang ĐƯỢC hiển thị bên cạnh currentPage (mặc định là 1)
 
   const maxGroupSize = 3 + 2 * siblingCount;
   const totalPageNumbers = maxGroupSize + 2;
   // Tổng số nút tối đa
 
-  // Trường hợp 1: Nếu tổng số trang ít hơn số nút tối đa cho phép
+  // Trường hợp 1: Nếu số nút tối đa cho phép NHIEU HON tổng số trang
   // -> hiển thị tất cả
   if (totalPageNumbers >= totalPages) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -55,20 +57,17 @@ function getPageNumbers(currentPage: number, totalPages: number, siblingCount = 
   return [];
 }
 
-export const Pagination = ({ totalPages = 50, onPageChange }: PaginationProps) => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+export const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) => {
+  if (totalPages <= 1) return null;
 
   const pages = getPageNumbers(currentPage, totalPages);
 
   const handlePageClick = (page: number | string) => {
     if (page === '...') return;
     if (typeof page === 'number') {
-      setCurrentPage(page);
       onPageChange?.(page);
     }
   };
-
-  if (totalPages <= 1) return null;
 
   return (
     <div className="flex justify-between items-center px-2 py-2 shrink-0 border-t border-white/40 w-full">
@@ -87,7 +86,10 @@ export const Pagination = ({ totalPages = 50, onPageChange }: PaginationProps) =
         {pages.map((page, index) => {
           if (page === '...') {
             return (
-              <span key={`dots-${index}`} className=" cursor-pointer py-1">
+              <span
+                key={`dots-${index}`}
+                className="cursor-pointer py-1 text-brand-accent-primar w-7 h-7 text-xs"
+              >
                 ...
               </span>
             );

@@ -93,9 +93,9 @@ export default function FilterPopover({
       <div className="fixed inset-0 z-35 bg-transparent cursor-default" />
       <div
         ref={popoverRef}
-        className="absolute top-12 right-0 w-80 max-h-[400px] flex flex-col p-4 gap-3 bg-white/65 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-md z-40 text-xs text-brand-accent-primary"
+        className="shrink-0 absolute top-10 right-0 w-100 flex flex-col px-4 py-4 gap-3 bg-white/65 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-md z-40 text-xs text-brand-accent-primary"
       >
-        <div className="flex items-center justify-between pb-2.5 border-b border-white/40 shrink-0">
+        <div className="flex items-center  justify-between pb-2 border-b border-white/40 shrink-0">
           <h3 className="font-semibold text-sm  text-brand-accent-primary tracking-tight">
             Filter
           </h3>
@@ -108,65 +108,66 @@ export default function FilterPopover({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto  px-2 -mr-1 flex flex-col gap-4">
+        <div className="flex-1 -mr-1 flex flex-col gap-3">
           {/* Section: TAG */}
-          <div ref={tagDropdownRef} className="relative flex flex-col gap-1.5 z-45">
+          <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 z-47">
             <span className="text-[10px] font-bold text-brand-accent-fourth uppercase tracking-wider px-0.5">
               TAG
             </span>
-
-            <div className="flex flex-col p-2 bg-white/40 backdrop-blur-sm border border-white/70 rounded-2xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+            <div className="flex flex-col gap-2 p-2  bg-white/40 backdrop-blur-sm  ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
               {tempTags.length > 0 && (
-                <div className="flex gap-1.5 flex-wrap overflow-y-auto max-h-20 mb-1.5 pb-2 pr-0.5">
-                  {tempTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTag(tag);
-                        }}
-                        className="p-0.5 -mr-1 rounded-full hover:bg-black/5 transition-colors"
+                <div className="p-1 pr-2 bg-white/40 backdrop-blur-sm ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+                  <div className="flex gap-1 flex-wrap  overflow-y-auto max-h-10 pb-2 pr-1">
+                    {tempTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
                       >
-                        <X className="w-3 h-3 text-brand-accent-fourth hover:text-brand-accent-primary cursor-pointer" />
-                      </button>
-                    </span>
-                  ))}
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTag(tag);
+                          }}
+                          className="p-0.5 -mr-1 rounded-full hover:bg-black/5 transition-colors"
+                        >
+                          <X className="w-3 h-3 text-brand-accent-fourth hover:text-brand-accent-primary cursor-pointer" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
-
-              <div className="relative flex-1 flex items-center">
-                <input
-                  value={tagQuery}
-                  onChange={(e) => handleSearchTagValue(e)}
-                  onClick={() => setIsTagOpen(true)}
-                  placeholder="Select tag..."
-                  className="w-full outline-none text-xs px-1 py-0.5 text-brand-accent-primary placeholder:text-brand-accent-fourth bg-transparent"
-                />
-                {tagQuery && (
-                  <button
-                    onClick={() => setTagQuery('')}
-                    type="button"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-brand-accent-fourth hover:text-brand-accent-primary transition-colors cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
+              <div className=" bg-white/40 backdrop-blur-sm  ring-1 ring-brand-accent-secondary/20 rounded-lg focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+                <div className="relative flex-1 flex items-center">
+                  <input
+                    value={tagQuery}
+                    onChange={(e) => handleSearchTagValue(e)}
+                    onClick={() => setIsTagOpen(true)}
+                    placeholder="Select tag..."
+                    className="w-full outline-none text-xs px-1 py-1 text-brand-accent-primary placeholder:text-brand-accent-fourth bg-transparent"
+                  />
+                  {tagQuery && (
+                    <button
+                      onClick={() => setTagQuery('')}
+                      type="button"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-brand-accent-fourth hover:text-brand-accent-primary transition-colors cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-
             {isTagOpen && (
-              <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/80 bg-white/75 backdrop-blur-xl shadow-md/10 rounded-xl animate-in fade-in-0 zoom-in-95 duration-150">
-                <div className="max-h-36 overflow-y-auto flex flex-col gap-0.5">
+              <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/95 bg-white/75 backdrop-blur-xl shadow-md/10 rounded-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                <div className="max-h-18 overflow-y-auto flex flex-col gap-0.5">
                   {displayTags.length > 0 ? (
                     displayTags.map((tag) => (
                       <label
                         key={tag}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
+                        className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
@@ -210,63 +211,64 @@ export default function FilterPopover({
           </div>
 
           {/* Section: MOOD */}
-          <div ref={moodDropdownRef} className="relative flex flex-col gap-1.5">
+          <div ref={moodDropdownRef} className=" relative flex flex-col gap-1.5 z-45">
             <span className="text-[10px] font-bold text-brand-accent-fourth uppercase tracking-wider px-0.5">
               MOOD
             </span>
-
-            <div className="flex flex-col p-2 bg-white/40 backdrop-blur-sm border border-white/50 rounded-2xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+            <div className="flex flex-col gap-2 p-2  bg-white/40 backdrop-blur-sm  ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
               {tempMoods.length > 0 && (
-                <div className="flex gap-1.5 flex-wrap overflow-y-auto max-h-20 mb-1.5 pb-2 pr-0.5">
-                  {tempMoods.map((mood) => (
-                    <span
-                      key={mood}
-                      className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
-                    >
-                      {mood}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMood(mood);
-                        }}
-                        className="p-0.5 -mr-1 rounded-full hover:bg-black/5 transition-colors"
+                <div className="p-1 pr-2 bg-white/40 backdrop-blur-sm ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+                  <div className="flex gap-1 flex-wrap  overflow-y-auto max-h-10 pb-2 pr-1">
+                    {tempMoods.map((mood) => (
+                      <span
+                        key={mood}
+                        className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
                       >
-                        <X className="w-3 h-3 text-brand-accent-fourth hover:text-brand-accent-p cursor-pointer" />
-                      </button>
-                    </span>
-                  ))}
+                        {mood}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMood(mood);
+                          }}
+                          className="p-0.5 -mr-1 rounded-full hover:bg-black/5 transition-colors"
+                        >
+                          <X className="w-3 h-3 text-brand-accent-fourth hover:text-brand-accent-primary cursor-pointer" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
-
-              <div className="relative flex-1 flex items-center">
-                <input
-                  value={moodQuery}
-                  onChange={(e) => handleSearchMoodValue(e)}
-                  onClick={() => setIsMoodOpen(true)}
-                  placeholder="Select mood..."
-                  className="w-full outline-none text-xs px-1 py-0.5 text-brand-accent-primary placeholder:text-brand-accent-fourth bg-transparent"
-                />
-                {moodQuery && (
-                  <button
-                    onClick={() => setMoodQuery('')}
-                    type="button"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-brand-accent-fourth hover:text-brand-accent-primary transition-colors cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
+              <div className=" bg-white/40 backdrop-blur-sm  ring-1 ring-brand-accent-secondary/20 rounded-lg focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
+                <div className="relative flex-1 flex items-center">
+                  <input
+                    value={moodQuery}
+                    onChange={(e) => handleSearchMoodValue(e)}
+                    onClick={() => setIsMoodOpen(true)}
+                    placeholder="Select mood..."
+                    className="w-full outline-none text-xs px-1 py-1 text-brand-accent-primary placeholder:text-brand-accent-fourth bg-transparent"
+                  />
+                  {moodQuery && (
+                    <button
+                      onClick={() => setMoodQuery('')}
+                      type="button"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-brand-accent-fourth hover:text-brand-accent-primary transition-colors cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-
             {isMoodOpen && (
-              <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/80 bg-white/75 backdrop-blur-xl shadow-md rounded-2xl animate-in fade-in-0 zoom-in-95 duration-150">
-                <div className="max-h-36 overflow-y-auto flex flex-col gap-0.5">
+              <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/95 bg-white/75 backdrop-blur-xl shadow-md/10 rounded-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                <div className="max-h-18 overflow-y-auto flex flex-col gap-0.5">
                   {displayMoods.length > 0 ? (
                     displayMoods.map((mood) => (
                       <label
                         key={mood}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
+                        className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
@@ -311,7 +313,7 @@ export default function FilterPopover({
         </div>
 
         {/* Footer Buttons */}
-        <div className="mt-auto pt-2.5 flex items-center justify-end gap-2 shrink-0 border-t border-white/40">
+        <div className="relative mt-auto z-10 pt-2.5 flex items-center justify-end gap-2 shrink-0 border-t border-white/40">
           <button
             onClick={onClose}
             type="button"

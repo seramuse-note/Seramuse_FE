@@ -1,7 +1,7 @@
 export interface Tag {
   id: string;
   name: string;
-  color?: string;
+  color: string;
   created_at: string;
   updated_at: string;
 }
@@ -11,23 +11,26 @@ interface ParagraphProperties {
 }
 
 interface Block {
+  id: string;
+  order_index: number;
   type: string;
   properties: ParagraphProperties;
-  order_index: number;
 }
 
 export interface Note {
   id: string;
   title: string;
-  mood_id: string;
+  mood_id?: string;
   blocks: Block[];
   created_at: string;
   updated_at: string;
-  tags: Tag[];
+  tags?: Tag[];
   isFavorite: boolean;
 }
 
 export interface CreateNoteDto {
   title: string;
-  content: string;
+  mood_id?: string;
+  blocks: Block[];
+  tags?: Tag[];
 }

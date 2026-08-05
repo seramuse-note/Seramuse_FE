@@ -1,5 +1,5 @@
 // import Tiptap from '@/components/common/Tiptap';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NoteSidebar } from '../notes/NoteSidebar';
 import { NoteEditor } from '../notes/NoteEditor';
 // import { useGetNotesQuery } from '@/services/notesApi';
@@ -18,6 +18,8 @@ export const NoteMainLayout = () => {
     setLayoutMode('SPLIT');
   };
 
+  const handleCreateNote = () => {};
+
   const handleToggleRecentList = () => {
     setLayoutMode((prev) => (prev === 'FULL_EDITOR' ? 'SPLIT' : 'FULL_EDITOR'));
   };
@@ -26,15 +28,6 @@ export const NoteMainLayout = () => {
     setLayoutMode('FULL_SIDEBAR');
     setSelectedNoteId(null);
   };
-
-  useEffect(() => {
-    console.log('selectedNoteId', selectedNoteId);
-    console.log('showEditor', showEditor);
-  }, [selectedNoteId]);
-
-  useEffect(() => {
-    console.log('layoutMode', layoutMode);
-  }, [layoutMode]);
 
   return (
     <div
@@ -46,7 +39,7 @@ export const NoteMainLayout = () => {
    `}
     >
       <div
-        className={`h-full min-h-0 min-w-0 border-r border-white/50  overflow-auto transform-gpu
+        className={`h-full min-h-0 min-w-0 border-r border-white/50  overflow-hidden transform-gpu
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-full' : ''}
        ${layoutMode === 'SPLIT' ? 'w-0 opacity-0 overflow-hidden md:w-70 md:opacity-100' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : ''}
@@ -56,7 +49,7 @@ export const NoteMainLayout = () => {
           layoutMode={layoutMode}
           selectedNoteId={selectedNoteId}
           onSelectNote={handleSelectNote}
-          // notesList={MOCK_NOTES}
+          onCreateNote={handleCreateNote}
         />
       </div>
       {showEditor && (
