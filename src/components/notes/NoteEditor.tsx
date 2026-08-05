@@ -5,12 +5,14 @@ import { Tag } from '@/components/common/Tag';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useState } from 'react';
+import { useGetNoteQuery } from '@/services/notesApi';
+import { formatDate } from '@/utils/formatDate';
 // import { useCreateNoteMutation } from '@/services/notesApi';
 // import type { Note } from '@/types/notes.types';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
-  // selectedNoteId: string;
+  selectedNoteId?: string | null;
   onToggleRecentList: () => void;
   onCloseEditor: () => void;
 }
@@ -23,7 +25,7 @@ interface TagItem {
 
 export const NoteEditor = ({
   layoutMode,
-  // selectedNoteId,
+  selectedNoteId,
   onToggleRecentList,
   onCloseEditor,
 }: EditorPanelProps) => {
@@ -54,6 +56,19 @@ export const NoteEditor = ({
   //     console.error('Error saving note:', error);
   //   }
   // };
+
+  const {
+    data: noteItem,
+    isLoading,
+    isFetching,
+    isError,
+  } = useGetNoteQuery(
+    { id: selectedNoteId! }, // Dấu ! để báo TS biến không null
+    {
+      skip: !selectedNoteId, // Nếu chưa có ID thì SKIP (không gọi API)
+    }
+  );
+  const itemNote = noteItem?.data;
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -87,6 +102,27 @@ export const NoteEditor = ({
       handleAddTag();
     }
   };
+
+  if (!selectedNoteId) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-400 text-xs">
+        Chọn một ghi chú để xem chi tiết
+      </div>
+    );
+  }
+
+  // 2. Đang tải dữ liệu của Note
+  if (isLoading || isFetching) {
+    return (
+      <div className="flex-1 p-6 animate-pulse flex flex-col gap-3">
+        <div className="h-6 bg-gray-200 rounded w-1/3" />
+        <div className="h-4 bg-gray-200 rounded w-full" />
+        <div className="h-4 bg-gray-200 rounded w-2/3" />
+      </div>
+    );
+  }
+
+  if (itemNote === undefined) return;
 
   return (
     <div
@@ -130,14 +166,16 @@ export const NoteEditor = ({
         </button>
         <div>Ghi chú của tôi</div>
         <div>/</div>
-        <div className="text-brand-accent-tertiary">Ghi chú tâm trạng hôm nay</div>
+        <div className="text-brand-accent-tertiary">{itemNote.title}</div>
       </div>
       <div className="flex justify-between gap-2 md:gap-50 shirnk-0">
         <input
+          key={itemNote?.id}
           type="text"
           className=" font-bold to-brand-accent-primary outline-0 flex-1 shrink-0 text-xs 
           md:text-xl"
           placeholder="Ghi chú tâm trạng hôm nay"
+          defaultValue={itemNote?.title || ''}
         />
         <div
           className="flex items-center gap-1 text-[10px] h-fit shrink-0
@@ -166,9 +204,9 @@ export const NoteEditor = ({
         </div>
       </div>
       <div className="flex gap-3 shirnk-0 text-brand-accent-primary font-light text-[10px]">
-        <div>Created: 20/08/2025</div>
-        <div>Updated: 20/08/2025</div>
-        <div>Đang lưu...</div>
+        <div>Created: {formatDate(itemNote?.created_at)}</div>
+        <div>Updated: {formatDate(itemNote?.updated_at)}</div>
+        <div>{isLoading ? 'Đang lưu...' : isError ? 'Lưu thất bại' : 'Đã lưu'} </div>
       </div>
 
       <div className="flex z-20 gap-2 text-sm items-center w-full h-10 shrink-0 ">

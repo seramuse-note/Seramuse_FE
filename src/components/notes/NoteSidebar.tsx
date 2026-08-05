@@ -1,41 +1,45 @@
-import { Pagination } from '@/components/common/Pagination';
 import { Ellipsis, Mic, Plus, X, Funnel } from 'lucide-react';
-import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useState } from 'react';
-import FilterPopover from './FilterSection';
-import { useGetNotesQuery } from '@/services/notesApi';
+import { Pagination } from '@/components/common/Pagination';
+import type { LayoutMode } from '../layout/NoteMainLayout';
+import { formatDate } from '@/utils/formatDate';
 import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
+import FilterPopover from './FilterSection';
+import type { Note } from '@/types/notes.types';
+import type { ApiResponse } from '@/types/api.types';
 
-const TAG_OPTIONS = [
-  'Work',
-  'Personal',
-  'Study',
-  'Code',
-  'Cod122e',
-  'Code31',
-  'Code',
-  'Code32',
-  'Cod12e',
-];
+const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
 const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
 
-interface EditorPanelProps {
+interface NoteSidebarProps {
+  notes: ApiResponse<Note> | undefined;
+  isLoading: boolean;
+  isFetching: boolean;
+  currentPage: number;
   layoutMode: LayoutMode;
   selectedNoteId?: string | null;
+  onPageChange: (page: number) => void;
   onSelectNote: (noteId: string) => void;
-  onCreateNote: (noteId: string) => void;
+  onCreateNote: () => void;
 }
 
-export const NoteSidebar = ({ layoutMode, onSelectNote }: EditorPanelProps) => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const limit = 10;
-
-  const { data: notesData, isLoading, isFetching } = useGetNotesQuery({ page: currentPage, limit });
-
-  const listNote = notesData?.data ?? [];
-  const pagination = notesData?.meta?.pagination;
-
+export const NoteSidebar = ({
+  notes,
+  isLoading,
+  isFetching,
+  currentPage,
+  layoutMode,
+  onPageChange,
+  onSelectNote,
+}: NoteSidebarProps) => {
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
+
+  const listNote = notes?.data ?? [];
+  const pagination = notes?.meta?.pagination;
+  const displayNotes = listNote.filter((note) => {
+    return activeTab === 'favorite' ? note.isFavorite : true;
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
@@ -43,7 +47,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote }: EditorPanelProps) => {
     moods: [],
   });
 
-  console.log({ currentPage });
+  // const handleCreateNote = () => {};
 
   const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
     setFilters(selectedData);
@@ -51,15 +55,10 @@ export const NoteSidebar = ({ layoutMode, onSelectNote }: EditorPanelProps) => {
     console.log('Giá trị Filter nhận được:', selectedData);
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
+  function handlePageChange(page: number): void {
+    onPageChange(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   // const handleFavoriteNote = (id: string) => {
   //   setListNote((prevNotes: Note[]) =>
@@ -67,28 +66,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote }: EditorPanelProps) => {
   //   );
   // };
 
-  const displayNotes = listNote.filter((note) => {
-    const matchesTab = activeTab === 'favorite' ? note.isFavorite : true;
-
-    const keyword = searchQuery.toLowerCase().trim();
-
-    const matchTitle = note.title ? note.title.toLowerCase().includes(keyword) : false;
-
-    const matchContent = note.blocks
-      ? note.blocks.some((block) => block.properties.text.includes(keyword))
-      : false;
-
-    const matchesSearch = !keyword || matchTitle || matchContent;
-
-    return matchesTab && matchesSearch;
-  });
-
   if (isLoading || isFetching) return <SidebarNoteSkeleton count={4} />;
-
-  function handlePageChange(page: number): void {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 
   return (
     <div className={`h-full relative bg-white/45 backdrop-blur-lg p-4 `}>

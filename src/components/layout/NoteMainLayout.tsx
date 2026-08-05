@@ -1,17 +1,18 @@
-// import Tiptap from '@/components/common/Tiptap';
 import { useState } from 'react';
 import { NoteSidebar } from '../notes/NoteSidebar';
 import { NoteEditor } from '../notes/NoteEditor';
-// import { useGetNotesQuery } from '@/services/notesApi';
+import { useGetNotesQuery } from '@/services/notesApi';
 
 export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
 export const NoteMainLayout = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const limit = 10;
+  const { data: notesData, isLoading, isFetching } = useGetNotesQuery({ page: currentPage, limit });
+
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('FULL_SIDEBAR');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const showEditor = Boolean(selectedNoteId);
-
-  // const { data: notes } = useGetNotesQuery();
 
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
@@ -46,8 +47,13 @@ export const NoteMainLayout = () => {
       `}
       >
         <NoteSidebar
+          notes={notesData}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          currentPage={currentPage}
           layoutMode={layoutMode}
           selectedNoteId={selectedNoteId}
+          onPageChange={setCurrentPage}
           onSelectNote={handleSelectNote}
           onCreateNote={handleCreateNote}
         />
@@ -62,7 +68,7 @@ export const NoteMainLayout = () => {
         >
           <NoteEditor
             layoutMode={layoutMode}
-            // selectedNoteId={selectedNoteId}
+            selectedNoteId={selectedNoteId}
             onToggleRecentList={handleToggleRecentList}
             onCloseEditor={handleCloseEditor}
           />

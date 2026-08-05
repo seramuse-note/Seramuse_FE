@@ -1,11 +1,12 @@
 import type { Note } from '@/types/notes.types';
 import { baseApi } from './baseApi';
-import type { ApiResponse } from '@/types/api.types';
+import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
+import type { NoteDetail } from '@/types/notedetail.types';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getNotes: builder.query<ApiResponse<Note>, { page: number; limit: number }>({
-      query: ({ page, limit }) => `notes?page=${page}&limit=${limit}`,
+      query: ({ page, limit }) => `/notes?page=${page}&limit=${limit}`,
       transformResponse: (response: ApiResponse<Note>) => response,
       providesTags: (result) =>
         result?.data
@@ -22,8 +23,12 @@ export const noteApi = baseApi.injectEndpoints({
         body: newNote,
       }),
     }),
+    getNote: builder.query<ApiResponseItemNote<NoteDetail>, { id: string }>({
+      query: ({ id }) => `/notes/${id}`,
+      providesTags: ['NOTE_ITEM'],
+    }),
   }),
 });
 
-export const { useGetNotesQuery, useCreateNoteMutation } = noteApi;
+export const { useGetNotesQuery, useCreateNoteMutation, useGetNoteQuery } = noteApi;
 export default noteApi;

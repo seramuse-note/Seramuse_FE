@@ -82,7 +82,6 @@ export default function FilterPopover({
   });
 
   useClickOutside(popoverRef, () => {
-    onApply({ tags: tempTags, moods: tempMoods });
     setIsTagOpen(false);
     setIsMoodOpen(false);
     onClose();
