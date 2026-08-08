@@ -5,35 +5,29 @@ import type { LayoutMode } from '../layout/NoteMainLayout';
 import { formatDate } from '@/utils/formatDate';
 import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
 import FilterPopover from './FilterSection';
-import type { Note } from '@/types/notes.types';
-import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
-import { useCreateNoteMutation } from '@/services/notesApi';
+import {
+  useCreateNoteMutation,
+  useDeleteNoteMutation,
+  useGetNotesQuery,
+} from '@/services/notesApi';
+import { toast } from 'react-toastify';
 
 const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
 const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
 
 interface NoteSidebarProps {
-  notes: ApiResponse<Note> | undefined;
-  isLoading: boolean;
-  isFetching: boolean;
-  currentPage: number;
   layoutMode: LayoutMode;
-  selectedNoteId?: string | null;
-  onPageChange: (page: number) => void;
   onSelectNote: (noteId: string) => void;
-  onCreateNote: (newNote: ApiResponseItemNote<Note>) => void;
+  onSetLayout: (mode: LayoutMode) => void;
 }
 
-export const NoteSidebar = ({
-  notes,
-  isLoading,
-  isFetching,
-  currentPage,
-  layoutMode,
-  onPageChange,
-  onSelectNote,
-  onCreateNote,
-}: NoteSidebarProps) => {
+const LIMIT = 10;
+
+export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSidebarProps) => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { data: notes, isLoading } = useGetNotesQuery({ page: currentPage, limit: LIMIT });
+
+  const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
 
@@ -53,11 +47,10 @@ export const NoteSidebar = ({
   const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
     setFilters(selectedData);
     setIsOpen(!isOpen);
-    console.log('Giá trị Filter nhận được:', selectedData);
   };
 
   function handlePageChange(page: number): void {
-    onPageChange(page);
+    setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -69,26 +62,34 @@ export const NoteSidebar = ({
         blocks: [],
       }).unwrap();
 
-      onCreateNote(response);
+      const data = response?.data;
+      if (data === undefined) return;
+
+      onSelectNote(data.id);
+      onSetLayout('SPLIT');
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
   };
 
-  // const handleDeleteNote = async (id: string) => {
-  //   try {
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await deleteNote({ id: id }).unwrap();
 
-  //   } catch (err) {
-  //     console.error('Lỗi khi xoa note:', err);
-  //   }
-  // };
+      toast.success('Xóa note thành công!');
+    } catch (err) {
+      toast.error('Xóa thất bại rồi!');
+      console.error('Lỗi:', err);
+    }
+  };
+
   // const handleFavoriteNote = (id: string) => {
   //   setListNote((prevNotes: Note[]) =>
   //     prevNotes.map((note) => (note.id === id ? { ...note, isFavorite: !note.isFavorite } : note))
   //   );
   // };
 
-  if (isLoading || isFetching) return <SidebarNoteSkeleton count={4} />;
+  if (isLoading) return <SidebarNoteSkeleton count={4} />;
 
   return (
     <div className={`h-full relative bg-white/45 backdrop-blur-lg p-4 `}>
@@ -270,7 +271,8 @@ export const NoteSidebar = ({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // handleDeleteNote(note?.id);
+                                console.log(note.id);
+                                handleDeleteNote(note?.id);
                               }}
                               className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"
                             >

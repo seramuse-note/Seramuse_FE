@@ -1,7 +1,8 @@
-import type { CreateNoteDto, Note } from '@/types/notes.types';
+import type { Note } from '@/types/notes.types';
 import { baseApi } from './baseApi';
 import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
 import type { NoteDetail } from '@/types/notedetail.types';
+import type { CreateNoteDto } from '@/types/dto.type';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -18,7 +19,7 @@ export const noteApi = baseApi.injectEndpoints({
     }),
     getNote: builder.query<ApiResponseItemNote<NoteDetail>, { id: string }>({
       query: ({ id }) => `/notes/${id}`,
-      providesTags: (result, error, { id }) => [{ type: 'NOTE', id }],
+      providesTags: (result, error, { id }) => [{ type: 'NOTE', id: id }],
     }),
     createNote: builder.mutation<ApiResponseItemNote<Note>, CreateNoteDto>({
       query(newNote) {
@@ -31,10 +32,22 @@ export const noteApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
     deleteNote: builder.mutation<ApiResponseItemNote<Note>, { id: string }>({
-      query(id) {
+      query({ id }) {
         return {
           url: `/notes/${id}`,
           method: 'DELETE',
+        };
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'NOTE', id: 'LIST_NOTE' },
+        { type: 'NOTE', id: id },
+      ],
+    }),
+    updateNote: builder.mutation<ApiResponseItemNote<Note>, { id: string }>({
+      query({ id }) {
+        return {
+          url: `/notes${id}`,
+          method: 'PATH',
         };
       },
       invalidatesTags: (result, error, { id }) => [
@@ -45,5 +58,11 @@ export const noteApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetNotesQuery, useGetNoteQuery, useCreateNoteMutation } = noteApi;
+export const {
+  useGetNotesQuery,
+  useGetNoteQuery,
+  useCreateNoteMutation,
+  useDeleteNoteMutation,
+  useUpdateNoteMutation,
+} = noteApi;
 export default noteApi;

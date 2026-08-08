@@ -8,6 +8,7 @@ export interface Pagination {
 
 export interface Meta {
   pagination?: Pagination;
+  description?: string;
 }
 
 export interface ApiResponse<T> {

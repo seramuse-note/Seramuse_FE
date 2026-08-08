@@ -1,36 +1,19 @@
 import { useState } from 'react';
 import { NoteSidebar } from '../notes/NoteSidebar';
 import { NoteEditor } from '../notes/NoteEditor';
-import { useGetNotesQuery } from '@/services/notesApi';
-import type { Note } from '@/types/notes.types';
-import type { ApiResponseItemNote } from '@/types/api.types';
 
 export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
 export const NoteMainLayout = () => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const limit = 10;
-  const { data: notesData, isLoading, isFetching } = useGetNotesQuery({ page: currentPage, limit });
-
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('FULL_SIDEBAR');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const showEditor = Boolean(selectedNoteId);
 
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
     setLayoutMode('SPLIT');
   };
-  console.log({ showEditor, selectedNoteId });
 
-  const handleCreateNote = (newNote: ApiResponseItemNote<Note>) => {
-    const data = newNote?.data;
-    if (data === undefined) return;
-
-    setSelectedNoteId(data.id);
-    setLayoutMode('SPLIT');
-  };
-
-  const handleToggleRecentList = () => {
+  const handleToggleLayout = () => {
     setLayoutMode((prev) => (prev === 'FULL_EDITOR' ? 'SPLIT' : 'FULL_EDITOR'));
   };
 
@@ -56,33 +39,25 @@ export const NoteMainLayout = () => {
       `}
       >
         <NoteSidebar
-          notes={notesData}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          currentPage={currentPage}
           layoutMode={layoutMode}
-          selectedNoteId={selectedNoteId}
-          onPageChange={setCurrentPage}
           onSelectNote={handleSelectNote}
-          onCreateNote={handleCreateNote}
+          onSetLayout={(mode: LayoutMode) => setLayoutMode(mode)}
         />
       </div>
-      {showEditor && (
-        <div
-          className={`h-full overflow-auto min-w-0 min-h-0
+      <div
+        className={`h-full overflow-auto min-w-0 min-h-0
        ${layoutMode === 'SPLIT' ? 'w-full md:flex-1' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : 'opacity-100'}
       `}
-        >
-          <NoteEditor
-            layoutMode={layoutMode}
-            selectedNoteId={selectedNoteId}
-            onToggleRecentList={handleToggleRecentList}
-            onCloseEditor={handleCloseEditor}
-          />
-        </div>
-      )}
+      >
+        <NoteEditor
+          layoutMode={layoutMode}
+          selectedNoteId={selectedNoteId}
+          onToggleRecentList={handleToggleLayout}
+          onCloseEditor={handleCloseEditor}
+        />
+      </div>
     </div>
   );
 };

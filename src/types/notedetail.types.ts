@@ -1,12 +1,4 @@
-export interface BlockProperty {
-  text: string;
-}
-
-export interface Block {
-  type: string;
-  properties: BlockProperty;
-  order_index: number;
-}
+import type { Block, Tag } from './notes.types';
 
 export interface NoteDetail {
   id: string;
@@ -15,7 +7,6 @@ export interface NoteDetail {
   blocks: Block[];
   created_at: string;
   updated_at: string;
-  first_block?: Block;
-  search_text: string;
-  tags: string[];
+  tags: Tag[];
+  is_favorite: boolean;
 }

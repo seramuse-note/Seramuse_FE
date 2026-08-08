@@ -1,5 +1,6 @@
 import Header from './components/layout/HeaderLayout';
 import HomePage from './pages/HomePage';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
     >
       <Header />
       <HomePage />
+      <ToastContainer />
     </div>
   );
 }
