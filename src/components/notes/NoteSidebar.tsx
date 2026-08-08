@@ -1,4 +1,4 @@
-import { Ellipsis, Mic, Plus, X, Funnel } from 'lucide-react';
+import { Ellipsis, Mic, Plus, X, Funnel, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
 import type { LayoutMode } from '../layout/NoteMainLayout';
@@ -6,7 +6,7 @@ import { formatDate } from '@/utils/formatDate';
 import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
 import FilterPopover from './FilterSection';
 import type { Note } from '@/types/notes.types';
-import type { ApiResponse } from '@/types/api.types';
+import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
 import { useCreateNoteMutation } from '@/services/notesApi';
 
 const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
@@ -21,7 +21,7 @@ interface NoteSidebarProps {
   selectedNoteId?: string | null;
   onPageChange: (page: number) => void;
   onSelectNote: (noteId: string) => void;
-  onCreateNote: (newNote: ApiResponse<Note>) => void;
+  onCreateNote: (newNote: ApiResponseItemNote<Note>) => void;
 }
 
 export const NoteSidebar = ({
@@ -63,7 +63,6 @@ export const NoteSidebar = ({
 
   const handleCreateNote = async (e: React.MouseEvent) => {
     e.preventDefault();
-
     try {
       const response = await createNote({
         title: '',
@@ -75,6 +74,14 @@ export const NoteSidebar = ({
       console.error('Lỗi khi tạo note:', err);
     }
   };
+
+  // const handleDeleteNote = async (id: string) => {
+  //   try {
+
+  //   } catch (err) {
+  //     console.error('Lỗi khi xoa note:', err);
+  //   }
+  // };
   // const handleFavoriteNote = (id: string) => {
   //   setListNote((prevNotes: Note[]) =>
   //     prevNotes.map((note) => (note.id === id ? { ...note, isFavorite: !note.isFavorite } : note))
@@ -183,10 +190,10 @@ export const NoteSidebar = ({
             </div>
           </div>
         </div>
-        <div className="min-h-0 h-full w-full overflow-y-auto flex ">
+        <div className="min-h-0 h-full w-full overflow-y-auto flex">
           {displayNotes && displayNotes.length > 0 ? (
             <div
-              className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4
+              className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4 
               ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1 md:grid-cols-2 md:items-center' : 'grid-cols-1 items-start'}`}
             >
               {displayNotes.map((note) => {
@@ -250,14 +257,28 @@ export const NoteSidebar = ({
                             }`}
                           />
                         </button> */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className="p-1 cursor-pointer transition-transform active:scale-90"
-                        >
-                          <Ellipsis className="w-5  text-brand-accent-tertiary hover:text-brand-accent-primary" />
-                        </button>
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            className="p-1 cursor-pointer transition-transform active:scale-90"
+                          >
+                            <Ellipsis className="w-5  text-brand-accent-tertiary hover:text-brand-accent-primary" />
+                          </button>
+                          <div className="absolute z-50 bottom-full right-0 mb-2 min-w-[100px] bg-white rounded-xl shadow-lg border border-gray-100 p-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // handleDeleteNote(note?.id);
+                              }}
+                              className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"
+                            >
+                              <Trash className="w-3 h-3" />
+                              <p>Delete</p>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

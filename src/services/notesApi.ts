@@ -16,19 +16,34 @@ export const noteApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
-    createNote: builder.mutation<ApiResponse<Note>, CreateNoteDto>({
-      query: (newNote) => ({
-        url: '/notes',
-        method: 'POST',
-        body: { title: newNote.title?.trim() || 'Untitled', blocks: newNote?.blocks ?? [] },
-      }),
-    }),
     getNote: builder.query<ApiResponseItemNote<NoteDetail>, { id: string }>({
       query: ({ id }) => `/notes/${id}`,
-      providesTags: ['NOTE_ITEM'],
+      providesTags: (result, error, { id }) => [{ type: 'NOTE', id }],
+    }),
+    createNote: builder.mutation<ApiResponseItemNote<Note>, CreateNoteDto>({
+      query(newNote) {
+        return {
+          url: '/notes',
+          method: 'POST',
+          body: { title: newNote.title?.trim() || 'Untitled', blocks: newNote?.blocks ?? [] },
+        };
+      },
+      invalidatesTags: [{ type: 'NOTE', id: 'LIST_NOTE' }],
+    }),
+    deleteNote: builder.mutation<ApiResponseItemNote<Note>, { id: string }>({
+      query(id) {
+        return {
+          url: `/notes/${id}`,
+          method: 'DELETE',
+        };
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'NOTE', id: 'LIST_NOTE' },
+        { type: 'NOTE', id },
+      ],
     }),
   }),
 });
 
-export const { useGetNotesQuery, useCreateNoteMutation, useGetNoteQuery } = noteApi;
+export const { useGetNotesQuery, useGetNoteQuery, useCreateNoteMutation } = noteApi;
 export default noteApi;

@@ -3,7 +3,7 @@ import { NoteSidebar } from '../notes/NoteSidebar';
 import { NoteEditor } from '../notes/NoteEditor';
 import { useGetNotesQuery } from '@/services/notesApi';
 import type { Note } from '@/types/notes.types';
-import type { ApiResponse } from '@/types/api.types';
+import type { ApiResponseItemNote } from '@/types/api.types';
 
 export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
@@ -20,10 +20,13 @@ export const NoteMainLayout = () => {
     setSelectedNoteId(id);
     setLayoutMode('SPLIT');
   };
+  console.log({ showEditor, selectedNoteId });
 
-  const handleCreateNote = (newNote: ApiResponse<Note>) => {
+  const handleCreateNote = (newNote: ApiResponseItemNote<Note>) => {
     const data = newNote?.data;
     if (data === undefined) return;
+
+    setSelectedNoteId(data.id);
     setLayoutMode('SPLIT');
   };
 
