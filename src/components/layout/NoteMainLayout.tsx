@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { NoteSidebar } from '../notes/NoteSidebar';
 import { NoteEditor } from '../notes/NoteEditor';
 import { useGetNotesQuery } from '@/services/notesApi';
+import type { Note } from '@/types/notes.types';
+import type { ApiResponse } from '@/types/api.types';
 
 export type LayoutMode = 'SPLIT' | 'FULL_SIDEBAR' | 'FULL_EDITOR';
 
@@ -19,7 +21,11 @@ export const NoteMainLayout = () => {
     setLayoutMode('SPLIT');
   };
 
-  const handleCreateNote = () => {};
+  const handleCreateNote = (newNote: ApiResponse<Note>) => {
+    const data = newNote?.data;
+    if (data === undefined) return;
+    setLayoutMode('SPLIT');
+  };
 
   const handleToggleRecentList = () => {
     setLayoutMode((prev) => (prev === 'FULL_EDITOR' ? 'SPLIT' : 'FULL_EDITOR'));

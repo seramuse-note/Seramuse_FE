@@ -18,13 +18,13 @@ interface Block {
 }
 
 export interface Note {
-  id: string;
+  id: string | 'Untitled';
   title: string;
   mood_id?: string;
-  blocks: Block[];
+  blocks: Block[] | [];
   created_at: string;
   updated_at: string;
-  tags?: Tag[];
+  tags?: Tag[] | [];
   isFavorite: boolean;
 }
 
@@ -32,5 +32,5 @@ export interface CreateNoteDto {
   title: string;
   mood_id?: string;
   blocks: Block[];
-  tags?: Tag[];
+  tag_ids?: Tag[];
 }

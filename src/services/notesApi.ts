@@ -1,4 +1,4 @@
-import type { Note } from '@/types/notes.types';
+import type { CreateNoteDto, Note } from '@/types/notes.types';
 import { baseApi } from './baseApi';
 import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
 import type { NoteDetail } from '@/types/notedetail.types';
@@ -16,11 +16,11 @@ export const noteApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
-    createNote: builder.mutation<Note, Partial<Note>>({
+    createNote: builder.mutation<ApiResponse<Note>, CreateNoteDto>({
       query: (newNote) => ({
         url: '/notes',
         method: 'POST',
-        body: newNote,
+        body: { title: newNote.title?.trim() || 'Untitled', blocks: newNote?.blocks ?? [] },
       }),
     }),
     getNote: builder.query<ApiResponseItemNote<NoteDetail>, { id: string }>({

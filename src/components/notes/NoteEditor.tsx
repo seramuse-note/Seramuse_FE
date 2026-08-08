@@ -69,6 +69,7 @@ export const NoteEditor = ({
     }
   );
   const itemNote = noteItem?.data;
+  if (itemNote === undefined) return;
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -121,8 +122,6 @@ export const NoteEditor = ({
       </div>
     );
   }
-
-  if (itemNote === undefined) return;
 
   return (
     <div

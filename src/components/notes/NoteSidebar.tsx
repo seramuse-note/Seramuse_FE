@@ -7,6 +7,7 @@ import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
 import FilterPopover from './FilterSection';
 import type { Note } from '@/types/notes.types';
 import type { ApiResponse } from '@/types/api.types';
+import { useCreateNoteMutation } from '@/services/notesApi';
 
 const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
 const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
@@ -20,7 +21,7 @@ interface NoteSidebarProps {
   selectedNoteId?: string | null;
   onPageChange: (page: number) => void;
   onSelectNote: (noteId: string) => void;
-  onCreateNote: () => void;
+  onCreateNote: (newNote: ApiResponse<Note>) => void;
 }
 
 export const NoteSidebar = ({
@@ -31,7 +32,9 @@ export const NoteSidebar = ({
   layoutMode,
   onPageChange,
   onSelectNote,
+  onCreateNote,
 }: NoteSidebarProps) => {
+  const [createNote] = useCreateNoteMutation();
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
 
   const listNote = notes?.data ?? [];
@@ -47,8 +50,6 @@ export const NoteSidebar = ({
     moods: [],
   });
 
-  // const handleCreateNote = () => {};
-
   const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
     setFilters(selectedData);
     setIsOpen(!isOpen);
@@ -60,6 +61,20 @@ export const NoteSidebar = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  const handleCreateNote = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await createNote({
+        title: '',
+        blocks: [],
+      }).unwrap();
+
+      onCreateNote(response);
+    } catch (err) {
+      console.error('Lỗi khi tạo note:', err);
+    }
+  };
   // const handleFavoriteNote = (id: string) => {
   //   setListNote((prevNotes: Note[]) =>
   //     prevNotes.map((note) => (note.id === id ? { ...note, isFavorite: !note.isFavorite } : note))
@@ -83,8 +98,9 @@ export const NoteSidebar = ({
                 <Mic className="w-4 h-4"></Mic>
               </button>
               <button
+                onClick={handleCreateNote}
                 className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border
-              border-white/80  text-brand-accent-primary cursor-pointer"
+                border-white/80  text-brand-accent-primary cursor-pointer"
                 title="Create a new note"
               >
                 <Plus className="w-4 h-4" />
@@ -267,6 +283,7 @@ export const NoteSidebar = ({
                       Hãy tạo ghi chú đầu tiên của bạn để bắt đầu lưu trữ ý tưởng!
                     </p>
                     <button
+                      onClick={handleCreateNote}
                       type="button"
                       className="mt-1 px-3.5 py-1.5 text-xs font-semibold text-white bg-brand-accent-primary 
                         hover:bg-brand-accent-secondary rounded-xl shadow-xs transition-all duration-200 
