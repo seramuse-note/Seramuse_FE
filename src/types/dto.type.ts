@@ -15,10 +15,10 @@ export interface CreateNoteDto {
 }
 
 export interface UpdateNoteDto {
-  title: string;
-  mood_id: string;
-  blocks: BlockDto[];
-  tag_ids: string[];
+  title?: string | 'Untitled';
+  mood_id?: string;
+  blocks?: BlockDto[];
+  tag_ids?: string[];
 }
 
 export interface CreateMoodDto {

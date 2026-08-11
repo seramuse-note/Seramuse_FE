@@ -1,8 +1,8 @@
 import type { Note } from '@/types/notes.types';
 import { baseApi } from './baseApi';
-import type { ApiResponse, ApiResponseItemNote } from '@/types/api.types';
+import type { ApiResponse, ApiResponseItem } from '@/types/api.types';
 import type { NoteDetail } from '@/types/notedetail.types';
-import type { CreateNoteDto } from '@/types/dto.type';
+import type { CreateNoteDto, UpdateNoteDto } from '@/types/dto.type';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,11 +17,11 @@ export const noteApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
-    getNote: builder.query<ApiResponseItemNote<NoteDetail>, { id: string }>({
+    getNote: builder.query<ApiResponseItem<NoteDetail>, { id: string }>({
       query: ({ id }) => `/notes/${id}`,
       providesTags: (result, error, { id }) => [{ type: 'NOTE', id: id }],
     }),
-    createNote: builder.mutation<ApiResponseItemNote<Note>, CreateNoteDto>({
+    createNote: builder.mutation<ApiResponseItem<Note>, CreateNoteDto>({
       query(newNote) {
         return {
           url: '/notes',
@@ -31,7 +31,7 @@ export const noteApi = baseApi.injectEndpoints({
       },
       invalidatesTags: [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
-    deleteNote: builder.mutation<ApiResponseItemNote<Note>, { id: string }>({
+    deleteNote: builder.mutation<ApiResponseItem<Note>, { id: string }>({
       query({ id }) {
         return {
           url: `/notes/${id}`,
@@ -43,16 +43,17 @@ export const noteApi = baseApi.injectEndpoints({
         { type: 'NOTE', id: id },
       ],
     }),
-    updateNote: builder.mutation<ApiResponseItemNote<Note>, { id: string }>({
-      query({ id }) {
+    updateNote: builder.mutation<ApiResponseItem<Note>, { idNote: string; body: UpdateNoteDto }>({
+      query({ idNote, body }) {
         return {
-          url: `/notes${id}`,
-          method: 'PATH',
+          url: `/notes/${idNote}`,
+          method: 'PATCH',
+          body,
         };
       },
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (result, error, { idNote }) => [
         { type: 'NOTE', id: 'LIST_NOTE' },
-        { type: 'NOTE', id },
+        { type: 'NOTE', id: idNote },
       ],
     }),
   }),

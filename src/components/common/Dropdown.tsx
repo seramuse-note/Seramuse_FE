@@ -1,41 +1,27 @@
+import type { Mood } from '@/types/notes.types';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-interface DropdownOption {
-  value: string;
-  label: string;
-}
-
-const DEFAULT_OPTIONS: DropdownOption[] = [
-  { value: 'Sad', label: 'Sad' },
-  { value: 'Normal', label: 'Normal' },
-  { value: 'Happy', label: 'Happy' },
-  { value: 'Excited', label: 'Excited' },
-];
-
 interface DropdownProps {
-  options?: DropdownOption[];
-  value?: string;
-  onChange?: (value: string) => void;
+  moodOptions: Mood[];
+  moodeSelected: string;
+  onSetMood: (id: string) => void;
 }
 
-export const Dropdown = ({ options = DEFAULT_OPTIONS, value, onChange }: DropdownProps) => {
+export const Dropdown = ({ moodOptions, moodeSelected, onSetMood }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>(value || options[0]?.value);
-  // const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (value: string) => {
-    setSelected(value);
+  const handleSelect = (id: string) => {
     setIsOpen(!isOpen);
-    onChange?.(value);
+    onSetMood(id);
   };
 
-  const selectedLabel = options.find((opt) => opt.value === selected)?.label || 'Trạng thái';
+  const selectedLabel = moodOptions.find((opt) => opt.id === moodeSelected)?.name || 'Trạng thái';
 
   return (
-    <div className="relative flex gap-2 min-h-0  shrink-0 " onClick={() => setIsOpen(!isOpen)}>
+    <div className="relative flex gap-2 min-h-0 shrink-0 " onClick={() => setIsOpen(!isOpen)}>
       <button
-        className="flex shrink-0 items-center px-4.5 py-2 text-[12px]  text-brand-accent-primary font-medium
+        className="flex shrink-0 items-center px-3 py-.5  text-brand-accent-primary font-medium
        bg-white/50 backdrop-blur-md hover:bg-white/70
         border border-white/60 shadow-sm rounded-xl active:scale-95 active:shadow-md
         box-border transition-all duration-200 cursor-pointer"
@@ -51,26 +37,28 @@ export const Dropdown = ({ options = DEFAULT_OPTIONS, value, onChange }: Dropdow
       {isOpen && (
         <ul
           className="absolute top-full mt-2  left-0 w-full
-         bg-transparent backdrop-blur-md text-[13px]
-        border border-white/60 shadow-md rounded-2xl box-border
+          bg-transparent backdrop-blur-md
+          border border-white/60 shadow-md rounded-2xl box-border
           flex flex-col min-h-0 overflow-y-auto cursor-pointer justify-center"
         >
-          {options.map((op) => {
-            const isSelected = op.value === selected;
+          {moodOptions.map((op) => {
+            const isSelected = op.id === moodeSelected;
+
             return (
               <li
                 className={`px-2 py-1 flex justify-center items-center-safe
                  ${isSelected ? 'text-brand-accent-secondary font-medium hover:shadow-none' : 'hover:font-medium hover:shadow-sm'}`}
               >
                 <button
-                  key={op.value}
+                  key={op.id}
                   type="button"
-                  onClick={() => {
-                    handleSelect(op.value);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelect(op.id);
                   }}
-                  className={` ${selected ? '' : 'bg-white/50'}  w-15 cursor-pointer  active:scale-95`}
+                  className={` ${moodeSelected ? '' : 'bg-white/50'}  w-15 cursor-pointer  active:scale-95`}
                 >
-                  {op.value}
+                  {op.name}
                 </button>
               </li>
             );

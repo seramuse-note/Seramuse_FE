@@ -1,26 +1,23 @@
 import { Dropdown } from '@/components/common/Dropdown';
-import { ChevronLeft, PanelLeftClose, PanelLeftOpen, Plus, TagIcon } from 'lucide-react';
+import { ChevronsLeft, Plus, Save, TagIcon, TextAlignJustify } from 'lucide-react';
 import { Editor } from '@/components/common/Editor';
-import { Tag } from '@/components/common/Tag';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
-import { useState } from 'react';
-import { useGetNoteQuery } from '@/services/notesApi';
-import { formatDate } from '@/utils/formatDate';
-// import { useCreateNoteMutation } from '@/services/notesApi';
-// import type { Note } from '@/types/notes.types';
+import { useEffect, useState } from 'react';
+import { useGetNoteQuery, useUpdateNoteMutation } from '@/services/notesApi';
+import type { CreateTagDto, UpdateNoteDto } from '@/types/dto.type';
+import { TagCompoment } from '../common/Tag';
+import { onEnter } from '@/utils/keyDown.util';
+import { toast } from 'react-toastify';
+import { useCreateTagMutation } from '@/services/tagsApi';
+import { getRandomHexColor } from '@/utils/randomColor.util';
+import { useGetMoodsQuery } from '@/services/moodApi';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
-  selectedNoteId?: string | null;
+  selectedNoteId: string | null;
   onToggleRecentList: () => void;
   onCloseEditor: () => void;
-}
-
-interface TagItem {
-  id: string;
-  label: string;
-  color: string;
 }
 
 export const NoteEditor = ({
@@ -29,80 +26,105 @@ export const NoteEditor = ({
   onToggleRecentList,
   onCloseEditor,
 }: EditorPanelProps) => {
-  const [value, setValue] = useState('');
-  const [tags, setTags] = useState<TagItem[]>([
-    { id: '1', label: 'Học tập', color: 'red' },
-    { id: '2', label: 'Công việc', color: 'red' },
-    { id: '3', label: 'Dự án Glass', color: 'red' },
-  ]);
-  // const [createNote, { isLoading, isError }] = useCreateNoteMutation();
-
-  // const handleSaveNote = async () => {
-  //   const newNote: Partial<Note> = {
-  //     title: 'Ghi chú mới',
-  //     blocks: [
-  //       {
-  //         type: 'paragraph',
-  //         properties: { text: 'Nội dung ghi chú mới' },
-  //         order_index: 0,
-  //       },
-  //     ],
-  //   };
-
-  //   try {
-  //     // Gọi API để lưu ghi chú mới
-  //     const response = await createNote(newNote);
-  //   } catch (error) {
-  //     console.error('Error saving note:', error);
-  //   }
-  // };
+  const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
+  const moodOptions = moodsData?.data ?? [];
 
   const {
-    data: noteItem,
+    data: noteData,
     isLoading,
-    isFetching,
     isError,
-  } = useGetNoteQuery(
-    { id: selectedNoteId! }, // Dấu ! để báo TS biến không null
-    {
-      skip: !selectedNoteId, // Nếu chưa có ID thì SKIP (không gọi API)
-    }
-  );
-  const itemNote = noteItem?.data;
-  if (itemNote === undefined) return;
+  } = useGetNoteQuery({ id: selectedNoteId! }, { skip: !selectedNoteId });
+  const note = noteData?.data;
+  const title = note?.title ?? 'Untitled';
+  const tagsNote = note?.tags ?? [];
+  const moodId = note?.mood_id ?? '';
 
-  const getRandomColor = () => {
-    const hue = Math.floor(Math.random() * 360);
-    return `hsl(${hue}, 95%, 30%)`;
-  };
+  const [createTag] = useCreateTagMutation();
+  const [updateNote] = useUpdateNoteMutation();
 
-  const handleRemoveTag = (idToRemove: string) => {
-    setTags((prevTags) => prevTags.filter((tag) => tag.id !== idToRemove));
-  };
+  const [titleNote, setTitleNote] = useState<string>(title);
+
+  const [moodNoteId, setMoodNoteId] = useState<string>(moodId);
+
+  // const [blockNote, setBlockNote] = useState<BlockDto[]>([]);
+
+  const [value, setValueTag] = useState('');
+  const [tagsNoteTemp, setTagsNoteTemp] = useState<CreateTagDto[]>(tagsNote);
 
   const handleAddTag = () => {
-    const isExist = tags.some(
-      (tag) => value.trim().toUpperCase() === tag.label.trim().toUpperCase()
-    );
-    const randomColor = getRandomColor();
-
-    if (!value.trim() || isExist) return;
-
-    const newTag: TagItem = {
-      id: Date.now().toString(),
-      label: value.toUpperCase(),
+    const randomColor = getRandomHexColor();
+    const newTagTemp: CreateTagDto = {
+      name: value.toUpperCase(),
       color: randomColor,
     };
-    setTags((prevTags) => [...prevTags, newTag]);
-    setValue('');
+
+    const isExistTemp = tagsNoteTemp.some(
+      (tag) => value.trim().toUpperCase() === tag.name.trim().toUpperCase()
+    );
+
+    const isExist = tagsNote.some(
+      (tag) => value.trim().toUpperCase() === tag.name.trim().toUpperCase()
+    );
+
+    if (!value.trim() || isExist || isExistTemp) return;
+
+    setTagsNoteTemp((prev) => [...prev, newTagTemp]);
+    setValueTag('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
+  const handleRemoveTag = (nameToRemove: string) => {
+    setTagsNoteTemp((prevtagsNote) => prevtagsNote.filter((tag) => tag.name !== nameToRemove));
+  };
+
+  const handleUpdateNote = async () => {
+    if (!selectedNoteId) return null;
+
+    const tagIds = await Promise.all(
+      tagsNoteTemp.map(async (tag) => {
+        try {
+          const response = await createTag(tag).unwrap();
+
+          return response.data.id || response.data?.id;
+        } catch (error) {
+          toast.error(`Thêm tag "${tag.name || tag}" thất bại`);
+          console.error('Lỗi tạo tag:', error);
+          return null;
+        }
+      })
+    );
+
+    const validTagIds = tagIds.filter((id): id is string => Boolean(id));
+
+    const bodyData: UpdateNoteDto = {
+      title: titleNote.trim() == '' ? 'Untitled' : titleNote,
+      mood_id: moodNoteId,
+      // blocks: blockNote,
+      tag_ids: validTagIds,
+    };
+
+    try {
+      const response = await updateNote({ idNote: selectedNoteId, body: bodyData }).unwrap();
+      reset();
+      toast.success('thanh cong');
+      console.log(response);
+    } catch (error) {
+      console.error('Error saving note:', error);
     }
   };
+
+  function reset() {
+    setValueTag('');
+  }
+
+  useEffect(() => {
+    handleUpdateNote();
+  }, [titleNote, moodNoteId, tagsNoteTemp]);
+
+  useEffect(() => {
+    if (!noteData || isError) {
+      onCloseEditor();
+    }
+  }, [noteData, isError]);
 
   if (!selectedNoteId) {
     return (
@@ -112,10 +134,9 @@ export const NoteEditor = ({
     );
   }
 
-  // 2. Đang tải dữ liệu của Note
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return (
-      <div className="flex-1 p-6 animate-pulse flex flex-col gap-3">
+      <div className="flex-1  p-6 animate-pulse flex flex-col gap-3">
         <div className="h-6 bg-gray-200 rounded w-1/3" />
         <div className="h-4 bg-gray-200 rounded w-full" />
         <div className="h-4 bg-gray-200 rounded w-2/3" />
@@ -123,142 +144,131 @@ export const NoteEditor = ({
     );
   }
 
+  if (isError) {
+    return (
+      <div className="flex-1 h-full flex flex-col items-center justify-center text-red-500 text-xs gap-2">
+        <p>Không thể tải dữ liệu ghi chú!</p>
+        <button onClick={onCloseEditor} className="underline cursor-pointer">
+          Quay lại
+        </button>
+      </div>
+    );
+  }
   return (
     <div
-      className={` flex-1 h-full min-w-0 min-h-0 flex flex-col
-         overflow-x-auto overflow-y-auto
-          py-5 px-3 z-0 gap-3
-          rounded-tr-xl rounded-br-xl box-border 
-        bg-white/80 backdrop-blur-xl  
-        shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] 
-        ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''}
-        `}
+      className={`flex-1 text-[10px] h-full min-w-0 min-h-0 flex flex-col overflow-x-auto overflow-y-auto z-0
+      bg-white/80 cursor-pointer shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)] 
+      ${layoutMode === 'FULL_EDITOR' ? 'w-full' : ''} `}
     >
-      <div className="flex text-xs gap-1 text-brand-accent-fourth items-center">
-        <button
-          onClick={onToggleRecentList}
-          className="block-0 hidden md:block md:w-fit md:h-fit "
-          title={
-            layoutMode === 'SPLIT'
-              ? 'Collapse the list'
-              : layoutMode === 'FULL_EDITOR'
-                ? 'Open list'
-                : ''
-          }
-        >
-          {layoutMode === 'SPLIT' ? (
-            <PanelLeftClose className="w-4 h-4 cursor-pointer" />
-          ) : layoutMode === 'FULL_EDITOR' ? (
-            <PanelLeftOpen className="w-4 h-4 cursor-pointer" />
-          ) : (
-            ''
-          )}
-          {/* ${
+      <div className="flex justify-between items-center h-7 gap-1 p-1 text-brand-accent-primary shadow-xs ">
+        <div className="flex items-center">
+          <button
+            onClick={onToggleRecentList}
+            className="block-0 hidden md:inline-flex md:items-center md:justify-center md:w-6 md:h-6 p-1 rounded-full 
+            hover:text-brand-accent-secondary cursor-pointer border border-transparent
+            transition-colors duration-200"
+            title={
+              layoutMode === 'SPLIT'
+                ? 'Close sidebar'
+                : layoutMode === 'FULL_EDITOR'
+                  ? 'Lock sidebar open'
+                  : ''
+            }
+          >
+            {layoutMode === 'SPLIT' ? (
+              <ChevronsLeft className="w-2 h-2  font-light" />
+            ) : layoutMode === 'FULL_EDITOR' ? (
+              <TextAlignJustify className="w-2 h-2 font-light" />
+            ) : (
+              ''
+            )}
+            {/* ${
               <{PanelLeftClose className="w-4 h-4 cursor-pointer" />
             :            layoutMode === 'FULL_EDITOR' ?
             
               (<PanelLeftOpen className="w-4 h-4 cursor-pointer" />)
             } */}
-        </button>
-        <button onClick={onCloseEditor} title="Go back" className={`cursor-pointer `}>
-          <ChevronLeft />
-        </button>
-        <div>Ghi chú của tôi</div>
-        <div>/</div>
-        <div className="text-brand-accent-tertiary">{itemNote.title}</div>
-      </div>
-      <div className="flex justify-between gap-2 md:gap-50 shirnk-0">
-        <input
-          key={itemNote?.id}
-          type="text"
-          className=" font-bold to-brand-accent-primary outline-0 flex-1 shrink-0 text-xs 
-          md:text-xl"
-          placeholder="Ghi chú tâm trạng hôm nay"
-          defaultValue={itemNote?.title || ''}
-        />
-        <div
-          className="flex items-center gap-1 text-[10px] h-fit shrink-0
-          bg-brand-accent-primary text-white rounded-md px-2
-            cursor-pointer hover:opacity-80"
-
-          // onClick={handleSaveNote}
+          </button>
+          <p className="leading-none truncate">{note?.title}</p>
+        </div>
+        <button
+          className="flex items-center gap-1 text-[8px] h-fit shrink-0
+          bg-brand-accent-primary text-white rounded-xl px-3
+          cursor-pointer hover:opacity-80"
+          onClick={handleUpdateNote}
+          disabled={isLoading}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="10"
-            height="10"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            className="lucide lucide-save-icon lucide-save"
-          >
-            <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
-            <path d="M7 3v4a1 1 0 0 0 1 1h7" />
-          </svg>
-          <div>Save</div>
-        </div>
+          <Save size={8} />
+          <div>{isLoading ? 'Saving...' : 'Save'}</div>
+        </button>
       </div>
-      <div className="flex gap-3 shirnk-0 text-brand-accent-primary font-light text-[10px]">
-        <div>Created: {formatDate(itemNote?.created_at)}</div>
-        <div>Updated: {formatDate(itemNote?.updated_at)}</div>
-        <div>{isLoading ? 'Đang lưu...' : isError ? 'Lưu thất bại' : 'Đã lưu'} </div>
-      </div>
-
-      <div className="flex z-20 gap-2 text-sm items-center w-full h-10 shrink-0 ">
-        <div className="shrink-0 z-20">
-          <Dropdown />
+      <div className="px-3 py-1 flex flex-col gap-1 h-full ">
+        <div className="flex justify-between gap-2 md:gap-50 shirnk-0">
+          <input
+            key={note?.id}
+            type="text"
+            placeholder="Ghi chú tâm trạng hôm nay"
+            defaultValue={note?.title}
+            onChange={(e) => setTitleNote(e.target.value)}
+            className="font-bold to-brand-accent-primary outline-0 flex-1 pl-1 shrink-0 text-xs md:text-lg"
+          />
         </div>
-        <div className="flex flex-1 min-w-0 gap-2 rounded-2xl items-center shrink-0">
-          <div className="gap-3 shrink-0">
-            <div
-              className="flex shrink-0 gap-2 items-center justify-center md:px-3 md:py-1 px-3 py-1.5 text-[12px] text-brand-accent-primary font-medium
+        <div className="flex z-20 gap-2 items-center w-full max-h-10 shrink-0 ">
+          <div className="shrink-0 z-20">
+            <Dropdown
+              moodOptions={moodOptions}
+              moodeSelected={moodNoteId}
+              onSetMood={setMoodNoteId}
+            />
+          </div>
+          <div className="flex flex-1 min-w-0 gap-2 rounded-2xl items-center shrink-0">
+            <div className="gap-3 shrink-0">
+              <div
+                className="flex shrink-0 gap-2 items-center justify-center md:pl-2 md:py-.5 px-3 py-.5 text-brand-accent-primary font-medium
               outline-none backdrop-blur-md shadow-sm hover:bg-white/70 
               rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
               overflow-x-hidden"
-            >
-              <TagIcon className="w-5 h-5 md:w-3.5 md:h-3.5 text-brand-accent-secondary mr-1 self-center" />
-              <div className="hidden md:flex shrink-0 gap-2 items-center">
-                <input
-                  type="text"
-                  placeholder="Add tag..."
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="hidden md:block w-full bg-transparent outline-none text-[12px] placeholder:text-brand-accent-tertiary"
-                />
-                <button
-                  type="button"
-                  className="py-1 rounded-lg cursor-pointer px-3"
-                  title="Add"
-                  onClick={handleAddTag}
-                >
-                  <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
-                </button>
+              >
+                <TagIcon className="w-5 h-5 md:w-3.5 ml:h-3.5 text-brand-accent-secondary mr-1 self-center" />
+                <div className="hidden md:flex shrink-0 gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Add tag..."
+                    value={value}
+                    onChange={(e) => setValueTag(e.target.value)}
+                    onKeyDown={onEnter(handleAddTag)}
+                    className="hidden md:block w-full bg-transparent outline-none  placeholder:text-brand-accent-tertiary"
+                  />
+                  <button
+                    type="button"
+                    className="rounded-lg cursor-pointer"
+                    title="Add"
+                    onClick={handleAddTag}
+                  >
+                    <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <ScrollContainer
-            vertical={false}
-            className={`hidden  sm:flex shrink-0 items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
+            <ScrollContainer
+              vertical={false}
+              className={`hidden sm:flex shrink-0 items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
             ${
-              tags.length > 0
-                ? 'p-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
+              tagsNoteTemp.length > 0
+                ? 'p-0 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
                 : 'p-0 bg-transparent border-transparent shadow-none'
             }`}
-          >
-            {tags.map((tag) => (
-              <Tag id={tag.id} tag={tag} onRemove={handleRemoveTag} />
-            ))}
-          </ScrollContainer>
+            >
+              {tagsNoteTemp.map((tag) => (
+                <TagCompoment tag={tag} onRemove={handleRemoveTag} />
+              ))}
+            </ScrollContainer>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col flex-1 min-h-0 w-full z-1">
-        <Editor />
+        <div className="flex flex-col flex-1 min-h-0 h-full w-full z-1">
+          <Editor />
+        </div>
       </div>
     </div>
   );

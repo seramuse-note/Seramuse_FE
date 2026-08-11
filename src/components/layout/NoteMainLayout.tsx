@@ -25,14 +25,13 @@ export const NoteMainLayout = () => {
   return (
     <div
       className={`flex h-full w-full bg-modern-glow/15  
-    border border-white/40 border-b-white/15
-    backdrop backdrop-blur-md rounded-r-xl 
+    backdrop backdrop-blur-md 
     shadow-[0_25px_50px_-12px_rgba(134,0,60,0.15)] 
     transition-all duration-300 overflow-auto
    `}
     >
       <div
-        className={`h-full min-h-0 min-w-0 border-r border-white/50  overflow-hidden transform-gpu
+        className={`h-full min-h-0 min-w-0 overflow-hidden transform-gpu
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-full' : ''}
        ${layoutMode === 'SPLIT' ? 'w-0 opacity-0 overflow-hidden md:w-70 md:opacity-100' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : ''}
@@ -52,6 +51,7 @@ export const NoteMainLayout = () => {
       `}
       >
         <NoteEditor
+          key={selectedNoteId}
           layoutMode={layoutMode}
           selectedNoteId={selectedNoteId}
           onToggleRecentList={handleToggleLayout}

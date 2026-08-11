@@ -15,7 +15,7 @@ export interface ApiResponse<T> {
   data: T[];
   meta: Meta;
 }
-export interface ApiResponseItemNote<T> {
+export interface ApiResponseItem<T> {
   data: T;
   meta: Meta;
 }

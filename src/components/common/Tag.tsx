@@ -1,34 +1,27 @@
+import type { CreateTagDto } from '@/types/dto.type';
 import { X } from 'lucide-react';
 
-interface TagItem {
-  id: string;
-  label: string;
-  color: string;
-}
-
 interface TagProps {
-  id: string;
-  tag: TagItem;
-  onRemove?: (id: string) => void | undefined;
+  tag: CreateTagDto;
+  onRemove: (name: string) => void;
 }
 
-export const Tag = ({ id, tag, onRemove }: TagProps) => (
+export const TagCompoment = ({ tag, onRemove }: TagProps) => (
   <div
-    key={id}
-    className={`group flex items-center gap-1 px-2.5 py-0.5
-     bg-white/90 border border-white/30 shadow-md font-medium
-     hover:shadow-sm
-      rounded-xl text-[10px] whitespace-nowrap 
-      transition-all shrink-0  `}
+    key={tag.name}
+    className={`group flex items-center gap-1 px-2.5 text-[8px]
+    bg-white/90 border border-white/30 shadow-md font-medium
+    hover:shadow-sm rounded-xl whitespace-nowrap 
+    transition-all shrink-0  `}
   >
     <span style={{ color: tag.color ? `${tag.color}` : '' }} className="truncate max-w-30">
-      {tag.label}
+      {tag.name}
     </span>
     <button
       type="button"
       onClick={(e) => {
         e.stopPropagation();
-        onRemove?.(id);
+        onRemove(tag.name);
       }}
       className=" rounded p-0.5 shrink-0 "
       title="Remove tag"

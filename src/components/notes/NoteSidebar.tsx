@@ -2,7 +2,7 @@ import { Ellipsis, Mic, Plus, X, Funnel, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
 import type { LayoutMode } from '../layout/NoteMainLayout';
-import { formatDate } from '@/utils/formatDate';
+import { formatDate } from '@/utils/event.util';
 import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
 import FilterPopover from './FilterSection';
 import {
@@ -100,7 +100,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
             <div className="flex gap-1.5">
               <button
                 className=" p-2 bg-white/60 hover:bg-white/90 rounded-full
-                  border border-white/80  text-brand-accent-primary cursor-pointer"
+                border border-white/80  text-brand-accent-primary cursor-pointer"
                 title="Use voice chat"
               >
                 <Mic className="w-4 h-4"></Mic>
