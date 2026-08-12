@@ -51,14 +51,14 @@ export const BUBBLE_MENU_OPTIONS = {
 };
 
 export const EXTENSIONS = [
+  Color,
+  TextStyleKit,
   StarterKit,
   TextAlign.configure({
     types: ['heading', 'paragraph'],
     alignments: ['left', 'center', 'right', 'justify'],
     defaultAlignment: 'left',
   }),
-  TextStyleKit,
-  Color,
 ];
 
 const COMMAND_ITEMS: CommandItem[] = [
@@ -92,7 +92,7 @@ const COMMAND_ITEMS: CommandItem[] = [
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
   const [showMenu] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
-  const [isOpenYellow, setIsOpenYellow] = useState(false);
+  const [isOpenSubBubble, setIsSubBubble] = useState(false);
 
   const editor = useEditor({
     extensions: EXTENSIONS,
@@ -296,7 +296,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
               <button
                 title="More"
                 type="button"
-                onClick={() => setIsOpenYellow((prev) => !prev)}
+                onClick={() => setIsSubBubble((prev) => !prev)}
                 className="cursor-pointer w-full mb-1 rounded-lg bg-transparent  hover:bg-brand-accent-secondary/5 border border-transparent 
                 flex items-center justify-between  hover:backdrop-blur-lg hover:border-white transition-all duration-300"
               >
@@ -468,7 +468,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
                 // className={isOrderedList ? 'is-active stroke-3' : ''}
               /> */}
             </div>
-            {isOpenYellow && (
+            {isOpenSubBubble && (
               <div
                 className="absolute top-0 left-full flex flex-col items-stretch w-[192px] overflow-hidden text-[8px] p-2 rounded-lg
                bg-white/60 backdrop-blur-md  shadow-[0_4px_6px_rgba(0,0,0,0.1)] "
