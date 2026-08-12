@@ -38,7 +38,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
   });
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
   const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
     tags: [],
     moods: [],
@@ -46,7 +46,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
 
   const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
     setFilters(selectedData);
-    setIsOpen(!isOpen);
+    setIsOpenFilter(!isOpenFilter);
   };
 
   function handlePageChange(page: number): void {
@@ -62,11 +62,15 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
         blocks: [],
       }).unwrap();
 
-      const data = response?.data;
-      if (data === undefined) return;
+      const noteId = response?.data?.id;
 
-      onSelectNote(data.id);
-      onSetLayout('SPLIT');
+      if (!noteId) {
+        console.warn('Không tìm thấy noteId trong response:', response);
+        return;
+      }
+
+      onSelectNote(noteId);
+      console.log({ noteId });
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -96,7 +100,14 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
       <div className={`h-full flex flex-col gap-4 w-full mx-auto `}>
         <div className="flex flex-col md:gap-4 gap-3 w-full">
           <div className="flex justify-between items-center px-1 shrink-0">
-            <div className=" items-start text-base font-bold flex-1">Recent</div>
+            <button className="cursor-pointer">
+              <div
+                onClick={() => onSetLayout('FULL_SIDEBAR')}
+                className=" items-start text-base font-bold flex-1"
+              >
+                Recent
+              </div>
+            </button>
             <div className="flex gap-1.5">
               <button
                 className=" p-2 bg-white/60 hover:bg-white/90 rounded-full
@@ -140,20 +151,20 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
             <div className="relative">
               <button
                 type="button"
-                onClick={() => setIsOpen((prev) => !prev)}
+                onClick={() => setIsOpenFilter((prev) => !prev)}
                 className="px-2.5 py-2.5 bg-white/90 hover:bg-white rounded-xl border
               border-white/80  text-brand-accent-tertiary shadow-sm cursor-pointer"
               >
                 <Funnel className="w-4 h-4" />
               </button>
-              {isOpen && (
+              {isOpenFilter && (
                 <FilterPopover
                   key={JSON.stringify(filters.tags) + JSON.stringify(filters.moods)}
                   tagOptions={TAG_OPTIONS}
                   moodOptions={MOOD_OPTIONS}
                   initialTags={filters.tags}
                   initialMoods={filters.moods}
-                  onClose={() => setIsOpen(false)}
+                  onClose={() => setIsOpenFilter(false)}
                   onApply={handleApplyFilter}
                 />
               )}
@@ -192,17 +203,20 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
           </div>
         </div>
         <div className="min-h-0 h-full w-full overflow-y-auto flex">
-          {displayNotes && displayNotes.length > 0 ? (
+          {listNote && listNote.length > 0 ? (
             <div
               className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4 
               ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1 md:grid-cols-2 md:items-center' : 'grid-cols-1 items-start'}`}
             >
               {displayNotes.map((note) => {
                 // const isFavorite = note.isFavorite;
+
                 return (
                   <div
                     key={note.id}
-                    onClick={() => onSelectNote(note.id)}
+                    onClick={() => {
+                      onSelectNote(note.id);
+                    }}
                     className="group flex flex-col relative p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
                     hover:bg-white/85 hover:shadow-xs active:scale-99 active:shadow-xs  duration-100 cursor-pointer "
                   >
@@ -271,7 +285,6 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                console.log(note.id);
                                 handleDeleteNote(note?.id);
                               }}
                               className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"

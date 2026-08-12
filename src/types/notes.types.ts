@@ -1,4 +1,6 @@
-interface ParagraphProperties {
+import type { BlockDto } from './dto.type';
+
+export interface ParagraphProperties {
   text: string;
 }
 
@@ -21,11 +23,22 @@ export interface Note {
   id: string | 'Untitled';
   title: string;
   mood_id?: string;
-  blocks: Block[] | [];
+  blocks: Block[];
   created_at: string;
   updated_at: string;
   tags?: Tag[] | [];
   isFavorite: boolean;
+}
+
+export interface NoteDetail {
+  id: string;
+  title: string;
+  mood_id: string | null;
+  blocks: BlockDto[];
+  created_at: string;
+  updated_at: string;
+  tags: Tag[];
+  is_favorite: boolean;
 }
 
 export interface Mood {

@@ -1,56 +1,60 @@
-import type { Block, Tag } from './notes.types';
+import type { Tag } from './notes.types';
 
-export interface BlockDto {
-  id: string;
-  order_index?: string;
-  type: Block[];
-  properties: Tag[];
-}
+export type BlockDto = {
+  id?: string;
+  order_index?: number;
+} & (
+  | { type: 'paragraph' | 'heading_1' | 'heading_2'; properties: { text: string } }
+  | { type: 'image'; properties: { url: string } }
+  | { type: 'todo_list'; properties: { checked: boolean; text?: string } }
+  | { type: 'bullet_list'; properties: { items: string[] } }
+  | { type: string; properties: Record<string, unknown> }
+);
 
-export interface CreateNoteDto {
-  title: string;
+export type CreateNoteDto = {
+  title: string | 'Untitled';
   mood_id?: string;
-  blocks: Block[];
+  blocks: BlockDto[];
   tag_ids?: Tag[];
-}
+};
 
-export interface UpdateNoteDto {
+export type UpdateNoteDto = {
   title?: string | 'Untitled';
-  mood_id?: string;
+  mood_id?: string | '';
   blocks?: BlockDto[];
   tag_ids?: string[];
-}
+};
 
-export interface CreateMoodDto {
+export type CreateMoodDto = {
   name: string;
   icon: string;
   weight: number;
-}
+};
 
-export interface updateMoodDto {
+export type updateMoodDto = {
   name: string;
   icon: string;
   weight: number;
-}
+};
 
-export interface CreateTagDto {
+export type CreateTagDto = {
   name: string;
   color: string;
-}
+};
 
-export interface UpdateTagDto {
+export type UpdateTagDto = {
   name: string;
   color: string;
-}
+};
 
-export interface UploadFileDto {
+export type UploadFileDto = {
   file: string;
-}
+};
 
-export interface PaginationMetaDto {
+export type PaginationMetaDto = {
   page: number;
   limit: number;
   total: number;
   totalPages: number;
   count: number;
-}
+};

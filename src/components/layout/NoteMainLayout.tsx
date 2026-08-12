@@ -33,7 +33,7 @@ export const NoteMainLayout = () => {
       <div
         className={`h-full min-h-0 min-w-0 overflow-hidden transform-gpu
        ${layoutMode === 'FULL_SIDEBAR' ? 'w-full' : ''}
-       ${layoutMode === 'SPLIT' ? 'w-0 opacity-0 overflow-hidden md:w-70 md:opacity-100' : ''}
+       ${layoutMode === 'SPLIT' ? 'w-0 opacity-0 overflow-hidden md:w-50 md:opacity-100' : ''}
        ${layoutMode === 'FULL_EDITOR' ? 'w-0 opacity-0 overflow-hidden pointer-events-none' : ''}
       `}
       >
@@ -52,7 +52,6 @@ export const NoteMainLayout = () => {
       >
         <NoteEditor
           key={selectedNoteId}
-          layoutMode={layoutMode}
           selectedNoteId={selectedNoteId}
           onToggleRecentList={handleToggleLayout}
           onCloseEditor={handleCloseEditor}

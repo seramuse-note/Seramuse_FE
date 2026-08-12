@@ -1,7 +1,6 @@
-import type { Note } from '@/types/notes.types';
+import type { Note, NoteDetail } from '@/types/notes.types';
 import { baseApi } from './baseApi';
 import type { ApiResponse, ApiResponseItem } from '@/types/api.types';
-import type { NoteDetail } from '@/types/notedetail.types';
 import type { CreateNoteDto, UpdateNoteDto } from '@/types/dto.type';
 
 export const noteApi = baseApi.injectEndpoints({

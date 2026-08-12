@@ -10,7 +10,7 @@ export const moodApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result?.data
           ? [
-              ...result.data.map(({ id }) => ({ type: 'TAG' as const, id })),
+              ...result.data.map(({ id }) => ({ type: 'MOOD' as const, id })),
               { type: 'MOOD', id: 'LIST_MOOD' },
             ]
           : [{ type: 'MOOD', id: 'LIST_MOOD' }],

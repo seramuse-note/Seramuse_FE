@@ -31,21 +31,26 @@ import { useState } from 'react';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
+import type { BlockDto } from '@/types/dto.type';
 
-// Định nghĩa interface rõ ràng cho cấu trúc của một dòng lệnh Slash
+interface EditorProps {
+  blocksNote: BlockDto[];
+  onSetBlock: (newBlock: BlockDto[]) => void;
+}
+
 interface CommandItem {
   title: string;
   description: string;
   action: (editor: TiptapEditor) => void;
 }
 
-const BUBBLE_MENU_OPTIONS = {
+export const BUBBLE_MENU_OPTIONS = {
   placement: 'bottom' as const,
   offset: 8,
   flip: true,
 };
 
-const EXTENSIONS = [
+export const EXTENSIONS = [
   StarterKit,
   TextAlign.configure({
     types: ['heading', 'paragraph'],
@@ -56,46 +61,56 @@ const EXTENSIONS = [
   Color,
 ];
 
-export const Editor = () => {
+const COMMAND_ITEMS: CommandItem[] = [
+  {
+    title: 'Heading 1',
+    description: 'Tiêu đề lớn',
+    action: (ed) => ed.chain().focus().toggleHeading({ level: 1 }).run(),
+  },
+  {
+    title: 'Heading 2',
+    description: 'Tiêu đề vừa',
+    action: (ed) => ed.chain().focus().toggleHeading({ level: 2 }).run(),
+  },
+  {
+    title: 'Bullet List',
+    description: 'Danh sách dấu chấm',
+    action: (ed) => ed.chain().focus().toggleBulletList().run(),
+  },
+  {
+    title: 'Ordered List',
+    description: 'Danh sách số',
+    action: (ed) => ed.chain().focus().toggleOrderedList().run(),
+  },
+  {
+    title: 'Code Block',
+    description: 'Khối mã code',
+    action: (ed) => ed.chain().focus().toggleCodeBlock().run(),
+  },
+];
+
+export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
   const [showMenu] = useState(true);
-  // const [showMenu, setShowMenu] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
+  const [isOpenYellow, setIsOpenYellow] = useState(false);
 
   const editor = useEditor({
     extensions: EXTENSIONS,
-    content: `
-      <p>Khu vuc ghi noi dung</p>
-    `,
-    onUpdate: ({ editor }) => {
-      const { state } = editor;
-      const { selection } = state;
-      const { $from } = selection;
+    content: blocksNote[0]?.properties,
 
+    onUpdate: ({ editor }) => {
+      const contentJSON = editor.getJSON();
+      onSetBlock([{ type: 'paragraph', properties: contentJSON }]);
+
+      const { $from } = editor.state.selection;
       const currentLineText = $from.nodeBefore?.text || '';
       const match = currentLineText.match(/(?:^|\s)\/(\w*)$/);
 
-      if (match) {
-        setSlashQuery(match[1].toLowerCase());
-      } else {
-        setSlashQuery('');
-      }
+      setSlashQuery(match ? match[1].toLowerCase() : '');
     },
   });
 
-  const {
-    isBold,
-    isItalic,
-    isStrikethrough,
-    isUnder,
-    // isList,
-    // isOrderedList,
-    isAlignLeft,
-    isAlignCenter,
-    isAlignRight,
-    isAlignJustify,
-    isQuote,
-    currentColor,
-  } = useEditorState({
+  const editorState = useEditorState({
     editor,
     selector: (ctx) => ({
       isBold: ctx.editor.isActive('bold') ?? false,
@@ -109,52 +124,20 @@ export const Editor = () => {
       isAlignRight: ctx.editor.isActive({ textAlign: 'right' }) ?? false,
       isAlignJustify: ctx.editor.isActive({ textAlign: 'justify' }) ?? false,
       isQuote: ctx.editor.isActive('blockquote') ?? false,
+      align:
+        ['left', 'center', 'right', 'justify'].find((a) => ctx.editor.isActive({ textAlign: a })) ||
+        'left',
       currentColor: ctx.editor.getAttributes('textStyle').color ?? '#000000',
     }),
   });
 
-  // Định nghĩa kiểu dữ liệu mảng CommandItem cho danh sách menu khối
-  const commandItems: CommandItem[] = [
-    {
-      title: 'Heading 1',
-      description: 'Tiêu đề lớn chính',
-      action: (ed) => ed.chain().focus().toggleHeading({ level: 1 }).run(),
-    },
-    {
-      title: 'Heading 2',
-      description: 'Tiêu đề phụ vừa',
-      action: (ed) => ed.chain().focus().toggleHeading({ level: 2 }).run(),
-    },
-    {
-      title: 'Bullet List',
-      description: 'Danh sách dấu chấm',
-      action: (ed) => ed.chain().focus().toggleBulletList().run(),
-    },
-    {
-      title: 'Ordered List',
-      description: 'Danh sách số thứ tự',
-      action: (ed) => ed.chain().focus().toggleOrderedList().run(),
-    },
-    {
-      title: 'Code Block',
-      description: 'Khối mã code',
-      action: (ed) => ed.chain().focus().toggleCodeBlock().run(),
-    },
-  ];
-
-  const filteredCommands = commandItems.filter((item) =>
-    item.title.toLowerCase().includes(slashQuery)
-  );
-
-  // Định nghĩa callback action nhận vào thực thể TiptapEditor chuẩn xác
   const handleExecuteCommand = (action: (ed: TiptapEditor) => void) => {
     if (!editor) return;
-
-    const { selection } = editor.state;
-    const { $from } = selection;
+    const { $from } = editor.state.selection;
     const currentLineText = $from.nodeBefore?.text || '';
     const match = currentLineText.match(/(?:^|\s)\/(\w*)$/);
 
+    // Xóa ký tự "/" và từ khóa đã gõ trước khi thực thi lệnh
     if (match && match.index !== undefined) {
       const deleteFrom = $from.pos - match[0].length;
       editor.chain().focus().deleteRange({ from: deleteFrom, to: $from.pos }).run();
@@ -164,12 +147,6 @@ export const Editor = () => {
     setSlashQuery('');
   };
 
-  /**
-   * Hàm thực thi chuỗi lệnh Tiptap với vị trí động
-   * @param {Object} editor - Instance của Tiptap editor
-   * @param {Function} commandFn - Hàm nhận vào chain builder và gọi phương thức cần dùng
-   */
-
   const executeCommand = (
     editor: TiptapEditor | null,
     commandFn: (chain: ChainedCommands) => ChainedCommands | boolean
@@ -177,21 +154,28 @@ export const Editor = () => {
     if (!editor) return;
     const result = commandFn(editor.chain().focus());
 
-    if (typeof result === 'boolean') {
-      return result;
-    }
+    if (typeof result === 'boolean') return result;
 
     return result.run();
   };
 
   type Alignment = 'left' | 'center' | 'right' | 'justify';
   const handleAlign = (type: Alignment, isActive: boolean) => {
+    if (!editor) return;
+    if (editorState?.align === type) {
+      editor.chain().focus().unsetTextAlign().run();
+    } else {
+      editor.chain().focus().setTextAlign(type).run();
+    }
     executeCommand(editor, (chain) =>
       isActive ? chain.unsetTextAlign() : chain.setTextAlign(type)
     );
   };
 
-  const [isOpenYellow, setIsOpenYellow] = useState(false);
+  // Lọc các câu lệnh theo từ khóa gõ sau dấu "/"
+  const filteredCommands = COMMAND_ITEMS.filter((item) =>
+    item.title.toLowerCase().includes(slashQuery)
+  );
 
   return (
     <div className="flex flex-col h-full min-h-full w-full gap-2">
@@ -333,7 +317,7 @@ export const Editor = () => {
                   <Bold
                     size={20}
                     onClick={() => executeCommand(editor, (chain) => chain.toggleBold())}
-                    className={`${isBold ? ' stroke-3' : ''} p-1`}
+                    className={`${editorState.isBold ? ' stroke-3' : ''} p-1`}
                   />
                 </button>
                 <button
@@ -343,7 +327,7 @@ export const Editor = () => {
                   <Italic
                     size={20}
                     onClick={() => executeCommand(editor, (chain) => chain.toggleItalic())}
-                    className={`${isItalic ? ' stroke-3' : ''} p-1`}
+                    className={`${editorState.isItalic ? ' stroke-3' : ''} p-1`}
                   />
                 </button>
                 <button
@@ -353,7 +337,7 @@ export const Editor = () => {
                   <Underline
                     size={20}
                     onClick={() => executeCommand(editor, (chain) => chain.toggleUnderline())}
-                    className={`${isUnder ? 'stroke-3' : ''} p-1`}
+                    className={`${editorState.isUnder ? 'stroke-3' : ''} p-1`}
                   />
                 </button>
                 <button
@@ -363,10 +347,10 @@ export const Editor = () => {
                   <Strikethrough
                     size={20}
                     onClick={() => executeCommand(editor, (chain) => chain.toggleStrike())}
-                    className={`${isStrikethrough ? ' stroke-3' : ''} p-1`}
+                    className={`${editorState.isStrikethrough ? ' stroke-3' : ''} p-1`}
                   />
                 </button>
-                <button
+                <div
                   title="Blod"
                   className=" flex items-center cursor-pointer rounded-md border border-gray-100 px-.5 hover:backdrop-blur-lg hover:border-brand-accent-fourth"
                 >
@@ -375,23 +359,27 @@ export const Editor = () => {
                     className="box-border hover:bg-white hover:cursor-pointer  rounded-md"
                     title="Text color"
                   >
-                    <Baseline size={20} style={{ color: currentColor }} className="p-1" />
+                    <Baseline
+                      size={20}
+                      style={{ color: editorState.currentColor }}
+                      className="p-1"
+                    />
                   </label>
                   <input
                     id="tiptap-color-picker"
                     type="color"
-                    value={currentColor}
+                    value={editorState.currentColor}
                     onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
                     className="absolute w-0 h-0 opacity-0 pointer-events-none"
                   />
-                  <button title="Default text" className="box-border hover:bg-white rounded-r-sm  ">
+                  <button title="Default text" className="box-border hover:bg-white rounded-r-sm ">
                     <RotateCcw
                       size={8}
                       onClick={() => editor.chain().focus().unsetColor().run()}
                       className="cursor-pointer flex justify-center text-gray-400 min-h-2"
                     />
                   </button>
-                </button>
+                </div>
               </div>
               <div className="flex gap-1 items-center">
                 <button
@@ -401,7 +389,7 @@ export const Editor = () => {
                   <AlignLeft
                     size={20}
                     onClick={() => executeCommand(editor, (chain) => chain.setTextAlign('left'))}
-                    className={`${isAlignLeft ? 'is-active stroke-3' : ''}  p-1`}
+                    className={`${editorState.isAlignLeft ? 'is-active stroke-3' : ''}  p-1`}
                   />
                 </button>
                 <button
@@ -410,8 +398,8 @@ export const Editor = () => {
                 >
                   <AlignCenter
                     size={20}
-                    onClick={() => handleAlign('center', isAlignCenter)}
-                    className={`${isAlignCenter ? 'is-active stroke-3' : ''} p-1`}
+                    onClick={() => handleAlign('center', editorState.isAlignCenter)}
+                    className={`${editorState.isAlignCenter ? 'is-active stroke-3' : ''} p-1`}
                     cursor-pointer
                   />
                 </button>
@@ -421,8 +409,8 @@ export const Editor = () => {
                 >
                   <AlignRight
                     size={20}
-                    onClick={() => handleAlign('right', isAlignRight)}
-                    className={`${isAlignRight ? 'is-active stroke-3' : ''}p-1`}
+                    onClick={() => handleAlign('right', editorState.isAlignRight)}
+                    className={`${editorState.isAlignRight ? 'is-active stroke-3' : ''}p-1`}
                     cursor-pointer
                   />
                 </button>
@@ -432,8 +420,8 @@ export const Editor = () => {
                 >
                   <AlignJustify
                     size={20}
-                    onClick={() => handleAlign('justify', isAlignJustify)}
-                    className={`${isAlignJustify ? 'is-active stroke-3' : ''} p-1`}
+                    onClick={() => handleAlign('justify', editorState.isAlignJustify)}
+                    className={`${editorState.isAlignJustify ? 'is-active stroke-3' : ''} p-1`}
                   />
                 </button>
               </div>
@@ -444,9 +432,9 @@ export const Editor = () => {
                 >
                   <Quote
                     size={20}
-                    values={currentColor}
+                    values={editorState.currentColor}
                     onClick={() => executeCommand(editor, (chain) => chain.toggleBlockquote())}
-                    className={`${isQuote ? 'stroke-3' : ''} p-1`}
+                    className={`${editorState.isQuote ? 'stroke-3' : ''} p-1`}
                   />
                 </button>
                 <button
