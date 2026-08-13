@@ -1,4 +1,4 @@
-function Avatar({ className }: { className?: string }) {
+export const Avatar = ({ className }: { className?: string }) => {
   return (
     <div className={`relative w-12 h-12 ${className}`}>
       <div className="rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
@@ -17,6 +17,4 @@ function Avatar({ className }: { className?: string }) {
       />
     </div>
   );
-}
-
-export default Avatar;
+};

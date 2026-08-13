@@ -1,7 +1,7 @@
-import HomePage from './pages/HomePage';
 import { ToastContainer } from 'react-toastify';
+import { HomePage } from './pages/HomePage';
 
-function App() {
+export const App = () => {
   return (
     <div className="h-screen w-screen relative flex flex-1 cursor: text bg-modern-glow">
       {/* <Header /> */}
@@ -9,5 +9,4 @@ function App() {
       <ToastContainer />
     </div>
   );
-}
-export default App;
+};

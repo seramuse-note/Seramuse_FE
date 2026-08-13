@@ -3,14 +3,14 @@ import type { FilterPopoverProps } from '@/types';
 import { RotateCcw, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
 
-export default function FilterPopover({
+export const FilterPopover = ({
   tagOptions,
   moodOptions,
   initialTags = [],
   initialMoods = [],
   onClose,
   onApply,
-}: FilterPopoverProps) {
+}: FilterPopoverProps) => {
   const [tempTags, setTempTags] = useState(initialTags);
   const [tempMoods, setTempMoods] = useState(initialMoods);
   const [tagQuery, setTagQuery] = useState<string>('');
@@ -323,4 +323,4 @@ export default function FilterPopover({
       </div>
     </>
   );
-}
+};

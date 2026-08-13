@@ -1,7 +1,7 @@
 import { NoteMainLayout } from '@/components/layout/NoteMainLayout';
 import { TabNavbar } from '@/components/navigation/TabNavbar';
 
-function HomePage() {
+export const HomePage = () => {
   return (
     <div
       className="flex flex-1 min-w-0 min-h-0 shirnk-0
@@ -16,5 +16,4 @@ function HomePage() {
       </div>
     </div>
   );
-}
-export default HomePage;
+};
