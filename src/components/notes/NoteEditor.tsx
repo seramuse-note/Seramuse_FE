@@ -39,8 +39,8 @@ export const NoteEditor = ({
   const moodId = note?.mood_id ?? '';
   const blocks = note?.blocks ?? [];
 
-  const [createTag] = useCreateTagMutation();
   const [updateNote] = useUpdateNoteMutation();
+  const [createTag] = useCreateTagMutation();
 
   const [titleNoteTemp, setTitleNoteTemp] = useState<string>(title);
 

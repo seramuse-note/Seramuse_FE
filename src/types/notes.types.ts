@@ -27,7 +27,7 @@ export interface Note {
   created_at: string;
   updated_at: string;
   tags?: Tag[] | [];
-  isFavorite: boolean;
+  is_favorite?: boolean;
 }
 
 export interface NoteDetail {

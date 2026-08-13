@@ -1,16 +1,17 @@
-import { Ellipsis, Mic, Plus, X, Funnel, Trash } from 'lucide-react';
+import { Mic, Plus, X, Funnel } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
 import type { LayoutMode } from '../layout/NoteMainLayout';
-import { formatDate } from '@/utils/event.util';
 import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
 import FilterPopover from './FilterSection';
 import {
   useCreateNoteMutation,
   useDeleteNoteMutation,
   useGetNotesQuery,
+  useUpdateFavoriteMutation,
 } from '@/services/notesApi';
 import { toast } from 'react-toastify';
+import { NoteCard } from './NoteCard';
 
 const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
 const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
@@ -29,12 +30,13 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
 
   const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
+  const [updateFavorite] = useUpdateFavoriteMutation();
   const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
 
   const listNote = notes?.data ?? [];
   const pagination = notes?.meta?.pagination;
   const displayNotes = listNote.filter((note) => {
-    return activeTab === 'favorite' ? note.isFavorite : true;
+    return activeTab === 'favorite' ? note.is_favorite : true;
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,11 +89,14 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
     }
   };
 
-  // const handleFavoriteNote = (id: string) => {
-  //   setListNote((prevNotes: Note[]) =>
-  //     prevNotes.map((note) => (note.id === id ? { ...note, isFavorite: !note.isFavorite } : note))
-  //   );
-  // };
+  const handleToggleLike = async (id: string) => {
+    try {
+      await updateFavorite({ id }).unwrap();
+    } catch (error) {
+      console.log('Lỗi toggle favorite', error);
+      toast.error('Cập nhật thất bại!');
+    }
+  };
 
   if (isLoading) return <SidebarNoteSkeleton count={4} />;
 
@@ -209,94 +214,14 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
               ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1 md:grid-cols-2 md:items-center' : 'grid-cols-1 items-start'}`}
             >
               {displayNotes.map((note) => {
-                // const isFavorite = note.isFavorite;
-
                 return (
-                  <div
-                    key={note.id}
-                    onClick={() => {
-                      onSelectNote(note.id);
-                    }}
-                    className="group flex flex-col relative p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
-                    hover:bg-white/85 hover:shadow-xs active:scale-99 active:shadow-xs  duration-100 cursor-pointer "
-                  >
-                    <div className="flex ">
-                      <h3
-                        className="font-semibold text-sm active:text-brand-accent-secondary
-                        group-hover:text-brand-accent-secondary transition-colors line-clamp-1"
-                      >
-                        {note.title || 'Untitled'}
-                      </h3>
-                    </div>
-                    <div className="min-h-[32px] text-[11px] text-brand-accent-tertiary line-clamp-2 leading-relaxed">
-                      {note.blocks.map((block) => block.properties?.text || '')}
-                    </div>
-
-                    <div className=" h-[35px] flex items-center py-5 border-t border-white/20 overflow-hidden">
-                      {note.tags && note.tags.length > 0 && (
-                        <div className="flex flex-nowrap gap-1.5">
-                          {note.tags.map((tag) => (
-                            <span
-                              key={tag.id}
-                              className="text-[9px] font-semibold px-2 py-0 rounded-lg bg-white/80 border border-white/50 shrink-0"
-                              style={{
-                                borderColor: tag.color ? `#${tag.color}` : undefined,
-                                color: tag.color ? `#${tag.color}` : undefined,
-                              }}
-                            >
-                              #{tag.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between border-t border-brand-accent-tertiary/10 ">
-                      <div className="text-[10px] text-brand-accent-tertiary font-medium active:text-brand-accent-secondary">
-                        {formatDate(note.created_at || '2026-07-14T05:28:46')}
-                      </div>
-                      <div className="flex gap-1 items-center">
-                        {/* <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFavoriteNote(note.id);
-                          }}
-                          className="p-2 cursor-pointer transition-transform active:scale-90"
-                          title={isFavorite ? 'Unlike' : 'Like'}
-                        >
-                          <Heart
-                            className={`w-3  transition-colors duration-300
-                            ${
-                              isFavorite
-                                ? 'fill-pink-500 text-pink-500'
-                                : 'fill-brand-accent-tertiary text-brand-accent-tertiary'
-                            }`}
-                          />
-                        </button> */}
-                        <div className="relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                            className="p-1 cursor-pointer transition-transform active:scale-90"
-                          >
-                            <Ellipsis className="w-5  text-brand-accent-tertiary hover:text-brand-accent-primary" />
-                          </button>
-                          <div className="absolute z-50 bottom-full right-0 mb-2 min-w-[100px] bg-white rounded-xl shadow-lg border border-gray-100 p-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteNote(note?.id);
-                              }}
-                              className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"
-                            >
-                              <Trash className="w-3 h-3" />
-                              <p>Delete</p>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <NoteCard
+                    key={`${note.id}-${note.is_favorite}`}
+                    note={note}
+                    onSelectNote={onSelectNote}
+                    onToggleLike={handleToggleLike}
+                    onDeleteNote={handleDeleteNote}
+                  />
                 );
               })}
             </div>

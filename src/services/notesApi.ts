@@ -55,6 +55,18 @@ export const noteApi = baseApi.injectEndpoints({
         { type: 'NOTE', id: idNote },
       ],
     }),
+    updateFavorite: builder.mutation<ApiResponseItem<Note>, { id: string }>({
+      query({ id }) {
+        return {
+          url: `/notes/${id}/favorite`,
+          method: 'PATCH',
+        };
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'NOTE', id: 'LIST_NOTE' },
+        { type: 'NOTE', id: id },
+      ],
+    }),
   }),
 });
 
@@ -64,5 +76,6 @@ export const {
   useCreateNoteMutation,
   useDeleteNoteMutation,
   useUpdateNoteMutation,
+  useUpdateFavoriteMutation,
 } = noteApi;
 export default noteApi;
