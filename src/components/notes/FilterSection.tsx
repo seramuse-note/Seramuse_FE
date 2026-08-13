@@ -1,15 +1,7 @@
 import { useClickOutside } from '@/hooks/useClickOutside';
+import type { FilterPopoverProps } from '@/types';
 import { RotateCcw, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
-
-interface FilterPopoverProps {
-  tagOptions: string[];
-  moodOptions: string[];
-  initialTags?: string[];
-  initialMoods?: string[];
-  onClose: () => void;
-  onApply: (data: { tags: string[]; moods: string[] }) => void;
-}
 
 export default function FilterPopover({
   tagOptions,

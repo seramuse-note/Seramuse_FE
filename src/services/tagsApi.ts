@@ -1,7 +1,5 @@
-import { type ApiResponseItem } from '@/types/api.types';
+import type { ApiResponseItem, CreateTagDto, Tag } from '@/types';
 import { baseApi } from './baseApi';
-import type { Tag } from '@/types/notes.types';
-import type { CreateTagDto } from '@/types/dto.type';
 
 export const tagApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

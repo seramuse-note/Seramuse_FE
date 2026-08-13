@@ -1,6 +1,5 @@
-import type { ApiResponse } from '@/types/api.types';
+import type { ApiResponse, Mood } from '@/types';
 import { baseApi } from './baseApi';
-import type { Mood } from '@/types/notes.types';
 
 export const moodApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

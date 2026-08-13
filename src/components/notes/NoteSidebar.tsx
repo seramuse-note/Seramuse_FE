@@ -26,24 +26,31 @@ const LIMIT = 10;
 
 export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSidebarProps) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { data: notes, isLoading } = useGetNotesQuery({ page: currentPage, limit: LIMIT });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
+  const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
+  const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
+    tags: [],
+    moods: [],
+  });
+
+  const { data: notes, isLoading } = useGetNotesQuery({
+    page: currentPage,
+    limit: LIMIT,
+    search: searchQuery || undefined,
+    tag_id: filters.tags.length > 0 ? filters.tags.join(',') : undefined,
+    mood_id: filters.moods.length > 0 ? filters.moods.join(',') : undefined,
+    is_favorite: activeTab === 'favorite' ? true : undefined,
+  });
 
   const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
   const [updateFavorite] = useUpdateFavoriteMutation();
-  const [activeTab, setActiveTab] = useState<'all' | 'favorite'>('all');
 
   const listNote = notes?.data ?? [];
   const pagination = notes?.meta?.pagination;
   const displayNotes = listNote.filter((note) => {
     return activeTab === 'favorite' ? note.is_favorite : true;
-  });
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
-  const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
-    tags: [],
-    moods: [],
   });
 
   const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
@@ -279,11 +286,11 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
           ) : (
             <div
               className="flex justify-center items-center
-          mt-auto w-full p-2.5 bg-white/50
-          hover:bg-white/80 backdrop-blur-md rounded-2xl border
-          border-white/70 text-xs font-medium text-brand-accent-primary
-          hover:text-brand-accent-secondary shadow-sm
-          cursor-pointer whitespace-nowrap truncate shrink-0"
+            mt-auto w-full p-2.5 bg-white/50
+            hover:bg-white/80 backdrop-blur-md rounded-2xl border
+            border-white/70 text-xs font-medium text-brand-accent-primary
+            hover:text-brand-accent-secondary shadow-sm
+            cursor-pointer whitespace-nowrap truncate shrink-0"
             >
               All post
             </div>

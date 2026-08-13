@@ -1,8 +1,8 @@
 import { Heart, Ellipsis, Trash } from 'lucide-react';
 import { formatDate } from '@/utils/event.util';
-import type { Block, Note, Tag } from '@/types/notes.types';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import type { Block, Note, Tag } from '@/types';
 
 interface NoteCardProps {
   note: Note;

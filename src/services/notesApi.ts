@@ -1,12 +1,31 @@
-import type { Note, NoteDetail } from '@/types/notes.types';
+import type {
+  ApiResponse,
+  ApiResponseItem,
+  CreateNoteDto,
+  GetNotesQueryParams,
+  Note,
+  NoteDetail,
+  UpdateNoteDto,
+} from '@/types';
 import { baseApi } from './baseApi';
-import type { ApiResponse, ApiResponseItem } from '@/types/api.types';
-import type { CreateNoteDto, UpdateNoteDto } from '@/types/dto.type';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getNotes: builder.query<ApiResponse<Note>, { page: number; limit: number }>({
-      query: ({ page, limit }) => `/notes?page=${page}&limit=${limit}`,
+    getNotes: builder.query<ApiResponse<Note>, GetNotesQueryParams>({
+      query: (params) => {
+        return {
+          url: `/notes`,
+          params: {
+            page: params?.page ?? 1,
+            limit: params?.limit ?? 10,
+            search: params?.search,
+            mood_id: params?.mood_id,
+            tag_id: params?.tag_id,
+            operator: params?.operator,
+            is_favorite: params?.is_favorite,
+          },
+        };
+      },
       transformResponse: (response: ApiResponse<Note>) => response,
       providesTags: (result) =>
         result?.data
