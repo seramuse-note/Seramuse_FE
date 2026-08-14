@@ -1,6 +1,6 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
 import { useState } from 'react';
-import type { BlockRequest } from '@/types';
+import type { Block, BlockRequest } from '@/types';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
 import {
   EditorToolbar,
@@ -10,7 +10,7 @@ import {
 } from '@/components/editor';
 
 interface EditorProps {
-  blocksNote: BlockRequest[];
+  blocksNote: Block[];
   onSetBlock: (_newBlock: BlockRequest[]) => void;
 }
 
