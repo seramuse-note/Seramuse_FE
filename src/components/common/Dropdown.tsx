@@ -1,22 +1,27 @@
-import type { Mood } from '@/types';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-interface DropdownProps {
-  moodOptions: Mood[];
-  moodeSelected: string;
-  onSetMood: (_id: string) => void;
+interface DropdownOption {
+  value: string;
+  label: string;
 }
 
-export const Dropdown = ({ moodOptions, moodeSelected, onSetMood }: DropdownProps) => {
+interface DropdownProps {
+  options: DropdownOption[];
+  value: string;
+  onChange: (_value: string) => void;
+  placeholder?: string;
+}
+
+export const Dropdown = ({ options, value, onChange, placeholder = 'Lựa chọn' }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleSelect = (id: string) => {
+  const handleSelect = (selectedId: string) => {
     setIsOpen(!isOpen);
-    onSetMood(id);
+    onChange(selectedId);
   };
 
-  const selectedLabel = moodOptions.find((opt) => opt.id === moodeSelected)?.name || 'Trạng thái';
+  const selectedLabel = options.find((opt) => opt.value === value)?.label || placeholder;
 
   return (
     <div className="relative flex gap-2 min-h-0 shrink-0 " onClick={() => setIsOpen(!isOpen)}>
@@ -41,24 +46,24 @@ export const Dropdown = ({ moodOptions, moodeSelected, onSetMood }: DropdownProp
           border border-white/60 shadow-md rounded-2xl box-border
           flex flex-col min-h-0 overflow-y-auto cursor-pointer justify-center"
         >
-          {moodOptions.map((op) => {
-            const isSelected = op.id === moodeSelected;
+          {options.map((op) => {
+            const isSelected = op.value === value;
 
             return (
               <li
+                key={op.value}
                 className={`px-2 py-1 flex justify-center items-center-safe
                  ${isSelected ? 'text-brand-accent-secondary font-medium hover:shadow-none' : 'hover:font-medium hover:shadow-sm'}`}
               >
                 <button
-                  key={op.id}
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSelect(op.id);
+                    handleSelect(op.value);
                   }}
-                  className={` ${moodeSelected ? '' : 'bg-white/50'}  w-15 cursor-pointer  active:scale-95`}
+                  className={` ${value ? '' : 'bg-white/50'}  w-15 cursor-pointer  active:scale-95`}
                 >
-                  {op.name}
+                  {op.label}
                 </button>
               </li>
             );

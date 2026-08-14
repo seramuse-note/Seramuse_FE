@@ -26,7 +26,11 @@ export const NoteEditor = ({
   onCloseEditor,
 }: EditorPanelProps) => {
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
-  const moodOptions = moodsData?.data ?? [];
+  const moods = moodsData?.data ?? [];
+  const moodOptions = moods.map((m) => ({
+    value: m.id,
+    label: m.name,
+  }));
 
   const {
     data: noteData,
@@ -44,7 +48,7 @@ export const NoteEditor = ({
 
   const [titleNoteTemp, setTitleNoteTemp] = useState<string>(title);
 
-  const [moodNoteIdTemp, setMoodNoteIdTemp] = useState<string>(moodId);
+  const [selectedMoodId, setSelectedMoodId] = useState<string>(moodId);
 
   const [blockNoteTemp, setBlocksNoteTemp] = useState<BlockDto[]>([]);
 
@@ -95,7 +99,7 @@ export const NoteEditor = ({
 
     const bodyData: UpdateNoteDto = {
       title: titleNoteTemp.trim() == '' ? 'Untitled' : titleNoteTemp,
-      mood_id: moodNoteIdTemp == '' ? undefined : moodNoteIdTemp,
+      mood_id: selectedMoodId == '' ? undefined : selectedMoodId,
       blocks: blockNoteTemp,
       tag_ids: validTagIds,
     };
@@ -212,9 +216,10 @@ export const NoteEditor = ({
         <div className="flex z-20 gap-2 items-center w-full max-h-10 shrink-0 ">
           <div className="shrink-0 z-20">
             <Dropdown
-              moodOptions={moodOptions}
-              moodeSelected={moodNoteIdTemp}
-              onSetMood={setMoodNoteIdTemp}
+              options={moodOptions}
+              value={selectedMoodId}
+              onChange={setSelectedMoodId}
+              placeholder="Trạng thái"
             />
           </div>
           <div className="flex flex-1 min-w-0 gap-2 rounded-2xl items-center shrink-0">
