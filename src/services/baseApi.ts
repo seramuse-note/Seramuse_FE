@@ -14,6 +14,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['NOTE', 'TAG', 'MOOD'], // Khai báo các loại Tag dùng để quản lý Cache (sẽ học ở phần sau)
-  endpoints: () => ({}), // Để trống ở đây nếu bạn muốn dùng tính năng injectEndpoints sau này
+  tagTypes: ['NOTE', 'TAG', 'MOOD'],
+  endpoints: () => ({}),
 });

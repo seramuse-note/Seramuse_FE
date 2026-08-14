@@ -1,9 +1,9 @@
-import type { ApiResponse, Mood } from '@/types';
+import type { ApiResponse, GetMoodsRequest, Mood } from '@/types';
 import { baseApi } from './baseApi';
 
 export const moodApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getMoods: builder.query<ApiResponse<Mood>, { page: number; limit: number }>({
+    getMoods: builder.query<ApiResponse<Mood>, GetMoodsRequest>({
       query: ({ page, limit }) => `/moods?page=${page}&limit=${limit}`,
       transformResponse: (response: ApiResponse<Mood>) => response,
       providesTags: (result) =>

@@ -15,6 +15,7 @@ export interface ApiResponse<T> {
   data: T[];
   meta: Meta;
 }
+
 export interface ApiResponseItem<T> {
   data: T;
   meta: Meta;
@@ -24,7 +25,7 @@ export type UploadFileDto = {
   file: string;
 };
 
-export type PaginationMetaDto = {
+export type PaginationMetaRequest = {
   page: number;
   limit: number;
   total: number;

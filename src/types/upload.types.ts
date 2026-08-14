@@ -11,3 +11,11 @@ export interface Upload {
   created_at: string;
   updated_at: string;
 }
+
+export interface UploadRequest {
+  file: string;
+}
+
+export interface UploadListRequest {
+  file: string[];
+}

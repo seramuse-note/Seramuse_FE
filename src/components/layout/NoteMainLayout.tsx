@@ -6,7 +6,6 @@ import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 export const NoteMainLayout = () => {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(LAYOUT_MODE.FULL_SIDEBAR);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  console.log('1, main', layoutMode);
 
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);

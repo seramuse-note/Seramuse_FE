@@ -1,4 +1,4 @@
-export * from './FilterSection';
+export * from './FilterPopover';
 export * from './NoteCard';
 export * from './NoteEditor';
 export * from './NoteSidebar';

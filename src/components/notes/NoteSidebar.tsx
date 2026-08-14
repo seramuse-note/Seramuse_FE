@@ -3,18 +3,19 @@ import { Mic, Plus, X, Funnel } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
 import {
+  useGetMoodsQuery,
+  useGetTagsQuery,
   useCreateNoteMutation,
   useDeleteNoteMutation,
   useGetNotesQuery,
   useUpdateFavoriteMutation,
-} from '@/services/notesApi';
+} from '@/services';
 import { toast } from 'react-toastify';
 import { NoteCard } from './NoteCard';
-import { FilterPopover } from './FilterSection';
-import { SidebarNoteSkeleton } from '../skeleton/NoteSkeleton';
+import { FilterPopover } from './FilterPopover';
+import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
-import { useGetTagsQuery } from '@/services/tagsApi';
-import { useGetMoodsQuery } from '@/services/moodApi';
+import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 
 const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_SIDEBAR: 'flex-1',
@@ -30,12 +31,6 @@ interface NoteSidebarProps {
 
 const LIMIT = 10;
 const PAGES = 1;
-
-const ACTIVE_TAB = {
-  ALL: 'all',
-  FAVORITE: 'favorite',
-};
-type ActiveTab = (typeof ACTIVE_TAB)[keyof typeof ACTIVE_TAB];
 
 export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSidebarProps) => {
   const [currentPage, setCurrentPage] = useState<number>(1);

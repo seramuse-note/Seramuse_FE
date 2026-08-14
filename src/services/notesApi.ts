@@ -1,17 +1,26 @@
 import type {
   ApiResponse,
   ApiResponseItem,
-  CreateNoteDto,
-  GetNotesQueryParams,
   Note,
-  NoteDetail,
-  UpdateNoteDto,
+  GetNotesRequest,
+  CreateNoteRequest,
+  UpdateNoteRequest,
 } from '@/types';
 import { baseApi } from './baseApi';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getNotes: builder.query<ApiResponse<Note>, GetNotesQueryParams>({
+    createNote: builder.mutation<ApiResponseItem<Note>, CreateNoteRequest>({
+      query(newNote) {
+        return {
+          url: '/notes',
+          method: 'POST',
+          body: { title: newNote.title?.trim() || 'Untitled', blocks: newNote?.blocks ?? [] },
+        };
+      },
+      invalidatesTags: [{ type: 'NOTE', id: 'LIST_NOTE' }],
+    }),
+    getNotes: builder.query<ApiResponse<Note>, GetNotesRequest>({
       query: (params) => {
         return {
           url: `/notes`,
@@ -35,19 +44,22 @@ export const noteApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'NOTE', id: 'LIST_NOTE' }],
     }),
-    getNote: builder.query<ApiResponseItem<NoteDetail>, { id: string }>({
+    getNote: builder.query<ApiResponseItem<Note>, { id: string }>({
       query: ({ id }) => `/notes/${id}`,
       providesTags: (_result, _error, { id }) => [{ type: 'NOTE', id: id }],
     }),
-    createNote: builder.mutation<ApiResponseItem<Note>, CreateNoteDto>({
-      query(newNote) {
+    updateNote: builder.mutation<ApiResponseItem<Note>, { id: string; body: UpdateNoteRequest }>({
+      query({ id, body }) {
         return {
-          url: '/notes',
-          method: 'POST',
-          body: { title: newNote.title?.trim() || 'Untitled', blocks: newNote?.blocks ?? [] },
+          url: `/notes/${id}`,
+          method: 'PATCH',
+          body,
         };
       },
-      invalidatesTags: [{ type: 'NOTE', id: 'LIST_NOTE' }],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'NOTE', id: 'LIST_NOTE' },
+        { type: 'NOTE', id: id },
+      ],
     }),
     deleteNote: builder.mutation<ApiResponseItem<Note>, { id: string }>({
       query({ id }) {
@@ -59,19 +71,6 @@ export const noteApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { id }) => [
         { type: 'NOTE', id: 'LIST_NOTE' },
         { type: 'NOTE', id: id },
-      ],
-    }),
-    updateNote: builder.mutation<ApiResponseItem<Note>, { idNote: string; body: UpdateNoteDto }>({
-      query({ idNote, body }) {
-        return {
-          url: `/notes/${idNote}`,
-          method: 'PATCH',
-          body,
-        };
-      },
-      invalidatesTags: (_result, _error, { idNote }) => [
-        { type: 'NOTE', id: 'LIST_NOTE' },
-        { type: 'NOTE', id: idNote },
       ],
     }),
     updateFavorite: builder.mutation<ApiResponseItem<Note>, { id: string }>({

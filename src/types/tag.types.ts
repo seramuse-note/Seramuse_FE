@@ -5,18 +5,17 @@ export interface Tag {
   created_at: string;
   updated_at: string;
 }
-
-export type CreateTagDto = {
+export interface CreateTagRequest {
   name: string;
   color: string;
-};
+}
 
-export type UpdateTagDto = {
-  name: string;
-  color: string;
-};
+export interface UpdateTagRequest {
+  name?: string;
+  color?: string;
+}
 
-export type GetTagsQueryParams = {
+export interface GetTagsRequest {
   page?: number;
   limit?: number;
-};
+}

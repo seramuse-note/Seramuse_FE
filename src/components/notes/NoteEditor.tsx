@@ -4,14 +4,17 @@ import { PanelLeftClose, PanelLeftOpen, Plus, Save, TagIcon } from 'lucide-react
 import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { useEffect, useState } from 'react';
-import { useGetNoteQuery, useUpdateNoteMutation } from '@/services/notesApi';
 import { TagCompoment } from '../common/Tag';
 import { onEnter } from '@/utils/keyDown.util';
-import { useCreateTagMutation } from '@/services/tagsApi';
 import { getRandomHexColor } from '@/utils/randomColor.util';
-import { useGetMoodsQuery } from '@/services/moodApi';
-import type { BlockDto, CreateTagDto, UpdateNoteDto } from '@/types';
+import type { BlockRequest, CreateTagRequest, UpdateNoteRequest } from '@/types';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
+import {
+  useCreateTagMutation,
+  useGetMoodsQuery,
+  useGetNoteQuery,
+  useUpdateNoteMutation,
+} from '@/services';
 
 const EDITOR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_EDITOR: 'flex-1',
@@ -58,14 +61,14 @@ export const NoteEditor = ({
 
   const [selectedMoodId, setSelectedMoodId] = useState<string>(moodId);
 
-  const [blockNoteTemp, setBlocksNoteTemp] = useState<BlockDto[]>([]);
+  const [blockNoteTemp, setBlocksNoteTemp] = useState<BlockRequest[]>([]);
 
   const [valueTag, setValueTag] = useState('');
-  const [tagsNoteTemp, setTagsNoteTemp] = useState<CreateTagDto[]>(tagsNote);
+  const [tagsNoteTemp, setTagsNoteTemp] = useState<CreateTagRequest[]>(tagsNote);
 
   const handleAddTag = () => {
     const randomColor = getRandomHexColor();
-    const newTagTemp: CreateTagDto = {
+    const newTagTemp: CreateTagRequest = {
       name: valueTag.toUpperCase(),
       color: randomColor,
     };
@@ -105,22 +108,22 @@ export const NoteEditor = ({
 
     const validTagIds = tagIds.filter((id): id is string => Boolean(id));
 
-    const bodyData: UpdateNoteDto = {
-      title: titleNoteTemp.trim() == '' ? 'Untitled' : titleNoteTemp,
+    const bodyData: UpdateNoteRequest = {
+      title: titleNoteTemp.trim() === undefined ? 'Untitled' : titleNoteTemp,
       mood_id: selectedMoodId == '' ? undefined : selectedMoodId,
       blocks: blockNoteTemp,
       tag_ids: validTagIds,
     };
 
     try {
-      await updateNote({ idNote: selectedNoteId, body: bodyData }).unwrap();
+      await updateNote({ id: selectedNoteId, body: bodyData }).unwrap();
       reset();
     } catch (error) {
       console.error('Error saving note:', error);
     }
   };
 
-  const handleProcessBlocks = (newBlocks: BlockDto[]) => {
+  const handleProcessBlocks = (newBlocks: BlockRequest[]) => {
     setBlocksNoteTemp(newBlocks);
   };
 
