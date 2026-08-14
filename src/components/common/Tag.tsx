@@ -1,8 +1,12 @@
-import type { CreateTagDto } from '@/types';
 import { X } from 'lucide-react';
 
+interface TagData {
+  name: string;
+  color: string;
+}
+
 interface TagProps {
-  tag: CreateTagDto;
+  tag: TagData;
   onRemove: (_name: string) => void;
 }
 
