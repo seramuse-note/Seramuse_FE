@@ -31,26 +31,26 @@ import { useState } from 'react';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
-import type { BlockDto } from '@/types/dto.type';
+import type { BlockDto } from '@/types';
 
 interface EditorProps {
   blocksNote: BlockDto[];
-  onSetBlock: (newBlock: BlockDto[]) => void;
+  onSetBlock: (_newBlock: BlockDto[]) => void;
 }
 
 interface CommandItem {
   title: string;
   description: string;
-  action: (editor: TiptapEditor) => void;
+  action: (_editor: TiptapEditor) => void;
 }
 
-export const BUBBLE_MENU_OPTIONS = {
+const BUBBLE_MENU_OPTIONS = {
   placement: 'bottom' as const,
   offset: 8,
   flip: true,
 };
 
-export const EXTENSIONS = [
+const EXTENSIONS = [
   Color,
   TextStyleKit,
   StarterKit,
@@ -131,7 +131,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     }),
   });
 
-  const handleExecuteCommand = (action: (ed: TiptapEditor) => void) => {
+  const handleExecuteCommand = (action: (_ed: TiptapEditor) => void) => {
     if (!editor) return;
     const { $from } = editor.state.selection;
     const currentLineText = $from.nodeBefore?.text || '';
@@ -149,7 +149,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
 
   const executeCommand = (
     editor: TiptapEditor | null,
-    commandFn: (chain: ChainedCommands) => ChainedCommands | boolean
+    commandFn: (_chain: ChainedCommands) => ChainedCommands | boolean
   ): boolean | undefined => {
     if (!editor) return;
     const result = commandFn(editor.chain().focus());

@@ -2,8 +2,6 @@ import { Mic, Plus, X, Funnel } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
 import type { LayoutMode } from '../layout/NoteMainLayout';
-import SidebarNoteSkeleton from '../skeleton/NoteSkeleton';
-import FilterPopover from './FilterSection';
 import {
   useCreateNoteMutation,
   useDeleteNoteMutation,
@@ -12,14 +10,16 @@ import {
 } from '@/services/notesApi';
 import { toast } from 'react-toastify';
 import { NoteCard } from './NoteCard';
+import { FilterPopover } from './FilterSection';
+import { SidebarNoteSkeleton } from '../skeleton/NoteSkeleton';
 
 const TAG_OPTIONS = ['Work', 'Personal', 'Study'];
 const MOOD_OPTIONS = ['😊 Vui vẻ', '🧘 Tập trung', '😴 Mệt mỏi', '🔥 Hào hứng'];
 
 interface NoteSidebarProps {
   layoutMode: LayoutMode;
-  onSelectNote: (noteId: string) => void;
-  onSetLayout: (mode: LayoutMode) => void;
+  onSelectNote: (_noteId: string) => void;
+  onSetLayout: (_mode: LayoutMode) => void;
 }
 
 const LIMIT = 10;
@@ -79,7 +79,6 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
       }
 
       onSelectNote(noteId);
-      console.log({ noteId });
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -99,8 +98,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
   const handleToggleLike = async (id: string) => {
     try {
       await updateFavorite({ id }).unwrap();
-    } catch (error) {
-      console.log('Lỗi toggle favorite', error);
+    } catch {
       toast.error('Cập nhật thất bại!');
     }
   };

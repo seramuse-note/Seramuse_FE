@@ -5,7 +5,7 @@ export const tagApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTag: builder.query<ApiResponseItem<Tag>, { id: number }>({
       query: ({ id }) => `/tags/${id}`,
-      providesTags: (result, error, { id }) => [{ type: 'TAG', id: id }],
+      providesTags: (_result, _error, { id }) => [{ type: 'TAG', id: id }],
     }),
     createTag: builder.mutation<ApiResponseItem<Tag>, CreateTagDto>({
       query(newTag) {

@@ -6,7 +6,7 @@ interface PaginationProps {
   total?: number;
   limit?: number;
   isLoading?: boolean;
-  onPageChange: (page: number) => void;
+  onPageChange: (_page: number) => void;
 }
 
 function getPageNumbers(currentPage: number, totalPages: number, siblingCount = 1) {

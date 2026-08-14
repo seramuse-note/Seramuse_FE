@@ -6,9 +6,9 @@ import type { Block, Note, Tag } from '@/types';
 
 interface NoteCardProps {
   note: Note;
-  onSelectNote: (id: string) => void;
-  onToggleLike: (id: string) => Promise<void>;
-  onDeleteNote: (id: string) => void;
+  onSelectNote: (_id: string) => void;
+  onToggleLike: (_id: string) => Promise<void>;
+  onDeleteNote: (_id: string) => void;
 }
 
 export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: NoteCardProps) => {
@@ -27,7 +27,7 @@ export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: Not
     if (debouncedlLocalLikes !== note.is_favorite) {
       onToggleLike(note.id);
     }
-  }, [debouncedlLocalLikes]);
+  }, [debouncedlLocalLikes, note.id, note.is_favorite, onToggleLike]);
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();

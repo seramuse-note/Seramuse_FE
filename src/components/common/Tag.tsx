@@ -1,9 +1,9 @@
-import type { CreateTagDto } from '@/types/dto.type';
+import type { CreateTagDto } from '@/types';
 import { X } from 'lucide-react';
 
 interface TagProps {
   tag: CreateTagDto;
-  onRemove: (name: string) => void;
+  onRemove: (_name: string) => void;
 }
 
 export const TagCompoment = ({ tag, onRemove }: TagProps) => (

@@ -38,5 +38,5 @@ export interface FilterPopoverProps {
   initialTags?: string[];
   initialMoods?: string[];
   onClose: () => void;
-  onApply: (data: { tags: string[]; moods: string[] }) => void;
+  onApply: (_data: { tags: string[]; moods: string[] }) => void;
 }

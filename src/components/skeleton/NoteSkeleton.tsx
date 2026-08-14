@@ -1,6 +1,4 @@
-import React from 'react';
-
-export const SidebarNoteSkeletonvv = ({ layoutMode = 'FULL_SIDEBAR', count = 4 }) => {
+export const SidebarNoteSkeleton = ({ layoutMode = 'FULL_SIDEBAR', count = 4 }) => {
   return (
     <div className="h-full relative bg-white/45 backdrop-blur-lg p-4">
       <div className="h-full flex flex-col gap-4 w-full mx-auto">

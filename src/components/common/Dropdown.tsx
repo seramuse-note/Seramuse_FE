@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface DropdownProps {
   moodOptions: Mood[];
   moodeSelected: string;
-  onSetMood: (id: string) => void;
+  onSetMood: (_id: string) => void;
 }
 
 export const Dropdown = ({ moodOptions, moodeSelected, onSetMood }: DropdownProps) => {

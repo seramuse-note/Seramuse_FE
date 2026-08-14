@@ -5,12 +5,12 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useEffect, useState } from 'react';
 import { useGetNoteQuery, useUpdateNoteMutation } from '@/services/notesApi';
-import type { BlockDto, CreateTagDto, UpdateNoteDto } from '@/types/dto.type';
 import { TagCompoment } from '../common/Tag';
 import { onEnter } from '@/utils/keyDown.util';
 import { useCreateTagMutation } from '@/services/tagsApi';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import { useGetMoodsQuery } from '@/services/moodApi';
+import type { BlockDto, CreateTagDto, UpdateNoteDto } from '@/types';
 
 interface EditorPanelProps {
   layoutMode?: LayoutMode;
@@ -101,9 +101,8 @@ export const NoteEditor = ({
     };
 
     try {
-      const response = await updateNote({ idNote: selectedNoteId, body: bodyData }).unwrap();
+      await updateNote({ idNote: selectedNoteId, body: bodyData }).unwrap();
       reset();
-      console.log(response);
     } catch (error) {
       console.error('Error saving note:', error);
     }
@@ -121,7 +120,7 @@ export const NoteEditor = ({
     if (isError) {
       onCloseEditor();
     }
-  }, [noteData, isError]);
+  }, [noteData, isError, onCloseEditor]);
 
   if (!selectedNoteId) {
     return (

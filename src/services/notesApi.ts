@@ -37,7 +37,7 @@ export const noteApi = baseApi.injectEndpoints({
     }),
     getNote: builder.query<ApiResponseItem<NoteDetail>, { id: string }>({
       query: ({ id }) => `/notes/${id}`,
-      providesTags: (result, error, { id }) => [{ type: 'NOTE', id: id }],
+      providesTags: (_result, _error, { id }) => [{ type: 'NOTE', id: id }],
     }),
     createNote: builder.mutation<ApiResponseItem<Note>, CreateNoteDto>({
       query(newNote) {
@@ -56,7 +56,7 @@ export const noteApi = baseApi.injectEndpoints({
           method: 'DELETE',
         };
       },
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'NOTE', id: 'LIST_NOTE' },
         { type: 'NOTE', id: id },
       ],
@@ -69,7 +69,7 @@ export const noteApi = baseApi.injectEndpoints({
           body,
         };
       },
-      invalidatesTags: (result, error, { idNote }) => [
+      invalidatesTags: (_result, _error, { idNote }) => [
         { type: 'NOTE', id: 'LIST_NOTE' },
         { type: 'NOTE', id: idNote },
       ],
@@ -81,7 +81,7 @@ export const noteApi = baseApi.injectEndpoints({
           method: 'PATCH',
         };
       },
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'NOTE', id: 'LIST_NOTE' },
         { type: 'NOTE', id: id },
       ],
