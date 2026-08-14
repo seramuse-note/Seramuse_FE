@@ -1,6 +1,6 @@
 import { Dropdown } from '@/components/common/Dropdown';
 import { PanelLeftClose, PanelLeftOpen, Plus, Save, TagIcon } from 'lucide-react';
-import { Editor } from '@/components/common/Editor';
+import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import type { LayoutMode } from '../layout/NoteMainLayout';
 import { useEffect, useState } from 'react';
