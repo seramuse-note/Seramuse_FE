@@ -1,4 +1,13 @@
-export const SidebarNoteSkeleton = ({ layoutMode = 'FULL_SIDEBAR', count = 4 }) => {
+import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
+import clsx from 'clsx';
+
+const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
+  FULL_SIDEBAR: 'grid-cols-1 md:grid-cols-2 md:items-center',
+  SPLIT: 'w-0 opacity-0 overflow-hidden md:w-50 md:opacity-100',
+  FULL_EDITOR: 'w-0 opacity-0 overflow-hidden pointer-events-none',
+};
+
+export const SidebarNoteSkeleton = ({ layoutMode = LAYOUT_MODE.FULL_SIDEBAR, count = 4 }) => {
   return (
     <div className="h-full relative bg-white/45 backdrop-blur-lg p-4">
       <div className="h-full flex flex-col gap-4 w-full mx-auto">
@@ -25,11 +34,10 @@ export const SidebarNoteSkeleton = ({ layoutMode = 'FULL_SIDEBAR', count = 4 }) 
 
         <div className="min-h-0 h-full w-full overflow-y-hidden flex">
           <div
-            className={`w-full h-full grid gap-4 justify-center md:gap-4 ${
-              layoutMode === 'FULL_SIDEBAR'
-                ? 'grid-cols-1 md:grid-cols-2 md:items-center'
-                : 'grid-cols-1 items-start'
-            }`}
+            className={clsx(
+              `w-full h-full grid gap-4 justify-center md:gap-4`,
+              SIDEBAR_LAYOUT_STYLES[layoutMode]
+            )}
           >
             {Array.from({ length: count }).map((_, index) => (
               <div

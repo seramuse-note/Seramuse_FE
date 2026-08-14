@@ -7,7 +7,7 @@ import Color from '@tiptap/extension-color';
 export interface CommandItem {
   title: string;
   description: string;
-  action: (editor: TiptapEditor) => void;
+  action: (_editor: TiptapEditor) => void;
 }
 
 export const BUBBLE_MENU_OPTIONS = {

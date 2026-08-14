@@ -15,3 +15,8 @@ export type UpdateTagDto = {
   name: string;
   color: string;
 };
+
+export type GetTagsQueryParams = {
+  page?: number;
+  limit?: number;
+};

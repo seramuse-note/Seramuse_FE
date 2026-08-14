@@ -32,9 +32,26 @@ export type PaginationMetaDto = {
   count: number;
 };
 
+interface TagData {
+  id: string;
+  name: string;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface MoodData {
+  id: string;
+  name: string;
+  icon: string;
+  weight: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface FilterPopoverProps {
-  tagOptions: string[];
-  moodOptions: string[];
+  tagOptions: TagData[];
+  moodOptions: MoodData[];
   initialTags?: string[];
   initialMoods?: string[];
   onClose: () => void;

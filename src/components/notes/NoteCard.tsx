@@ -1,7 +1,6 @@
 import { Heart, Ellipsis, Trash } from 'lucide-react';
 import { formatDate } from '@/utils/event.util';
-import { useEffect, useRef, useState } from 'react';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useRef, useState } from 'react';
 import type { Block, Note, Tag } from '@/types';
 
 interface NoteCardProps {
@@ -13,26 +12,25 @@ interface NoteCardProps {
 
 export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: NoteCardProps) => {
   const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
-  const debouncedlLocalLikes = useDebounce(isLocalLikes, 500);
 
-  const isFirstRender = useRef(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    // Bỏ qua lần Render đầu tiên (khi vừa hiện Card ra)
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    if (debouncedlLocalLikes !== note.is_favorite) {
-      onToggleLike(note.id);
-    }
-  }, [debouncedlLocalLikes, note.id, note.is_favorite, onToggleLike]);
-
-  const handleHeartClick = async (e: React.MouseEvent) => {
+  const handleHeartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setIsLocalLikes((prev) => !prev);
+
+    const nextState = !isLocalLikes;
+    setIsLocalLikes(nextState);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      if (nextState !== note.is_favorite) {
+        onToggleLike(note.id);
+      }
+    }, 500);
   };
 
   return (

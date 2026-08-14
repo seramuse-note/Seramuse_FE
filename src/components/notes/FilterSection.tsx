@@ -59,11 +59,11 @@ export const FilterPopover = ({
   };
 
   const displayTags = tagOptions.filter((tag) =>
-    tag.toLocaleLowerCase().includes(tagQuery.toLocaleLowerCase().trim())
+    tag.name.toLocaleLowerCase().includes(tagQuery.toLocaleLowerCase().trim())
   );
 
   const displayMoods = moodOptions.filter((item) =>
-    item.toLowerCase().trim().includes(moodQuery.toLocaleLowerCase().trim())
+    item.name.toLowerCase().trim().includes(moodQuery.toLocaleLowerCase().trim())
   );
 
   useClickOutside(tagDropdownRef, () => {
@@ -157,23 +157,23 @@ export const FilterPopover = ({
                   {displayTags.length > 0 ? (
                     displayTags.map((tag) => (
                       <label
-                        key={tag}
+                        key={tag.id}
                         className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
-                          checked={tempTags.includes(tag)}
-                          onChange={() => handleTag(tag)}
+                          checked={tempTags.includes(tag.name)}
+                          onChange={() => handleTag(tag.name)}
                           className="sr-only"
                         />
                         <div
                           className={`w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                            tempTags.includes(tag)
+                            tempTags.includes(tag.name)
                               ? 'bg-brand-accent-secondary border-brand-accent-secondary text-white shadow-xs'
                               : 'border-gray-300/80 bg-white/40 group-hover:border-gray-400'
                           }`}
                         >
-                          {tempTags.includes(tag) && (
+                          {tempTags.includes(tag.name) && (
                             <svg
                               className="w-2.5 h-2.5 stroke-[2]"
                               fill="none"
@@ -188,7 +188,7 @@ export const FilterPopover = ({
                             </svg>
                           )}
                         </div>
-                        <span className="font-medium">{tag}</span>
+                        <span className="font-medium">{tag.name}</span>
                       </label>
                     ))
                   ) : (
@@ -258,23 +258,23 @@ export const FilterPopover = ({
                   {displayMoods.length > 0 ? (
                     displayMoods.map((mood) => (
                       <label
-                        key={mood}
+                        key={mood.id}
                         className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
-                          checked={tempMoods.includes(mood)}
-                          onChange={() => handleMood(mood)}
+                          checked={tempMoods.includes(mood.name)}
+                          onChange={() => handleMood(mood.name)}
                           className="sr-only"
                         />
                         <div
                           className={`w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                            tempMoods.includes(mood)
+                            tempMoods.includes(mood.name)
                               ? 'bg-brand-accent-secondary border-brand-accent-secondary text-white shadow-xs'
                               : 'border-gray-300/80 bg-white/40 group-hover:border-gray-400'
                           }`}
                         >
-                          {tempMoods.includes(mood) && (
+                          {tempMoods.includes(mood.name) && (
                             <svg
                               className="w-2.5 h-2.5 stroke-[2]"
                               fill="none"
@@ -289,7 +289,7 @@ export const FilterPopover = ({
                             </svg>
                           )}
                         </div>
-                        <span className="font-medium">{mood}</span>
+                        <span className="font-medium">{mood.name}</span>
                       </label>
                     ))
                   ) : (
