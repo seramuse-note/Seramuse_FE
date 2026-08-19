@@ -1,6 +1,5 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
-import { useState } from 'react';
-import type { Block, BlockRequest } from '@/types';
+import { useEffect, useState } from 'react';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
 import {
   EditorToolbar,
@@ -8,10 +7,11 @@ import {
   ListBubbleMenu,
   SlashCommandMenu,
 } from '@/components/editor';
+import type { Block, CreateBlockPayload } from '@/types';
 
 interface EditorProps {
   blocksNote: Block[];
-  onSetBlock: (_newBlock: BlockRequest[]) => void;
+  onSetBlock: (_newBlock: CreateBlockPayload[]) => void;
 }
 
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
@@ -23,8 +23,19 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     content: blocksNote[0]?.properties,
 
     onUpdate: ({ editor }) => {
-      const contentJSON = editor.getJSON();
-      onSetBlock([{ type: 'paragraph', properties: contentJSON }]);
+      const properties = editor.getJSON();
+
+      const newBlocks: CreateBlockPayload[] = [
+        {
+          type: blocksNote[0]?.type ?? 'paragraph',
+          properties: properties,
+        },
+      ];
+      const isUnchanged = JSON.stringify(blocksNote[0]?.properties) === JSON.stringify(properties);
+
+      if (!isUnchanged) {
+        onSetBlock(newBlocks);
+      }
 
       const { $from } = editor.state.selection;
       const currentLineText = $from.nodeBefore?.text || '';
@@ -33,6 +44,10 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
       setSlashQuery(match ? match[1].toLowerCase() : '');
     },
   });
+
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+  }, [blocksNote, editor]);
 
   const editorState = useEditorState({
     editor,

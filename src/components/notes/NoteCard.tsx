@@ -1,7 +1,10 @@
 import { Heart, Ellipsis, Trash } from 'lucide-react';
-import { formatDate } from '@/utils/event.util';
 import { useRef, useState } from 'react';
-import type { Block, Note, Tag } from '@/types';
+import type { Note, Tag } from '@/types';
+import moment from 'moment';
+import { formatDate } from '@/utils/event.util';
+import { getFirstBlockText } from '@/utils/block.util';
+moment.locale('vi');
 
 interface NoteCardProps {
   note: Note;
@@ -49,7 +52,7 @@ export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: Not
       </div>
 
       <div className="min-h-[32px] text-[11px] text-brand-accent-tertiary line-clamp-2 leading-relaxed">
-        {note.blocks?.map((block: Block) => block.properties?.text || '')}
+        {getFirstBlockText(note.blocks)}
       </div>
 
       <div className="h-[35px] flex items-center py-5 border-t border-white/20 overflow-hidden">
@@ -60,8 +63,8 @@ export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: Not
                 key={tag.id}
                 className="text-[9px] font-semibold px-2 py-0 rounded-lg bg-white/80 border border-white/50 shrink-0"
                 style={{
-                  borderColor: tag.color ? `#${tag.color}` : undefined,
-                  color: tag.color ? `#${tag.color}` : undefined,
+                  borderColor: tag.color ? `${tag.color}` : undefined,
+                  color: tag.color ? `${tag.color}` : undefined,
                 }}
               >
                 #{tag.name}
@@ -73,7 +76,7 @@ export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: Not
 
       <div className="flex items-center justify-between border-t border-brand-accent-tertiary/10">
         <div className="text-[10px] text-brand-accent-tertiary font-medium active:text-brand-accent-secondary">
-          {formatDate(note.created_at || '2026-07-14T05:28:46')}
+          {formatDate(note.created_at)}
         </div>
 
         <div className="flex gap-1 items-center">

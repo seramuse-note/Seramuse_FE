@@ -3,11 +3,11 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { PanelLeftClose, PanelLeftOpen, Plus, Save, TagIcon } from 'lucide-react';
 import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TagCompoment } from '../common/Tag';
-import { onEnter } from '@/utils/keyDown.util';
+import { onKey } from '@/utils/keyDown.util';
 import { getRandomHexColor } from '@/utils/randomColor.util';
-import type { BlockRequest, CreateTagRequest, UpdateNoteRequest } from '@/types';
+import type { CreateBlockPayload, NoteRequest, Tag, TagRequest } from '@/types';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import {
   useCreateTagMutation,
@@ -15,6 +15,8 @@ import {
   useGetNoteQuery,
   useUpdateNoteMutation,
 } from '@/services';
+import { toast } from 'react-toastify';
+import { EditorSkeleton } from '../skeleton/EditorSkeleton';
 
 const EDITOR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_EDITOR: 'flex-1',
@@ -22,114 +24,160 @@ const EDITOR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_SIDEBAR: '-translate-x-full w-0 opacity-0 overflow-hidden pointer-events-none',
 };
 
+export interface DropdownOption {
+  value: string;
+  label: string;
+}
+
 interface EditorPanelProps {
-  layoutMode: LayoutMode;
+  key: string | null;
   selectedNoteId: string | null;
+  layoutMode: LayoutMode;
   onToggleRecentList: () => void;
   onCloseEditor: () => void;
-  onSetLayout: (_mode: LayoutMode) => void;
 }
 
 export const NoteEditor = ({
-  layoutMode,
+  key,
   selectedNoteId,
+  layoutMode,
   onToggleRecentList,
   onCloseEditor,
 }: EditorPanelProps) => {
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
-  const moods = moodsData?.data ?? [];
-  const moodOptions = moods.map((m) => ({
-    value: m.id,
-    label: m.name,
-  }));
-
   const {
     data: noteData,
     isLoading,
     isError,
-  } = useGetNoteQuery({ id: selectedNoteId! }, { skip: !selectedNoteId });
-  const note = noteData?.data;
-  const title = note?.title ?? 'Untitled';
-  const tagsNote = note?.tags ?? [];
-  const moodId = note?.mood_id ?? '';
-  const blocks = note?.blocks ?? [];
+  } = useGetNoteQuery({ id: selectedNoteId ?? '' }, { skip: !selectedNoteId });
 
-  const [updateNote] = useUpdateNoteMutation();
+  const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
   const [createTag] = useCreateTagMutation();
 
-  const [titleNoteTemp, setTitleNoteTemp] = useState<string>(title);
+  const moods = moodsData?.data ?? [];
+  const moodOptions = moods.map((m) => ({ value: m.id, label: m.name }));
 
-  const [selectedMoodId, setSelectedMoodId] = useState<string>(moodId);
+  const initialData = noteData?.data ?? undefined;
+  const initialTitle = initialData?.title ?? '';
+  const initialMoodId = initialData?.mood_id ?? '';
+  const initialBlocks = initialData?.blocks ?? [];
+  const initialTags =
+    initialData?.tags?.map((tag) => ({
+      id: tag.id,
+      name: tag.name,
+      color: tag.color,
+    })) ?? [];
 
-  const [blockNoteTemp, setBlocksNoteTemp] = useState<BlockRequest[]>([]);
+  const [formData, setFormData] = useState<Partial<NoteRequest>>({});
+  const [tagInput, setTagInput] = useState('');
+  const [addedTags, setAddedTags] = useState<TagRequest[]>([]);
+  const [removedTagNames, setRemovedTagNames] = useState<string[]>([]);
 
-  const [valueTag, setValueTag] = useState('');
-  const [tagsNoteTemp, setTagsNoteTemp] = useState<CreateTagRequest[]>(tagsNote);
+  const currentTitle = formData.title ?? initialTitle;
+  const currentMoodId = formData.mood_id ?? initialMoodId;
+  const currentBlocks = formData.blocks ?? initialBlocks;
 
-  const handleAddTag = () => {
-    const randomColor = getRandomHexColor();
-    const newTagTemp: CreateTagRequest = {
-      name: valueTag.toUpperCase(),
-      color: randomColor,
-    };
+  const displayTags = [
+    ...initialTags.filter((tag) => !removedTagNames.includes(tag.name.toUpperCase())),
+    ...addedTags,
+  ];
 
-    const isExistTemp = tagsNoteTemp.some(
-      (tag) => valueTag.trim().toUpperCase() === tag.name.trim().toUpperCase()
-    );
-
-    const isExist = tagsNote.some(
-      (tag) => valueTag.trim().toUpperCase() === tag.name.trim().toUpperCase()
-    );
-
-    if (!valueTag.trim() || isExist || isExistTemp) return;
-
-    setTagsNoteTemp((prev) => [...prev, newTagTemp]);
-    setValueTag('');
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      title: e.target.value,
+    }));
   };
 
-  const handleRemoveTag = (nameToRemove: string) => {
-    setTagsNoteTemp((prevtagsNote) => prevtagsNote.filter((tag) => tag.name !== nameToRemove));
+  const handleBlocksChange = useCallback((newBlocks: CreateBlockPayload[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      blocks: newBlocks,
+    }));
+  }, []);
+
+  const handleMoodChange = (moodId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      mood_id: moodId,
+    }));
+  };
+
+  const handleAddTag = () => {
+    const normalizedInput = tagInput.trim().toUpperCase();
+    if (!normalizedInput) return;
+
+    const isExist = displayTags.some((tag) => normalizedInput === tag.name?.trim().toUpperCase());
+    if (isExist) {
+      toast.warn('The tag already exists');
+      return;
+    }
+
+    if (removedTagNames.includes(normalizedInput)) {
+      setRemovedTagNames((prev) => prev.filter((name) => name !== normalizedInput));
+    } else {
+      setAddedTags((prev) => [
+        ...prev,
+        {
+          name: normalizedInput,
+          color: getRandomHexColor(),
+        },
+      ]);
+    }
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (targetTag: string) => {
+    const normalizedTarget = targetTag.trim().toUpperCase();
+    setAddedTags((prev) =>
+      prev.filter((tag) => tag.name.trim().toUpperCase() !== normalizedTarget)
+    );
+    setRemovedTagNames((prev) => [...prev, normalizedTarget]);
   };
 
   const handleUpdateNote = async () => {
     if (!selectedNoteId) return null;
 
+    const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
+
     const tagIds = await Promise.all(
-      tagsNoteTemp.map(async (tag) => {
+      displayTags.map(async (tag) => {
+        if (typeof tag === 'object' && 'id' in tag) {
+          return tag.id;
+        }
+
         try {
-          const response = await createTag(tag).unwrap();
-          return response.data.id || response.data?.id;
+          const tagRequest: TagRequest = {
+            name: tag.name,
+            color: tag.color,
+          };
+          const response = await createTag(tagRequest).unwrap();
+          return response.data?.id || null;
         } catch (error) {
-          console.error('Lỗi tạo tag:', error);
+          console.error('Lỗi tạo tag mới:', error);
           return null;
         }
       })
     );
 
-    const validTagIds = tagIds.filter((id): id is string => Boolean(id));
+    const validTagIds = Array.from(
+      new Set(tagIds.filter((id): id is string => Boolean(id !== '')))
+    );
 
-    const bodyData: UpdateNoteRequest = {
-      title: titleNoteTemp.trim() === undefined ? 'Untitled' : titleNoteTemp,
-      mood_id: selectedMoodId == '' ? undefined : selectedMoodId,
-      blocks: blockNoteTemp,
+    const isValidMood = currentMoodId && currentMoodId !== '';
+    const updatePayload: NoteRequest = {
+      title: formattedTitle,
+      blocks: currentBlocks ?? [],
       tag_ids: validTagIds,
+      ...(isValidMood && { mood_id: currentMoodId }),
     };
 
     try {
-      await updateNote({ id: selectedNoteId, body: bodyData }).unwrap();
-      reset();
+      await updateNote({ id: selectedNoteId, body: { ...updatePayload } }).unwrap();
     } catch (error) {
       console.error('Error saving note:', error);
     }
   };
-
-  const handleProcessBlocks = (newBlocks: BlockRequest[]) => {
-    setBlocksNoteTemp(newBlocks);
-  };
-
-  function reset() {
-    setValueTag('');
-  }
 
   useEffect(() => {
     if (isError) {
@@ -138,18 +186,12 @@ export const NoteEditor = ({
   }, [noteData, isError, onCloseEditor]);
 
   if (isLoading) {
-    return (
-      <div className="flex-1  p-6 animate-pulse flex flex-col gap-3">
-        <div className="h-6 bg-gray-200 rounded w-1/3" />
-        <div className="h-4 bg-gray-200 rounded w-full" />
-        <div className="h-4 bg-gray-200 rounded w-2/3" />
-      </div>
-    );
+    return <EditorSkeleton layoutMode={layoutMode} EDITOR_LAYOUT_STYLES={EDITOR_LAYOUT_STYLES} />;
   }
 
   if (isError) {
     return (
-      <div className="flex-1 h-full flex flex-col items-center justify-center text-red-500 text-xs gap-2">
+      <div className="flex-1 h-full flex flex-col items-center justify-center font-medium text-red-500 text-xs gap-2">
         <p>Không thể tải dữ liệu ghi chú!</p>
         <button onClick={onCloseEditor} className="underline cursor-pointer">
           Quay lại
@@ -159,6 +201,7 @@ export const NoteEditor = ({
   }
   return (
     <div
+      key={key}
       className={clsx(
         'h-full min-h-0 min-w-0 overflow-auto transition-all duration-300',
         EDITOR_LAYOUT_STYLES[layoutMode]
@@ -194,26 +237,27 @@ export const NoteEditor = ({
                 ''
               )}
             </button>
-            <p className="leading-none truncate">{note?.title}</p>
+            <p className="leading-none truncate">{initialData?.title}</p>
           </div>
           <button
-            className="flex items-center gap-1 text-[8px] h-fit shrink-0 bg-brand-accent-primary 
+            className="flex items-center gap-1 text-[8px] h-fit shrink-0 bg-brand-accent-primary
             text-white rounded-xl px-3 cursor-pointer hover:opacity-80"
             onClick={handleUpdateNote}
-            disabled={isLoading}
+            disabled={isUpdating}
           >
             <Save size={8} />
-            <div>{isLoading ? 'Saving...' : 'Save'}</div>
+            <div>{isUpdating ? 'Saving...' : 'Save'}</div>
           </button>
         </div>
         <div className="px-3 py-1 flex flex-col gap-1 h-full ">
           <div className="flex justify-between gap-2 md:gap-50 shirnk-0">
             <input
-              key={note?.id}
+              key={initialData?.id}
+              name="title"
               type="text"
               placeholder="Ghi chú tâm trạng hôm nay"
-              defaultValue={note?.title}
-              onChange={(e) => setTitleNoteTemp(e.target.value)}
+              value={currentTitle}
+              onChange={handleTitleChange}
               className="font-bold to-brand-accent-primary outline-0 flex-1 pl-1 shrink-0 text-xs md:text-lg"
             />
           </div>
@@ -221,8 +265,8 @@ export const NoteEditor = ({
             <div className="shrink-0 z-20">
               <Dropdown
                 options={moodOptions}
-                value={selectedMoodId}
-                onChange={setSelectedMoodId}
+                value={currentMoodId ?? ''}
+                onChange={handleMoodChange}
                 placeholder="Trạng thái"
               />
             </div>
@@ -230,8 +274,7 @@ export const NoteEditor = ({
               <div className="gap-3 shrink-0">
                 <div
                   className="flex shrink-0 gap-2 items-center justify-center md:pl-2 md:py-.5 px-3 py-.5 text-brand-accent-primary font-medium
-              outline-none backdrop-blur-md shadow-sm hover:bg-white/70 
-              rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
+              outline-none backdrop-blur-md shadow-sm hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
               overflow-x-hidden"
                 >
                   <TagIcon className="w-5 h-5 md:w-3.5 ml:h-3.5 text-brand-accent-secondary mr-1 self-center" />
@@ -239,9 +282,9 @@ export const NoteEditor = ({
                     <input
                       type="text"
                       placeholder="Add tag..."
-                      value={valueTag}
-                      onChange={(e) => setValueTag(e.target.value)}
-                      onKeyDown={onEnter(handleAddTag)}
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={onKey('Enter', handleAddTag)}
                       className="hidden md:block w-full bg-transparent outline-none  placeholder:text-brand-accent-tertiary"
                     />
                     <button
@@ -260,19 +303,27 @@ export const NoteEditor = ({
                 vertical={false}
                 className={`hidden sm:flex shrink-0 items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
             ${
-              tagsNoteTemp.length > 0
+              displayTags.length > 0
                 ? 'p-0 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
                 : 'p-0 bg-transparent border-transparent shadow-none'
             }`}
               >
-                {tagsNoteTemp.map((tag) => (
-                  <TagCompoment key={tag.name} tag={tag} onRemove={handleRemoveTag} />
+                {displayTags.map((tag) => (
+                  <TagCompoment
+                    key={typeof tag === 'string' ? tag : (tag as Tag).id || tag.name}
+                    tag={tag}
+                    onRemove={handleRemoveTag}
+                  />
                 ))}
               </ScrollContainer>
             </div>
           </div>
           <div className="flex flex-col flex-1 min-h-0 h-full w-full z-1">
-            <Editor blocksNote={blocks} onSetBlock={handleProcessBlocks} />
+            <Editor
+              key={selectedNoteId}
+              blocksNote={currentBlocks}
+              onSetBlock={handleBlocksChange}
+            />
           </div>
         </div>
       </div>

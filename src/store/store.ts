@@ -9,7 +9,6 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(notesApi.middleware),
 });
-// Kích hoạt tính năng refetch dữ liệu khi người dùng chuyển tab rồi quay lại (không bắt buộc nhưng nên có)
 setupListeners(store.dispatch);
 
 export type RootState = ReturnType<typeof store.getState>;

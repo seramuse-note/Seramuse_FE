@@ -1,10 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-
-interface DropdownOption {
-  value: string;
-  label: string;
-}
+import type { DropdownOption } from '../notes';
 
 interface DropdownProps {
   options: DropdownOption[];

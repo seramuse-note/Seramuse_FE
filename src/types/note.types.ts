@@ -1,14 +1,14 @@
 import type { Tag } from './tag.types';
 
-export interface ParagraphProperties {
-  text: string;
-}
+export type BlockType = 'paragraph' | 'heading' | 'code' | 'image' | 'todo' | 'quote';
+
+export type BlockProperties = Record<string, unknown>;
 
 export interface Block {
-  id: string;
-  order_index: number;
-  type: string;
-  properties: ParagraphProperties;
+  id?: string;
+  order_index?: number;
+  type: BlockType;
+  properties: BlockProperties;
 }
 
 export interface Note {
@@ -22,21 +22,15 @@ export interface Note {
   is_favorite?: boolean;
 }
 
-export type BlockRequest = {
-  id?: string;
-  order_index?: number;
-} & (
-  | { type: 'paragraph' | 'heading_1' | 'heading_2'; properties: { text: string } }
-  | { type: 'image'; properties: { url: string } }
-  | { type: 'todo_list'; properties: { checked: boolean; text?: string } }
-  | { type: 'bullet_list'; properties: { items: string[] } }
-  | { type: string; properties: Record<string, unknown> }
-);
+export type CreateBlockPayload = {
+  type: BlockType;
+  properties: BlockProperties;
+};
 
-export interface CreateNoteRequest {
-  title: string | 'Untitled';
+export interface NoteRequest {
+  title?: string;
   mood_id?: string | null;
-  blocks: BlockRequest[];
+  blocks?: CreateBlockPayload[];
   tag_ids?: string[];
 }
 
@@ -49,14 +43,3 @@ export interface GetNotesRequest {
   operator?: 'and' | 'or';
   is_favorite?: 'true' | 'false' | boolean;
 }
-
-export interface UpdateNoteRequest {
-  title?: string | 'Untitled';
-  mood_id?: string | null;
-  blocks?: BlockRequest[];
-  tag_ids?: string[];
-}
-
-// ===================================================
-// 3. API RESPONSE TYPES (Data thô nhận VỀ từ API)
-// ===================================================

@@ -5,14 +5,10 @@ export interface Tag {
   created_at: string;
   updated_at: string;
 }
-export interface CreateTagRequest {
+
+export interface TagRequest {
   name: string;
   color: string;
-}
-
-export interface UpdateTagRequest {
-  name?: string;
-  color?: string;
 }
 
 export interface GetTagsRequest {

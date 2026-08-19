@@ -1,16 +1,9 @@
-import type {
-  ApiResponse,
-  ApiResponseItem,
-  Note,
-  GetNotesRequest,
-  CreateNoteRequest,
-  UpdateNoteRequest,
-} from '@/types';
+import type { ApiResponse, ApiResponseItem, Note, GetNotesRequest, NoteRequest } from '@/types';
 import { baseApi } from './baseApi';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createNote: builder.mutation<ApiResponseItem<Note>, CreateNoteRequest>({
+    createNote: builder.mutation<ApiResponseItem<Note>, NoteRequest>({
       query(newNote) {
         return {
           url: '/notes',
@@ -48,7 +41,7 @@ export const noteApi = baseApi.injectEndpoints({
       query: ({ id }) => `/notes/${id}`,
       providesTags: (_result, _error, { id }) => [{ type: 'NOTE', id: id }],
     }),
-    updateNote: builder.mutation<ApiResponseItem<Note>, { id: string; body: UpdateNoteRequest }>({
+    updateNote: builder.mutation<ApiResponseItem<Note>, { id: string; body: NoteRequest }>({
       query({ id, body }) {
         return {
           url: `/notes/${id}`,

@@ -5,7 +5,6 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://seramuse-be.onrender.com',
     prepareHeaders: (headers) => {
-      // Lấy token từ localStorage
       const token = localStorage.getItem('token');
 
       if (token) {

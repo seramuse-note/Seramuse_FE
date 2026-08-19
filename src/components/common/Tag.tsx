@@ -6,13 +6,14 @@ interface TagData {
 }
 
 interface TagProps {
+  key: string;
   tag: TagData;
   onRemove: (_name: string) => void;
 }
 
-export const TagCompoment = ({ tag, onRemove }: TagProps) => (
+export const TagCompoment = ({ key, tag, onRemove }: TagProps) => (
   <div
-    key={tag.name}
+    key={key}
     className={`group flex items-center gap-1 px-2.5 text-[8px]
     bg-white/90 border border-white/30 shadow-md font-medium
     hover:shadow-sm rounded-xl whitespace-nowrap 

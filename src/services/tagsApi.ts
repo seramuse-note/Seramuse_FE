@@ -1,9 +1,9 @@
-import type { ApiResponse, ApiResponseItem, CreateTagRequest, GetTagsRequest, Tag } from '@/types';
+import type { ApiResponse, ApiResponseItem, GetTagsRequest, Tag, TagRequest } from '@/types';
 import { baseApi } from './baseApi';
 
 export const tagApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createTag: builder.mutation<ApiResponseItem<Tag>, CreateTagRequest>({
+    createTag: builder.mutation<ApiResponseItem<Tag>, TagRequest>({
       query(newTag) {
         return {
           url: `/tags`,

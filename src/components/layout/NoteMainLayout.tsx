@@ -35,11 +35,10 @@ export const NoteMainLayout = () => {
       />
       <NoteEditor
         key={selectedNoteId}
-        layoutMode={layoutMode}
         selectedNoteId={selectedNoteId}
+        layoutMode={layoutMode}
         onToggleRecentList={handleToggleLayout}
         onCloseEditor={handleCloseEditor}
-        onSetLayout={(mode: LayoutMode) => setLayoutMode(mode)}
       />
     </div>
   );
