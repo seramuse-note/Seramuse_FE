@@ -6,19 +6,19 @@ import { useRef, useState, type ChangeEvent } from 'react';
 export const FilterPopover = ({
   tagOptions,
   moodOptions,
-  initialTags = [],
-  initialMoods = [],
   onClose,
   onApply,
 }: FilterPopoverProps) => {
-  const [tempTags, setTempTags] = useState(initialTags);
-  const [tempMoods, setTempMoods] = useState(initialMoods);
-  const [tagQuery, setTagQuery] = useState<string>('');
-  const [moodQuery, setMoodQuery] = useState<string>('');
-
   const popoverRef = useRef<HTMLDivElement>(null);
   const tagDropdownRef = useRef<HTMLDivElement>(null);
   const moodDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [tempTags, setTempTags] = useState<string[]>([]);
+  const [tempMoods, setTempMoods] = useState<string[]>([]);
+
+  const [tagQuery, setTagQuery] = useState<string>('');
+  const [moodQuery, setMoodQuery] = useState<string>('');
+
   const [isTagOpen, setIsTagOpen] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
 
@@ -69,6 +69,7 @@ export const FilterPopover = ({
   useClickOutside(tagDropdownRef, () => {
     setIsTagOpen(false);
   });
+
   useClickOutside(moodDropdownRef, () => {
     setIsMoodOpen(false);
   });
@@ -100,7 +101,6 @@ export const FilterPopover = ({
         </div>
 
         <div className="flex-1 -mr-1 flex flex-col gap-3">
-          {/* Section: TAG */}
           <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 z-47">
             <span className="text-[10px] font-bold text-brand-accent-fourth uppercase tracking-wider px-0.5">
               TAG

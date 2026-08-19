@@ -33,12 +33,25 @@ export const tagApi = baseApi.injectEndpoints({
           : [{ type: 'TAG', id: 'LIST_TAG' }];
       },
     }),
-    getTag: builder.query<ApiResponseItem<Tag>, { id: number }>({
+    getTag: builder.query<ApiResponseItem<Tag>, { id: string }>({
       query: ({ id }) => `/tags/${id}`,
       providesTags: (_result, _error, { id }) => [{ type: 'TAG', id: id }],
+    }),
+    deleteTag: builder.mutation<ApiResponse<Tag>, { id: string }>({
+      query({ id }) {
+        return {
+          url: `/tags/${id}`,
+          method: 'DELETE',
+        };
+      },
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'TAG', id: id },
+        { type: 'TAG', id: 'LIST_TAG' },
+      ],
     }),
   }),
 });
 
-export const { useGetTagQuery, useGetTagsQuery, useCreateTagMutation } = tagApi;
+export const { useGetTagQuery, useGetTagsQuery, useCreateTagMutation, useDeleteTagMutation } =
+  tagApi;
 export default tagApi;

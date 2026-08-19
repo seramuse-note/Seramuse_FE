@@ -17,27 +17,38 @@ import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 
-const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
-  FULL_SIDEBAR: 'flex-1',
-  SPLIT: 'w-0 opacity-0 overflow-hidden md:w-50 md:opacity-100',
-  FULL_EDITOR: 'w-0 opacity-0 overflow-hidden pointer-events-none',
-};
-
 interface NoteSidebarProps {
   layoutMode: LayoutMode;
   onSelectNote: (_noteId: string) => void;
   onSetLayout: (_mode: LayoutMode) => void;
 }
 
+const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
+  FULL_SIDEBAR: 'flex-1',
+  SPLIT: 'w-0 opacity-0 overflow-hidden md:w-50 md:opacity-100',
+  FULL_EDITOR: 'w-0 opacity-0 overflow-hidden pointer-events-none',
+};
+
 const LIMIT = 10;
 const PAGES = 1;
 
 export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSidebarProps) => {
+  const [deleteNote] = useDeleteNoteMutation();
+  const [createNote] = useCreateNoteMutation();
+  const [updateFavorite] = useUpdateFavoriteMutation();
+  const { data: tagsData } = useGetTagsQuery({
+    page: PAGES ?? 1,
+    limit: LIMIT,
+  });
+  const { data: moodsData } = useGetMoodsQuery({
+    page: PAGES ?? 1,
+    limit: LIMIT,
+  });
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>(ACTIVE_TAB.ALL);
   const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
-
   const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
     tags: [],
     moods: [],
@@ -49,24 +60,12 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
     search: searchQuery || undefined,
     tag_id: filters.tags.length > 0 ? filters.tags.join(',') : undefined,
     mood_id: filters.moods.length > 0 ? filters.moods.join(',') : undefined,
+    operator: 'and',
     is_favorite: activeTab === 'favorite' ? true : undefined,
   });
 
-  const { data: tags } = useGetTagsQuery({
-    page: PAGES ?? 1,
-    limit: LIMIT,
-  });
-  const TAG_OPTIONS = tags?.data ?? [];
-
-  const { data: moods } = useGetMoodsQuery({
-    page: PAGES ?? 1,
-    limit: LIMIT,
-  });
-  const MOOD_OPTIONS = moods?.data ?? [];
-
-  const [deleteNote] = useDeleteNoteMutation();
-  const [createNote] = useCreateNoteMutation();
-  const [updateFavorite] = useUpdateFavoriteMutation();
+  const tagsOption = tagsData?.data ?? [];
+  const moodsOption = moodsData?.data ?? [];
 
   const listNote = notes?.data ?? [];
   const pagination = notes?.meta?.pagination;
@@ -193,10 +192,8 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                   {isOpenFilter && (
                     <FilterPopover
                       key={JSON.stringify(filters.tags) + JSON.stringify(filters.moods)}
-                      tagOptions={TAG_OPTIONS}
-                      moodOptions={MOOD_OPTIONS}
-                      initialTags={filters.tags}
-                      initialMoods={filters.moods}
+                      tagOptions={tagsOption}
+                      moodOptions={moodsOption}
                       onClose={() => setIsOpenFilter(false)}
                       onApply={handleApplyFilter}
                     />
