@@ -1,4 +1,4 @@
-import { NoteMainLayout } from '@/components/layout/NoteMainLayout';
+import { NoteMainLayout } from '@/components/layout';
 import { TabNavbar } from '@/components/navigation/TabNavbar';
 
 export const HomePage = () => {
