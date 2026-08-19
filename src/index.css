@@ -1,6 +1,20 @@
+@import 'tailwindcss';
+
+@theme {
+  --background-image-modern-glow: linear-gradient(170deg, #e3aec2 1%, #fdeff4 29%, #e3aec2 58%);
+  /* --color-brand-primary: #e3aec2; */
+  /* --color-brand-secondary: #fcd1db; */
+  --color-brand-primary: rgba(255, 255, 255, 0.5);
+  --color-brand-secondary: #fdeff4;
+  --color-brand-accent-primary: #303030;
+  --color-brand-accent-secondary: #e3aec2;
+  --color-brand-accent-tertiary: #898989;
+  --color-brand-accent-fourth: #aeaeb2;
+}
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
+  --text: #303030;
+  --text-h: #6b6375;
   --bg: #fff;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
@@ -31,9 +45,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
+    --text: #303030;
+    --text-h: #898989;
+    --bg: #fff;
     --border: #2e303a;
     --code-bg: #1f2028;
     --accent: #c084fc;
@@ -46,18 +60,6 @@
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
 }
 
 body {
@@ -75,20 +77,24 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
+
   @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
+
   @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -106,4 +112,186 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+.tiptap blockquote {
+  border-left: 4px solid #4b5563a1;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #4b5563;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Kích thước tổng thể của thanh cuộn */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Đường ray (Khung chứa con trượt cuộn) */
+::-webkit-scrollbar-track {
+  background: transparent;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+
+/* Con trượt thanh cuộn (Thumb) */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  /* Màu xám mờ nhẹ trên nền sáng */
+  border-radius: 9999px;
+  /* Bo tròn hoàn toàn 2 đầu */
+  transition: background-color 0.2s ease;
+}
+
+/* Hiệu ứng khi rê chuột vào con trượt (Hover) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+/* Hiệu ứng khi đang nhấn giữ con trượt (Active) */
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Góc giao nhau giữa cuộn dọc và cuộn ngang */
+::-webkit-scrollbar-corner {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Target vào vùng nhập liệu của Tiptap */
+.tiptap.ProseMirror {
+  height: 100%;
+  min-height: 100%;
+  padding: 16px;
+  padding-bottom: 15px !important;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text, #1f2937);
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
+.tiptap.ProseMirror > *:last-child {
+  margin-bottom: 15px;
+}
+
+/* Style cho các phần tử bên trong editor */
+.tiptap.ProseMirror p {
+  margin-bottom: 0.75rem;
+}
+
+.tiptap.ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.tiptap.ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap.ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap.ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+
+.tiptap.ProseMirror li p {
+  margin-bottom: 0;
+}
+
+/* Style đường gạch ngang, trích dẫn,... */
+.tiptap.ProseMirror blockquote {
+  /* Đổi sang màu accent cho đẹp */
+  border-left: 4px solid pink;
+  padding-left: 1rem;
+  color: var(--text-h);
+  font-style: italic;
+  background-color: rgb(249, 240, 242);
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.tiptap.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+.tiptap.ProseMirror code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.875em;
+}
+
+.tiptap.ProseMirror pre {
+  background: #1e293b;
+  color: #f8fafc;
+  font-family: monospace;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.tiptap.ProseMirror pre code {
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+/* 6. Placeholder (Dành cho extension Placeholder khi editor rỗng) */
+.tiptap.ProseMirror p.is-editor-empty:first-child::before {
+  color: pink;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 7. Hình ảnh (Images) */
+.tiptap.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* 8. Link / Liên kết */
+.tiptap.ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 9. Highlight (Đánh dấu văn bản) */
+.tiptap.ProseMirror mark {
+  background-color: #fef08a;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
 }
