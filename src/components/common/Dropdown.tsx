@@ -5,7 +5,7 @@ import type { DropdownOption } from '../notes';
 interface DropdownProps {
   options: DropdownOption[];
   value: string;
-  onChange: (_value: string) => void;
+  onChange: (value: string) => void;
   placeholder?: string;
 }
 

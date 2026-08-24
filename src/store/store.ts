@@ -4,9 +4,9 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { baseApi } from '@/services';
 import tagReducer from './slices/filterSlice';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    tag: tagReducer,
+    filter: tagReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),

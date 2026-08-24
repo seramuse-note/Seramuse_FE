@@ -1,3 +1,6 @@
+import type { Mood } from './mood.types';
+import type { Tag } from './tag.types';
+
 export interface Pagination {
   page: number;
   limit: number;
@@ -33,28 +36,7 @@ export type PaginationMetaRequest = {
   count: number;
 };
 
-interface TagData {
-  id: string;
-  name: string;
-  color: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface MoodData {
-  id: string;
-  name: string;
-  icon: string;
-  weight: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface FilterPopoverProps {
-  tagOptions: TagData[];
-  moodOptions: MoodData[];
-  initialTags?: string[];
-  initialMoods?: string[];
-  onClose: () => void;
-  onApply: (_data: { tags: string[]; moods: string[] }) => void;
-}
+export type FilterState = {
+  tags: Tag[];
+  moods: Mood[];
+};

@@ -8,7 +8,7 @@ interface TagData {
 interface TagProps {
   key: string;
   tag: TagData;
-  onRemove: (_name: string) => void;
+  onRemove: (name: string) => void;
 }
 
 export const TagCompoment = ({ key, tag, onRemove }: TagProps) => (

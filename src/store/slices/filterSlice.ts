@@ -1,22 +1,23 @@
-import { createSlice } from '@reduxjs/toolkit';
-const initialState = {
-  selectedMoodId: null,
-  selectedTagId: null,
+import type { FilterState, Mood, Tag } from '@/types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
+export const initialState: FilterState = {
+  tags: [],
+  moods: [],
 };
 export const filterSlice = createSlice({
   name: 'filter',
-  initialState: { initialState },
+  initialState,
   reducers: {
-    setSelectedTagId: (state, action) => {
-      state.initialState.selectedTagId = action.payload;
+    setTags: (state, action: PayloadAction<Tag[]>) => {
+      state.tags = action.payload;
     },
-    setSelectedMoodId: (state, action) => {
-      state.initialState.selectedMoodId = action.payload;
+    setMoods: (state, action: PayloadAction<Mood[]>) => {
+      state.moods = action.payload;
     },
-    resetFilters: () => ({ initialState }),
   },
 });
 
-export const { setSelectedTagId, setSelectedMoodId, resetFilters } = filterSlice.actions;
+export const { setMoods, setTags } = filterSlice.actions;
 
 export default filterSlice.reducer;

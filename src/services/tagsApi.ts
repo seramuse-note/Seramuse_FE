@@ -1,5 +1,6 @@
 import type { ApiResponse, ApiResponseItem, GetTagsRequest, Tag, TagRequest } from '@/types';
 import { baseApi } from './baseApi';
+import { setTags } from '@/store/slices/filterSlice';
 
 export const tagApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,6 +25,14 @@ export const tagApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: ApiResponse<Tag>) => response,
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { data: tags } = data;
+
+          dispatch(setTags(tags));
+        } catch {}
+      },
       providesTags: (result) => {
         return result?.data
           ? [
@@ -35,7 +44,7 @@ export const tagApi = baseApi.injectEndpoints({
     }),
     getTag: builder.query<ApiResponseItem<Tag>, { id: string }>({
       query: ({ id }) => `/tags/${id}`,
-      providesTags: (_result, _error, { id }) => [{ type: 'TAG', id: id }],
+      providesTags: (_, _error, { id }) => [{ type: 'TAG', id: id }],
     }),
     deleteTag: builder.mutation<ApiResponse<Tag>, { id: string }>({
       query({ id }) {
@@ -44,7 +53,7 @@ export const tagApi = baseApi.injectEndpoints({
           method: 'DELETE',
         };
       },
-      invalidatesTags: (_result, _error, { id }) => [
+      invalidatesTags: (_, _error, { id }) => [
         { type: 'TAG', id: id },
         { type: 'TAG', id: 'LIST_TAG' },
       ],

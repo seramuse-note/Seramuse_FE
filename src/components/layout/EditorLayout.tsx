@@ -11,7 +11,7 @@ import type { Block, CreateBlockPayload } from '@/types';
 
 interface EditorProps {
   blocksNote: Block[];
-  onSetBlock: (_newBlock: CreateBlockPayload[]) => void;
+  onSetBlock: (newBlock: CreateBlockPayload[]) => void;
 }
 
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
@@ -70,7 +70,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     }),
   });
 
-  const handleExecuteCommand = (action: (_ed: TiptapEditor) => void) => {
+  const handleExecuteCommand = (action: (ed: TiptapEditor) => void) => {
     if (!editor) return;
     const { $from } = editor.state.selection;
     const currentLineText = $from.nodeBefore?.text || '';

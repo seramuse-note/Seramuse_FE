@@ -8,9 +8,9 @@ moment.locale('vi');
 
 interface NoteCardProps {
   note: Note;
-  onSelectNote: (_id: string) => void;
-  onToggleLike: (_id: string) => Promise<void>;
-  onDeleteNote: (_id: string) => void;
+  onSelectNote: (id: string) => void;
+  onToggleLike: (id: string) => Promise<void>;
+  onDeleteNote: (id: string) => void;
 }
 
 export const NoteCard = ({ note, onSelectNote, onToggleLike, onDeleteNote }: NoteCardProps) => {

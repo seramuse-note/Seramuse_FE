@@ -16,11 +16,13 @@ import { FilterPopover } from './FilterPopover';
 import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
+import { useAppSelector } from '@/store/store';
+import type { FilterState } from '@/types';
 
 interface NoteSidebarProps {
   layoutMode: LayoutMode;
-  onSelectNote: (_noteId: string) => void;
-  onSetLayout: (_mode: LayoutMode) => void;
+  onSelectNote: (noteId: string) => void;
+  onSetLayout: (mode: LayoutMode) => void;
 }
 
 const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
@@ -36,12 +38,13 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
   const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
   const [updateFavorite] = useUpdateFavoriteMutation();
-  const { data: tagsData } = useGetTagsQuery({
-    page: PAGES ?? 1,
+
+  useGetTagsQuery({
+    page: PAGES,
     limit: LIMIT,
   });
-  const { data: moodsData } = useGetMoodsQuery({
-    page: PAGES ?? 1,
+  useGetMoodsQuery({
+    page: PAGES,
     limit: LIMIT,
   });
 
@@ -50,34 +53,28 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
   const [activeTab, setActiveTab] = useState<ActiveTab>(ACTIVE_TAB.ALL);
   const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
 
-  const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
-    tags: [],
+  const { tags, moods } = useAppSelector((state) => state.filter);
+
+  const [selectedFilter, setSelectedFilter] = useState<FilterState>({
     moods: [],
+    tags: [],
   });
 
   const { data: notes, isLoading } = useGetNotesQuery({
     page: currentPage,
     limit: LIMIT,
     search: searchQuery || undefined,
-    tag_id: filters.tags.length > 0 ? filters.tags.join(',') : undefined,
-    mood_id: filters.moods.length > 0 ? filters.moods.join(',') : undefined,
+    tag_id: selectedFilter.tags?.map((item) => item.id).join(','),
+    mood_id: selectedFilter.moods?.map((item) => item.id).join(','),
     operator: 'and',
     is_favorite: activeTab === 'favorite' ? true : undefined,
   });
-
-  const tagsOption = tagsData?.data ?? [];
-  const moodsOption = moodsData?.data ?? [];
 
   const listNote = notes?.data ?? [];
   const pagination = notes?.meta?.pagination;
   const displayNotes = listNote.filter((note) => {
     return activeTab === ACTIVE_TAB.FAVORITE ? note.is_favorite : true;
   });
-
-  const handleApplyFilter = (selectedData: { tags: string[]; moods: string[] }) => {
-    setFilters(selectedData);
-    setIsOpenFilter(!isOpenFilter);
-  };
 
   function handlePageChange(page: number): void {
     setCurrentPage(page);
@@ -192,11 +189,12 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                   </button>
                   {isOpenFilter && (
                     <FilterPopover
-                      key={JSON.stringify(filters.tags) + JSON.stringify(filters.moods)}
-                      tagOptions={tagsOption}
-                      moodOptions={moodsOption}
+                      key={JSON.stringify(tags) + JSON.stringify(moods)}
                       onClose={() => setIsOpenFilter(false)}
-                      onApply={handleApplyFilter}
+                      onApply={(data: FilterState) => {
+                        setSelectedFilter(data);
+                      }}
+                      selectedFilter={selectedFilter}
                     />
                   )}
                 </div>
@@ -229,6 +227,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                 </div>
               </div>
             </div>
+
             <div className="min-h-0 h-full w-full overflow-y-auto flex">
               {listNote && listNote.length > 0 ? (
                 <div
