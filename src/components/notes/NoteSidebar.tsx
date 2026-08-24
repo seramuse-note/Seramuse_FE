@@ -49,6 +49,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>(ACTIVE_TAB.ALL);
   const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
+
   const [filters, setFilters] = useState<{ tags: string[]; moods: string[] }>({
     tags: [],
     moods: [],
