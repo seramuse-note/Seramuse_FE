@@ -12,7 +12,6 @@ export const HomePage = () => {
       </div>
       <div className="flex-1 h-full min-w-0 min-h-0">
         <NoteMainLayout />
-        {/* <DashboardLayout /> */}
       </div>
     </div>
   );

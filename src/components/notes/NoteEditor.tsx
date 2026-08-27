@@ -182,6 +182,7 @@ export const NoteEditor = ({
   useEffect(() => {
     if (isError) {
       onCloseEditor();
+      toast.error('Không thể tải dữ liệu ghi chú!');
     }
   }, [noteData, isError, onCloseEditor]);
 
@@ -189,16 +190,6 @@ export const NoteEditor = ({
     return <EditorSkeleton layoutMode={layoutMode} EDITOR_LAYOUT_STYLES={EDITOR_LAYOUT_STYLES} />;
   }
 
-  if (isError) {
-    return (
-      <div className="flex-1 h-full flex flex-col items-center justify-center font-medium text-red-500 text-xs gap-2">
-        <p>Không thể tải dữ liệu ghi chú!</p>
-        <button onClick={onCloseEditor} className="underline cursor-pointer">
-          Quay lại
-        </button>
-      </div>
-    );
-  }
   return (
     <div
       key={key}

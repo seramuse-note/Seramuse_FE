@@ -3,10 +3,12 @@ import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { baseApi } from '@/services';
 import tagReducer from './slices/filterSlice';
+import noteReducer from './slices/noteSlice';
 
 export const store = configureStore({
   reducer: {
     filter: tagReducer,
+    notes: noteReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),

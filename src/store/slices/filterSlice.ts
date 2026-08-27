@@ -19,5 +19,4 @@ export const filterSlice = createSlice({
 });
 
 export const { setMoods, setTags } = filterSlice.actions;
-
 export default filterSlice.reducer;

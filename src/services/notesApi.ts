@@ -1,5 +1,6 @@
 import type { ApiResponse, ApiResponseItem, Note, GetNotesRequest, NoteRequest } from '@/types';
 import { baseApi } from './baseApi';
+import { setNotes } from '@/store/slices/noteSlice';
 
 export const noteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,6 +30,14 @@ export const noteApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: ApiResponse<Note>) => response,
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { data: notes } = data;
+
+          dispatch(setNotes(notes));
+        } catch {}
+      },
       providesTags: (result) =>
         result?.data
           ? [
