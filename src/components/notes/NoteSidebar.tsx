@@ -132,7 +132,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
         <SidebarNoteSkeleton count={4} />
       ) : (
         <div className={`h-full relative bg-white/45 backdrop-blur-lg p-4 `}>
-          <div className={`h-full flex flex-col gap-4 w-full mx-auto `}>
+          <div className={`h-full flex flex-col gap-6 w-full mx-auto `}>
             <div className="flex flex-col md:gap-4 gap-3 w-full">
               <div className="flex justify-between items-center px-1 shrink-0">
                 <button className="cursor-pointer">
@@ -145,14 +145,14 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                 </button>
                 <div className="flex gap-1.5">
                   <button
-                    className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80  text-brand-accent-primary cursor-pointer"
+                    className=" p-2 bg-white/90 shadow-xs rounded-full text-brand-accent-primary cursor-pointer  active:scale-95 "
                     title="Use voice chat"
                   >
                     <Mic className="w-4 h-4"></Mic>
                   </button>
                   <button
                     onClick={handleCreateNote}
-                    className=" p-2 bg-white/60 hover:bg-white/90 rounded-full border border-white/80  text-brand-accent-primary cursor-pointer"
+                    className=" p-2  shadow-xs bg-white/90 rounded-full   text-brand-accent-primary cursor-pointer  active:scale-95"
                     title="Create a new note"
                   >
                     <Plus className="w-4 h-4" />
@@ -167,7 +167,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className=" w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-brand-accent-primary
-                  placeholder-brand-accent-tertiary outline-none focus:bg-white/90 focus:border-brand-accent-secondary shadow-sm"
+                  placeholder-brand-accent-tertiary outline-none focus:bg-white/90 focus:border-brand-accent-secondary shadow-xs"
                   />
                   {searchQuery && (
                     <button
@@ -179,11 +179,11 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                     </button>
                   )}
                 </div>
-                <div className="relative">
+                <div className="relative ">
                   <button
                     type="button"
                     onClick={() => setIsOpenFilter((prev) => !prev)}
-                    className="px-2.5 py-2.5 bg-white/90 hover:bg-white rounded-xl border border-white/80 text-brand-accent-tertiary shadow-sm cursor-pointer"
+                    className="px-2.5 py-2.5  bg-white/90 text-brand-accent-primary shadow-xs rounded-xl cursor-pointer hover:bg-white/90  active:scale-95"
                   >
                     <Funnel className="w-4 h-4" />
                   </button>
@@ -201,11 +201,11 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
               </div>
               <div
                 className="min-w-0 min-h-0 overflow-hidden px-2.5 py-2 bg-white/30 backdrop-blur-md
-              hover:bg-white/80 border border-white/40 shadow-sm gap-1.5 flex items-center justify-between rounded-2xl"
+              hover:bg-white/80 border border-white/40 shadow-xs gap-1.5 flex items-center justify-between rounded-2xl"
               >
                 <div
                   onClick={() => setActiveTab(ACTIVE_TAB.ALL)}
-                  className={`flex-1 flex items-center justify-center p-1.5 gap-1 shadow-sm text-xs rounded-xl font-medium transition-all duration-300 cursor-pointer
+                  className={`flex-1 flex items-center justify-center p-1.5 gap-1 shadow-xs text-xs rounded-xl font-medium transition-all duration-300 cursor-pointer
               ${
                 activeTab === 'all'
                   ? ' bg-brand-accent-primary text-white'
@@ -216,7 +216,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                 </div>
                 <div
                   onClick={() => setActiveTab(ACTIVE_TAB.FAVORITE)}
-                  className={`flex-1 flex items-center justify-center p-1.5 gap-1 shadow-sm text-xs rounded-xl font-medium  transition-all duration-300 cursor-pointer
+                  className={`flex-1 flex items-center justify-center p-1.5 gap-1 shadow-xs text-xs rounded-xl font-medium  transition-all duration-300 cursor-pointer
               ${
                 activeTab === 'favorite'
                   ? ' bg-brand-accent-primary text-white'
@@ -232,7 +232,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
               {listNote && listNote.length > 0 ? (
                 <div
                   className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4 
-                  ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1 md:grid-cols-2 md:items-center' : 'grid-cols-1 items-start'}`}
+                  ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1  md:grid-cols-2 md:items-start' : 'grid-cols-1 items-start'}`}
                 >
                   {displayNotes.map((note) => {
                     return (
@@ -270,7 +270,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                           onClick={handleCreateNote}
                           type="button"
                           className="mt-1 px-3.5 py-1.5 text-xs font-semibold text-white bg-brand-accent-primary 
-                        hover:bg-brand-accent-secondary rounded-xl shadow-xs transition-all duration-200 active:scale-95 cursor-pointer flex items-center gap-1.5"
+                        hover:bg-brand-accent-secondary rounded-xl shadow-xs transition-all duration-200 active:scale-95 cursor-pointer flex items-center gap-1.5 "
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Tạo ghi chú mới</span>
@@ -301,7 +301,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
               ) : (
                 <div
                   className="flex justify-center items-center mt-auto w-full p-2.5 bg-white/50 hover:bg-white/80 backdrop-blur-md rounded-2xl border
-                 border-white/70 text-xs font-medium text-brand-accent-primary hover:text-brand-accent-secondary shadow-sm cursor-pointer whitespace-nowrap truncate shrink-0"
+                 border-white/70 text-xs font-medium text-brand-accent-primary hover:text-brand-accent-secondary shadow-xs cursor-pointer whitespace-nowrap truncate shrink-0"
                 >
                   All post
                 </div>

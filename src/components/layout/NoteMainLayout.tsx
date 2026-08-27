@@ -25,8 +25,7 @@ export const NoteMainLayout = () => {
 
   return (
     <div
-      className={`flex h-full w-full bg-modern-glow/15 backdrop backdrop-blur-md 
-      shadow-[0_25px_50px_-12px_rgba(134,0,60,0.15)] transition-all duration-300 overflow-auto`}
+      className={`flex h-full w-full bg-modern-glow/15 backdrop backdrop-blur-md transition-all duration-300 overflow-auto`}
     >
       <NoteSidebar
         layoutMode={layoutMode}
