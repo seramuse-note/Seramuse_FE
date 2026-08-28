@@ -94,7 +94,6 @@ export const NoteSidebar = () => {
         return;
       }
       dispatch(selectNote(noteId));
-      toast.success(`${noteId}`);
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -275,7 +274,7 @@ export const NoteSidebar = () => {
                           icon: Plus,
                         }}
                       />
-                    ) : searchQuery.trim() ? (
+                    ) : searchQuery.trim() || displayNotes.length == 0 ? (
                       <EmptyState
                         title="Không tìm thấy kết quả"
                         description="Không có ghi chú phù hợp với từ khóa tìm kiếm"
