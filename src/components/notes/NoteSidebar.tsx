@@ -16,14 +16,9 @@ import { FilterPopover } from './FilterPopover';
 import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
 import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
-import { useAppSelector } from '@/store/store';
+import { useAppDispatch, useAppSelector } from '@/store/store';
 import type { FilterState } from '@/types';
-
-interface NoteSidebarProps {
-  layoutMode: LayoutMode;
-  onSelectNote: (noteId: string) => void;
-  onSetLayout: (mode: LayoutMode) => void;
-}
+import { setActiveNoteId, setLayoutMode } from '@/store/slices/uiSlice';
 
 const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_SIDEBAR: 'flex-1',
@@ -34,7 +29,11 @@ const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
 const LIMIT = 10;
 const PAGES = 1;
 
-export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSidebarProps) => {
+export const NoteSidebar = () => {
+  const dispatch = useAppDispatch();
+  const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
+  const layoutMode = useAppSelector((state) => state.ui.layoutMode);
+
   const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
   const [updateFavorite] = useUpdateFavoriteMutation();
@@ -76,10 +75,15 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
     return activeTab === ACTIVE_TAB.FAVORITE ? note.is_favorite : true;
   });
 
-  function handlePageChange(page: number): void {
+  const handlePageChange = (page: number): void => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
+
+  const handleActiveNote = (id: string) => {
+    dispatch(setActiveNoteId(id));
+    dispatch(setLayoutMode(LAYOUT_MODE.SPLIT));
+  };
 
   const handleCreateNote = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -96,7 +100,8 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
         return;
       }
 
-      onSelectNote(noteId);
+      dispatch(setActiveNoteId(noteId));
+      dispatch(setLayoutMode(LAYOUT_MODE.SPLIT));
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -137,22 +142,22 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
               <div className="flex justify-between items-center px-1 shrink-0">
                 <button className="cursor-pointer">
                   <div
-                    onClick={() => onSetLayout(LAYOUT_MODE.FULL_SIDEBAR)}
+                    onClick={() => dispatch(setLayoutMode(LAYOUT_MODE.FULL_SIDEBAR))}
                     className=" items-start text-base font-bold flex-1"
                   >
-                    Recent
+                    Note List
                   </div>
                 </button>
                 <div className="flex gap-1.5">
                   <button
-                    className=" p-2 bg-white/90 shadow-xs rounded-full text-brand-accent-primary cursor-pointer  active:scale-95 "
+                    className=" p-2 bg-white/90 shadow-xs rounded-full text-brand-accent-primary cursor-pointer  "
                     title="Use voice chat"
                   >
                     <Mic className="w-4 h-4"></Mic>
                   </button>
                   <button
                     onClick={handleCreateNote}
-                    className=" p-2  shadow-xs bg-white/90 rounded-full   text-brand-accent-primary cursor-pointer  active:scale-95"
+                    className=" p-2  shadow-xs bg-white/90 rounded-full   text-brand-accent-primary cursor-pointer "
                     title="Create a new note"
                   >
                     <Plus className="w-4 h-4" />
@@ -183,7 +188,7 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                   <button
                     type="button"
                     onClick={() => setIsOpenFilter((prev) => !prev)}
-                    className="px-2.5 py-2.5  bg-white/90 text-brand-accent-primary shadow-xs rounded-xl cursor-pointer hover:bg-white/90  active:scale-95"
+                    className="px-2.5 py-2.5  bg-white/90 text-brand-accent-primary shadow-xs rounded-xl cursor-pointer hover:bg-white/90  "
                   >
                     <Funnel className="w-4 h-4" />
                   </button>
@@ -239,7 +244,8 @@ export const NoteSidebar = ({ layoutMode, onSelectNote, onSetLayout }: NoteSideb
                       <NoteCard
                         key={`${note.id}`}
                         note={note}
-                        onSelectNote={onSelectNote}
+                        isActive={activeNoteId === note.id}
+                        onActiveNote={() => handleActiveNote(note.id)}
                         onToggleLike={handleToggleLike}
                         onDeleteNote={handleDeleteNote}
                       />

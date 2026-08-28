@@ -77,7 +77,7 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
 
   return (
     <>
-      <div className="fixed inset-0 z-35 bg-transparent cursor-default" />
+      <div className="fixed inset-0 z-1 bg-transparent cursor-default" />
       <div
         ref={popoverRef}
         className="shrink-0 absolute top-10 right-0 w-100 flex flex-col px-4 py-4 gap-3 bg-white/65 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-md z-40 text-xs text-brand-accent-primary"
@@ -96,7 +96,7 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
         </div>
 
         <div className="flex-1 -mr-1 flex flex-col gap-3">
-          <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 z-47">
+          <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 47">
             <span className="text-[10px] font-bold text-brand-accent-fourth uppercase tracking-wider px-0.5">
               TAG
             </span>
@@ -296,7 +296,6 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
           </div>
         </div>
 
-        {/* Footer Buttons */}
         <div className="relative mt-auto z-10 pt-2.5 flex items-center justify-end gap-2 shrink-0 border-t border-white/40">
           <button
             onClick={onClose}

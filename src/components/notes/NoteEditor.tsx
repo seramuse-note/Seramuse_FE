@@ -17,6 +17,8 @@ import {
 } from '@/services';
 import { toast } from 'react-toastify';
 import { EditorSkeleton } from '../skeleton/EditorSkeleton';
+import { useAppDispatch, useAppSelector } from '@/store/store';
+import { setActiveNoteId, setLayoutMode } from '@/store/slices/uiSlice';
 
 const EDITOR_LAYOUT_STYLES: Record<LayoutMode, string> = {
   FULL_EDITOR: 'flex-1',
@@ -28,28 +30,17 @@ export interface DropdownOption {
   value: string;
   label: string;
 }
+export const NoteEditor = () => {
+  const dispatch = useAppDispatch();
+  const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
+  const layoutMode = useAppSelector((state) => state.ui.layoutMode);
 
-interface EditorPanelProps {
-  key: string | null;
-  selectedNoteId: string | null;
-  layoutMode: LayoutMode;
-  onToggleRecentList: () => void;
-  onCloseEditor: () => void;
-}
-
-export const NoteEditor = ({
-  key,
-  selectedNoteId,
-  layoutMode,
-  onToggleRecentList,
-  onCloseEditor,
-}: EditorPanelProps) => {
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
   const {
     data: noteData,
     isLoading,
     isError,
-  } = useGetNoteQuery({ id: selectedNoteId ?? '' }, { skip: !selectedNoteId });
+  } = useGetNoteQuery({ id: activeNoteId ?? '' }, { skip: !activeNoteId });
 
   const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
   const [createTag] = useCreateTagMutation();
@@ -136,7 +127,7 @@ export const NoteEditor = ({
   };
 
   const handleUpdateNote = async () => {
-    if (!selectedNoteId) return null;
+    if (!activeNoteId) return null;
 
     const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
 
@@ -173,18 +164,29 @@ export const NoteEditor = ({
     };
 
     try {
-      await updateNote({ id: selectedNoteId, body: { ...updatePayload } }).unwrap();
+      await updateNote({ id: activeNoteId, body: { ...updatePayload } }).unwrap();
     } catch (error) {
       console.error('Error saving note:', error);
     }
   };
 
+  const handleToggleLayout = () => {
+    const prev =
+      layoutMode === LAYOUT_MODE.FULL_EDITOR ? LAYOUT_MODE.SPLIT : LAYOUT_MODE.FULL_EDITOR;
+    dispatch(setLayoutMode(prev));
+  };
+
+  const handleCloseEditor = () => {
+    dispatch(setLayoutMode(LAYOUT_MODE.FULL_SIDEBAR));
+    dispatch(setActiveNoteId(null));
+  };
+
   useEffect(() => {
     if (isError) {
-      onCloseEditor();
+      handleCloseEditor();
       toast.error('Không thể tải dữ liệu ghi chú!');
     }
-  }, [noteData, isError, onCloseEditor]);
+  }, [noteData, isError, handleCloseEditor]);
 
   if (isLoading) {
     return <EditorSkeleton layoutMode={layoutMode} EDITOR_LAYOUT_STYLES={EDITOR_LAYOUT_STYLES} />;
@@ -192,7 +194,7 @@ export const NoteEditor = ({
 
   return (
     <div
-      key={key}
+      key={activeNoteId}
       className={clsx(
         'h-full min-h-0 min-w-0 overflow-auto transition-all duration-300',
         EDITOR_LAYOUT_STYLES[layoutMode]
@@ -208,7 +210,7 @@ export const NoteEditor = ({
         <div className="flex justify-between items-center h-7 gap-1 p-1 text-brand-accent-primary shadow-xs ">
           <div className="flex items-center">
             <button
-              onClick={onToggleRecentList}
+              onClick={handleToggleLayout}
               className="block-0 hidden md:inline-flex md:items-center md:justify-center md:w-6 md:h-6 p-1 rounded-full text-brand-accent-fourth
             hover:text-brand-accent-secondary cursor-pointer border border-transparent
             transition-colors duration-200"
@@ -310,11 +312,7 @@ export const NoteEditor = ({
             </div>
           </div>
           <div className="flex flex-col flex-1 min-h-0 h-full w-full z-1">
-            <Editor
-              key={selectedNoteId}
-              blocksNote={currentBlocks}
-              onSetBlock={handleBlocksChange}
-            />
+            <Editor key={activeNoteId} blocksNote={currentBlocks} onSetBlock={handleBlocksChange} />
           </div>
         </div>
       </div>

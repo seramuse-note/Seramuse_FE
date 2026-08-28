@@ -4,9 +4,11 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { baseApi } from '@/services';
 import tagReducer from './slices/filterSlice';
 import noteReducer from './slices/noteSlice';
+import UIReducer from './slices/uiSlice';
 
 export const store = configureStore({
   reducer: {
+    ui: UIReducer,
     filter: tagReducer,
     notes: noteReducer,
     [baseApi.reducerPath]: baseApi.reducer,
