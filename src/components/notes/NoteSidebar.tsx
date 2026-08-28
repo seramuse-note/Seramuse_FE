@@ -1,6 +1,7 @@
 import { Mic, Plus, X, Funnel } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
+
 import {
   useGetMoodsQuery,
   useGetTagsQuery,
@@ -15,9 +16,10 @@ import { FilterPopover } from './FilterPopover';
 import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import type { FilterState } from '@/types';
+import type { FilterState, Note } from '@/types';
 import { closeNote, selectNote } from '@/store/slices/noteUiSlice';
-import { setActiveNoteId } from '@/store/slices/uiSlice';
+import { ConfirmModal } from '../common/ConfirmModal';
+import { EmptyState } from '../common/EmptyState';
 
 const LIMIT = 10;
 const PAGES = 1;
@@ -26,6 +28,7 @@ export const NoteSidebar = () => {
   const dispatch = useAppDispatch();
   const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
   const layoutMode = useAppSelector((state) => state.ui.layoutMode);
+  const [deletingNote, setDeletingNote] = useState<Note | null>(null);
 
   const [deleteNote] = useDeleteNoteMutation();
   const [createNote] = useCreateNoteMutation();
@@ -55,7 +58,7 @@ export const NoteSidebar = () => {
   const { data: notes, isLoading } = useGetNotesQuery({
     page: currentPage,
     limit: LIMIT,
-    search: searchQuery || undefined,
+    search: searchQuery.trim() || undefined,
     tag_id: selectedFilter.tags?.map((item) => item.id).join(','),
     mood_id: selectedFilter.moods?.map((item) => item.id).join(','),
     operator: 'and',
@@ -92,20 +95,23 @@ export const NoteSidebar = () => {
         return;
       }
 
-      dispatch(setActiveNoteId(noteId));
+      dispatch(selectNote(noteId));
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
   };
 
-  const handleDeleteNote = async (id: string) => {
-    try {
-      await deleteNote({ id: id }).unwrap();
-
-      toast.success('Xóa note thành công!');
-    } catch (err) {
-      toast.error('Xóa thất bại rồi!');
-      console.error('Lỗi:', err);
+  const handleDeleteNote = async () => {
+    if (!deletingNote) return;
+    if (deletingNote) {
+      try {
+        await deleteNote({ id: deletingNote.id }).unwrap();
+        toast.success('Xóa note thành công!');
+        setDeletingNote(null);
+      } catch (err) {
+        toast.error('Xóa thất bại rồi!');
+        console.error('Lỗi:', err);
+      }
     }
   };
 
@@ -160,7 +166,7 @@ export const NoteSidebar = () => {
                     className=" w-full bg-white/60 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-brand-accent-primary
                   placeholder-brand-accent-tertiary outline-none focus:bg-white/90 focus:border-brand-accent-secondary shadow-xs"
                   />
-                  {searchQuery && (
+                  {searchQuery.trim() && (
                     <button
                       onClick={() => setSearchQuery('')}
                       type="button"
@@ -220,7 +226,7 @@ export const NoteSidebar = () => {
             </div>
 
             <div className="min-h-0 h-full w-full overflow-y-auto flex">
-              {listNote && listNote.length > 0 ? (
+              {displayNotes && displayNotes.length > 0 ? (
                 <div
                   className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4 
                   ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1  md:grid-cols-2 md:items-start' : 'grid-cols-1 items-start'}`}
@@ -233,50 +239,53 @@ export const NoteSidebar = () => {
                         isActive={activeNoteId === note.id}
                         onActiveNote={() => handleActiveNote(note.id)}
                         onToggleLike={handleToggleLike}
-                        onDeleteNote={handleDeleteNote}
+                        onOpenDeleteModal={() => setDeletingNote(note)}
                       />
                     );
                   })}
+
+                  {deletingNote && (
+                    <ConfirmModal
+                      isOpen={!!deletingNote}
+                      title="Xác nhận xóa ghi chú"
+                      description={
+                        <>
+                          Ghi chú
+                          <span className="font-semibold text-brand-accent-primary">
+                            '{deletingNote?.title || 'Untitled'}'
+                          </span>
+                          sẽ bị xóa vĩnh viễn và không thể hoàn tác
+                        </>
+                      }
+                      confirmText="Xóa ngay"
+                      onClose={() => setDeletingNote(null)}
+                      onConfirm={handleDeleteNote}
+                    />
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col h-full w-full items-center justify-center gap-3 p-6 text-center select-none animate-fadeIn">
                   <div className="space-y-1 max-w-full">
-                    {searchQuery ? (
-                      <div className="flex flex-col items-center">
-                        <p className="text-sm font-bold text-brand-accent-primary">
-                          Không tìm thấy kết quả
-                        </p>
-                        <p className="text-[11px] text-brand-accent-tertiary leading-relaxed">
-                          Không có ghi chú phù hợp với từ khóa tìm kiếm
-                        </p>
-                      </div>
-                    ) : listNote.length === 0 ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <p className="text-sm font-bold text-brand-accent-primary">
-                          Chưa có ghi chú
-                        </p>
-                        <p className="text-[11px] text-brand-accent-tertiary leading-relaxed">
-                          Hãy tạo ghi chú đầu tiên của bạn để bắt đầu lưu trữ ý tưởng!
-                        </p>
-                        <button
-                          onClick={handleCreateNote}
-                          type="button"
-                          className="mt-1 px-3.5 py-1.5 text-xs font-semibold text-white bg-brand-accent-primary 
-                        hover:bg-brand-accent-secondary rounded-xl shadow-xs transition-all duration-200 active:scale-95 cursor-pointer flex items-center gap-1.5 "
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Tạo ghi chú mới</span>
-                        </button>
-                      </div>
+                    {!listNote || listNote.length === 0 ? (
+                      <EmptyState
+                        title="Chưa có ghi chú"
+                        description="Hãy tạo ghi chú đầu tiên của bạn để bắt đầu lưu trữ ý tưởng!"
+                        action={{
+                          label: 'Tạo ghi chú mới',
+                          onClick: handleCreateNote,
+                          icon: Plus,
+                        }}
+                      />
+                    ) : searchQuery.trim() ? (
+                      <EmptyState
+                        title="Không tìm thấy kết quả"
+                        description="Không có ghi chú phù hợp với từ khóa tìm kiếm"
+                      />
                     ) : activeTab === 'favorite' ? (
-                      <div className="flex flex-col items-center">
-                        <p className="text-sm font-bold text-brand-accent-primary">
-                          Chưa có ghi chú yêu thích
-                        </p>
-                        <p className="text-[11px] text-brand-accent-tertiary leading-relaxed">
-                          Nhấn vào biểu tượng trái tim ở ghi chú để đưa vào danh sách favorite nhé!
-                        </p>
-                      </div>
+                      <EmptyState
+                        title="Chưa có ghi chú yêu thích"
+                        description="Nhấn vào biểu tượng trái tim ở ghi chú để đưa vào danh sách favorite nhé!"
+                      />
                     ) : null}
                   </div>
                 </div>

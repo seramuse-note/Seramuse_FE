@@ -77,7 +77,13 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
 
   return (
     <>
-      <div className="fixed inset-0 z-1 bg-transparent cursor-default" />
+      <div
+        className="fixed inset-0 z-1 bg-transparent cursor-default"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
       <div
         ref={popoverRef}
         className="shrink-0 absolute top-10 right-0 w-100 flex flex-col px-4 py-4 gap-3 bg-white/65 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-md z-40 text-xs text-brand-accent-primary"

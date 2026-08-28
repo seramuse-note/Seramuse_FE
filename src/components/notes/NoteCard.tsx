@@ -1,6 +1,6 @@
-import { Heart, Ellipsis, Trash } from 'lucide-react';
+import { Heart, Trash } from 'lucide-react';
+
 import { useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import type { Note, Tag } from '@/types';
 import moment from 'moment';
 import { formatDate } from '@/utils/event.util';
@@ -14,18 +14,16 @@ interface NoteCardProps {
   isActive?: boolean;
   onActiveNote: (id: string) => void;
   onToggleLike: (id: string) => Promise<void>;
-  onDeleteNote: (id: string) => void;
+  onOpenDeleteModal: () => void;
 }
-
 export const NoteCard = ({
   note,
   isActive,
   onActiveNote,
   onToggleLike,
-  onDeleteNote,
+  onOpenDeleteModal,
 }: NoteCardProps) => {
   const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
-  const layoutMode = useAppSelector((state) => state.ui.layoutMode);
 
   const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -59,23 +57,10 @@ export const NoteCard = ({
       <div
         onClick={() => {
           onActiveNote(note.id);
-          console.log({ activeNoteId, layoutMode });
         }}
-        className="group flex flex-col relative  p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
-      hover:bg-white/85 hover:shadow-xs active:shadow-xs duration-100 cursor-pointer"
+        className={`group flex flex-col relative  p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
+      hover:bg-white/85 hover:shadow-xs active:shadow-xs duration-100 cursor-pointer ${activeNoteId ? 'pointer-events-none' : ''}`}
       >
-        {isOpenDelete &&
-          createPortal(
-            <div
-              className="fixed inset-0 z-40 bg-transparent"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpenDelete(false);
-              }}
-            />,
-            document.body
-          )}
-
         <div className="flex">
           <h3
             className={`font-semibold text-sm transition-colors line-clamp-1 ${isActive ? 'text-brand-accent-secondary' : 'text-brand-accent-primary'} `}
@@ -128,7 +113,7 @@ export const NoteCard = ({
               />
             </button>
 
-            <div className="relative">
+            <div ref={deleteBtnRef} className="relative">
               <button
                 type="button"
                 onClick={(e) => {
@@ -137,26 +122,20 @@ export const NoteCard = ({
                 }}
                 className="p-1 cursor-pointer transition-transform  "
               >
-                <Ellipsis className="w-5 text-brand-accent-tertiary hover:text-brand-accent-primary" />
-              </button>
-              {isOpenDelete && (
-                <div
-                  ref={deleteBtnRef}
-                  className="absolute z-50 bottom-full right-0 mb-1 min-w-[100px] bg-white rounded-xl shadow-md border border-gray-100 p-1"
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenDeleteModal();
+                    setIsOpenDelete(false);
+                  }}
+                  className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-red-50  hover:text-red-600 rounded-lg transition-colors cursor-pointer font-medium
+                  ${isOpenDelete ? 'text-red-600' : ''}`}
+                  title="Delete"
                 >
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteNote(note?.id);
-                      setIsOpenDelete(false);
-                    }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium"
-                  >
-                    <Trash className="w-3 h-3" /> <p>Delete</p>
-                  </button>
-                </div>
-              )}
+                  <Trash className="w-3 h-3" />
+                </button>
+              </button>
             </div>
           </div>
         </div>
