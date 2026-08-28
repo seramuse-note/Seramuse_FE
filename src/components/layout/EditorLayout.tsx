@@ -1,12 +1,7 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
 import { useEffect, useState } from 'react';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
-import {
-  EditorToolbar,
-  FormattingBubbleMenu,
-  ListBubbleMenu,
-  SlashCommandMenu,
-} from '@/components/editor';
+import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/components/editor';
 import type { Block, CreateBlockPayload } from '@/types';
 
 interface EditorProps {
@@ -97,7 +92,6 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
       >
         <EditorContent editor={editor} className="h-full " />
       </div>
-      <EditorToolbar editor={editor} editorState={editorState} />
       {editor && showMenu && (
         <>
           <FormattingBubbleMenu editor={editor} editorState={editorState} />

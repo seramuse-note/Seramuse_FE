@@ -8,7 +8,6 @@ import { TagCompoment } from '../common/Tag';
 import { onKey } from '@/utils/keyDown.util';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import type { CreateBlockPayload, NoteRequest, Tag, TagRequest } from '@/types';
-import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import {
   useCreateTagMutation,
   useGetMoodsQuery,
@@ -18,13 +17,8 @@ import {
 import { toast } from 'react-toastify';
 import { EditorSkeleton } from '../skeleton/EditorSkeleton';
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import { setActiveNoteId, setLayoutMode } from '@/store/slices/uiSlice';
-
-const EDITOR_LAYOUT_STYLES: Record<LayoutMode, string> = {
-  FULL_EDITOR: 'flex-1',
-  SPLIT: 'w-full translate-x-0 md:flex-1',
-  FULL_SIDEBAR: '-translate-x-full w-0 opacity-0 overflow-hidden pointer-events-none',
-};
+import { setActiveNoteId } from '@/store/slices/uiSlice';
+import { toggleNav } from '@/store/slices/noteUiSlice';
 
 export interface DropdownOption {
   value: string;
@@ -33,7 +27,8 @@ export interface DropdownOption {
 export const NoteEditor = () => {
   const dispatch = useAppDispatch();
   const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
-  const layoutMode = useAppSelector((state) => state.ui.layoutMode);
+
+  const { isNavCollapsed } = useAppSelector((state) => state.uiNote);
 
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
   const {
@@ -171,13 +166,10 @@ export const NoteEditor = () => {
   };
 
   const handleToggleLayout = () => {
-    const prev =
-      layoutMode === LAYOUT_MODE.FULL_EDITOR ? LAYOUT_MODE.SPLIT : LAYOUT_MODE.FULL_EDITOR;
-    dispatch(setLayoutMode(prev));
+    dispatch(toggleNav());
   };
 
   const handleCloseEditor = () => {
-    dispatch(setLayoutMode(LAYOUT_MODE.FULL_SIDEBAR));
     dispatch(setActiveNoteId(null));
   };
 
@@ -189,22 +181,18 @@ export const NoteEditor = () => {
   }, [noteData, isError, handleCloseEditor]);
 
   if (isLoading) {
-    return <EditorSkeleton layoutMode={layoutMode} EDITOR_LAYOUT_STYLES={EDITOR_LAYOUT_STYLES} />;
+    return <EditorSkeleton />;
   }
 
   return (
     <div
       key={activeNoteId}
-      className={clsx(
-        'h-full min-h-0 min-w-0 overflow-auto transition-all duration-300',
-        EDITOR_LAYOUT_STYLES[layoutMode]
-      )}
+      className=" flex-1 h-full min-h-0 min-w-0 overflow-auto transition-all duration-300"
     >
       <div
         className={clsx(
           `flex-1 text-[10px] h-full min-w-0 min-h-0 flex flex-col overflow-x-auto overflow-y-auto z-0
-        bg-white/80 cursor-pointer shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)]`,
-          EDITOR_LAYOUT_STYLES[layoutMode]
+        bg-white/80 cursor-pointer shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)]`
         )}
       >
         <div className="flex justify-between items-center h-7 gap-1 p-1 text-brand-accent-primary shadow-xs ">
@@ -212,22 +200,13 @@ export const NoteEditor = () => {
             <button
               onClick={handleToggleLayout}
               className="block-0 hidden md:inline-flex md:items-center md:justify-center md:w-6 md:h-6 p-1 rounded-full text-brand-accent-fourth
-            hover:text-brand-accent-secondary cursor-pointer border border-transparent
-            transition-colors duration-200"
-              title={
-                layoutMode === LAYOUT_MODE.SPLIT
-                  ? 'Close sidebar'
-                  : layoutMode === LAYOUT_MODE.FULL_EDITOR
-                    ? 'Lock sidebar open'
-                    : ''
-              }
+            hover:text-brand-accent-secondary cursor-pointer border border-transparent transition-colors duration-200"
+              title={!isNavCollapsed ? 'Close navbar' : 'Open navbar'}
             >
-              {layoutMode === LAYOUT_MODE.SPLIT ? (
+              {!isNavCollapsed ? (
                 <PanelLeftClose className="w-2 h-2  font-light" />
-              ) : layoutMode === LAYOUT_MODE.FULL_EDITOR ? (
-                <PanelLeftOpen className="w-2 h-2 font-light" />
               ) : (
-                ''
+                <PanelLeftOpen className="w-2 h-2 font-light" />
               )}
             </button>
             <p className="leading-none truncate">{initialData?.title}</p>

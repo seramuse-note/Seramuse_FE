@@ -1,23 +1,16 @@
-import type { LayoutMode } from '@/types/layout.types';
 import clsx from 'clsx';
 
-interface EditorSkeletonProps {
-  layoutMode: LayoutMode;
-  EDITOR_LAYOUT_STYLES: Record<LayoutMode, string>;
-}
-export const EditorSkeleton = ({ layoutMode, EDITOR_LAYOUT_STYLES }: EditorSkeletonProps) => {
+export const EditorSkeleton = () => {
   return (
     <div
       className={clsx(
-        ' h-full min-h-0 min-w-0 overflow-auto transition-all duration-300 animate-pulse',
-        EDITOR_LAYOUT_STYLES?.[layoutMode]
+        'flex-1 h-full min-h-0 min-w-0 overflow-auto transition-all duration-300 animate-pulse'
       )}
     >
       <div
         className={clsx(
           `flex-1 text-[10px] h-full min-w-0 min-h-0 flex flex-col overflow-x-auto overflow-y-auto z-0 p-3  
-          bg-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)]`,
-          EDITOR_LAYOUT_STYLES?.[layoutMode]
+          bg-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)]`
         )}
       >
         <div className="flex justify-between items-center h-7 gap-1 p-1">

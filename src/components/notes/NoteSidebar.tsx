@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { Mic, Plus, X, Funnel } from 'lucide-react';
 import { useState } from 'react';
 import { Pagination } from '@/components/common/Pagination';
@@ -14,17 +13,11 @@ import { toast } from 'react-toastify';
 import { NoteCard } from './NoteCard';
 import { FilterPopover } from './FilterPopover';
 import { SidebarNoteSkeleton } from '../skeleton/SidebarNoteSkeleton';
-import { LAYOUT_MODE, type LayoutMode } from '@/types/layout.types';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 import { useAppDispatch, useAppSelector } from '@/store/store';
 import type { FilterState } from '@/types';
-import { setActiveNoteId, setLayoutMode } from '@/store/slices/uiSlice';
-
-const SIDEBAR_LAYOUT_STYLES: Record<LayoutMode, string> = {
-  FULL_SIDEBAR: 'flex-1',
-  SPLIT: 'w-0 opacity-0 overflow-hidden md:w-50 md:opacity-100',
-  FULL_EDITOR: 'w-0 opacity-0 overflow-hidden pointer-events-none',
-};
+import { closeNote, selectNote } from '@/store/slices/noteUiSlice';
+import { setActiveNoteId } from '@/store/slices/uiSlice';
 
 const LIMIT = 10;
 const PAGES = 1;
@@ -81,8 +74,7 @@ export const NoteSidebar = () => {
   };
 
   const handleActiveNote = (id: string) => {
-    dispatch(setActiveNoteId(id));
-    dispatch(setLayoutMode(LAYOUT_MODE.SPLIT));
+    dispatch(selectNote(id));
   };
 
   const handleCreateNote = async (e: React.MouseEvent) => {
@@ -101,7 +93,6 @@ export const NoteSidebar = () => {
       }
 
       dispatch(setActiveNoteId(noteId));
-      dispatch(setLayoutMode(LAYOUT_MODE.SPLIT));
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -127,12 +118,7 @@ export const NoteSidebar = () => {
   };
 
   return (
-    <div
-      className={clsx(
-        'h-full min-h-0 min-w-0 overflow-hidden transform-gpu transition-all duration-300',
-        SIDEBAR_LAYOUT_STYLES[layoutMode]
-      )}
-    >
+    <div className=" flex-1 h-full min-h-0 min-w-0 overflow-hidden transform-gpu transition-all duration-300">
       {isLoading ? (
         <SidebarNoteSkeleton count={4} />
       ) : (
@@ -142,7 +128,7 @@ export const NoteSidebar = () => {
               <div className="flex justify-between items-center px-1 shrink-0">
                 <button className="cursor-pointer">
                   <div
-                    onClick={() => dispatch(setLayoutMode(LAYOUT_MODE.FULL_SIDEBAR))}
+                    onClick={() => dispatch(closeNote())}
                     className=" items-start text-base font-bold flex-1"
                   >
                     Note List
