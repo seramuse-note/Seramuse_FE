@@ -23,7 +23,7 @@ export const NoteCard = ({
   onToggleLike,
   onOpenDeleteModal,
 }: NoteCardProps) => {
-  const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
+  const activeNoteId = useAppSelector((state) => state.uiNote.activeNoteId);
 
   const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -69,11 +69,11 @@ export const NoteCard = ({
           </h3>
         </div>
 
-        <div className="min-h-[32px] text-[11px] text-brand-accent-tertiary line-clamp-2 leading-relaxed">
+        <div className="min-h-8 text-[11px] text-brand-accent-tertiary line-clamp-2 leading-relaxed">
           {getFirstBlockText(note.blocks)}
         </div>
 
-        <div className="h-[35px] flex items-center py-5 border-t border-white/20 overflow-hidden">
+        <div className="h-8.75 flex items-center py-5 border-t border-white/20 overflow-hidden">
           {note.tags && note.tags.length > 0 && (
             <div className="flex flex-nowrap gap-1.5">
               {note.tags.map((tag: Tag) => (
@@ -118,23 +118,18 @@ export const NoteCard = ({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  onOpenDeleteModal();
                   setIsOpenDelete((prev) => !prev);
                 }}
                 className="p-1 cursor-pointer transition-transform  "
               >
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenDeleteModal();
-                    setIsOpenDelete(false);
-                  }}
+                <div
                   className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-red-50  hover:text-red-600 rounded-lg transition-colors cursor-pointer font-medium
                   ${isOpenDelete ? 'text-red-600' : ''}`}
                   title="Delete"
                 >
                   <Trash className="w-3 h-3" />
-                </button>
+                </div>
               </button>
             </div>
           </div>

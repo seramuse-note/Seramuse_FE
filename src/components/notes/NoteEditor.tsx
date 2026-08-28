@@ -17,8 +17,7 @@ import {
 import { toast } from 'react-toastify';
 import { EditorSkeleton } from '../skeleton/EditorSkeleton';
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import { setActiveNoteId } from '@/store/slices/uiSlice';
-import { toggleNav } from '@/store/slices/noteUiSlice';
+import { selectNote, toggleNav } from '@/store/slices/noteUiSlice';
 
 export interface DropdownOption {
   value: string;
@@ -26,9 +25,8 @@ export interface DropdownOption {
 }
 export const NoteEditor = () => {
   const dispatch = useAppDispatch();
-  const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
-
-  const { isNavCollapsed } = useAppSelector((state) => state.uiNote);
+  const activeNoteId = useAppSelector((state) => state.uiNote.activeNoteId);
+  const isNavCollapsed = useAppSelector((state) => state.uiNote.isNavCollapsed);
 
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
   const {
@@ -169,16 +167,12 @@ export const NoteEditor = () => {
     dispatch(toggleNav());
   };
 
-  const handleCloseEditor = () => {
-    dispatch(setActiveNoteId(null));
-  };
-
   useEffect(() => {
     if (isError) {
-      handleCloseEditor();
+      dispatch(selectNote(null));
       toast.error('Không thể tải dữ liệu ghi chú!');
     }
-  }, [noteData, isError, handleCloseEditor]);
+  }, [dispatch, isError]);
 
   if (isLoading) {
     return <EditorSkeleton />;

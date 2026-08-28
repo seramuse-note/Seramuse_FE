@@ -26,8 +26,7 @@ const PAGES = 1;
 
 export const NoteSidebar = () => {
   const dispatch = useAppDispatch();
-  const activeNoteId = useAppSelector((state) => state.ui.activeNoteId);
-  const layoutMode = useAppSelector((state) => state.ui.layoutMode);
+  const activeNoteId = useAppSelector((state) => state.uiNote.activeNoteId);
   const [deletingNote, setDeletingNote] = useState<Note | null>(null);
 
   const [deleteNote] = useDeleteNoteMutation();
@@ -94,8 +93,8 @@ export const NoteSidebar = () => {
         console.warn('Không tìm thấy noteId trong response:', response);
         return;
       }
-
       dispatch(selectNote(noteId));
+      toast.success(`${noteId}`);
     } catch (err) {
       console.error('Lỗi khi tạo note:', err);
     }
@@ -229,7 +228,7 @@ export const NoteSidebar = () => {
               {displayNotes && displayNotes.length > 0 ? (
                 <div
                   className={`w-full h-full pr-2 grid gap-4 justify-center md:gap-4 
-                  ${layoutMode === 'FULL_SIDEBAR' ? 'grid-cols-1  md:grid-cols-2 md:items-start' : 'grid-cols-1 items-start'}`}
+                  ${!activeNoteId ? 'grid-cols-1  md:grid-cols-2 md:items-start' : 'grid-cols-1 items-start'}`}
                 >
                   {displayNotes.map((note) => {
                     return (
@@ -293,7 +292,7 @@ export const NoteSidebar = () => {
             </div>
 
             <div className="flex justify-center items-center w-full shrink-0 ">
-              {layoutMode === 'FULL_SIDEBAR' ? (
+              {!activeNoteId ? (
                 <Pagination
                   currentPage={currentPage}
                   totalPages={pagination?.totalPages ?? 1}

@@ -174,7 +174,7 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
                         >
                           {tempTags.includes(tag) && (
                             <svg
-                              className="w-2.5 h-2.5 stroke-[2]"
+                              className="w-2.5 h-2.5 stroke-2"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -275,7 +275,7 @@ export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopove
                         >
                           {tempMoods.includes(mood) && (
                             <svg
-                              className="w-2.5 h-2.5 stroke-[2]"
+                              className="w-2.5 h-2.5 stroke-2"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"

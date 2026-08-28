@@ -25,6 +25,7 @@ export const TabNavbar = () => {
       <div className=" flex flex-col gap-1 text-xs text-brand-accent-primary font-medium">
         {NAV_ITEMS.map((item) => (
           <div
+            key={item.name}
             className="relative h-8 px-2 gap-2 box-border rounded-md flex justify-between items-center cursor-pointer hover:bg-white/20 "
             onClick={item.onClick}
           >

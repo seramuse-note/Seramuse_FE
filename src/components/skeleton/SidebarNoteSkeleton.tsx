@@ -48,12 +48,12 @@ export const SidebarNoteSkeleton = ({ layoutMode = LAYOUT_MODE.FULL_SIDEBAR, cou
                   <div className="h-4 bg-gray-200/90 rounded-md w-3/4" />
                 </div>
 
-                <div className="min-h-[32px] space-y-2 pt-0.5">
+                <div className="min-h-8 space-y-2 pt-0.5">
                   <div className="h-3 bg-gray-200/70 rounded w-full" />
                   <div className="h-3 bg-gray-200/70 rounded w-4/5" />
                 </div>
 
-                <div className="h-[35px] border-t border-white/20 pt-1.5 flex gap-1.5">
+                <div className="h-8.75 border-t border-white/20 pt-1.5 flex gap-1.5">
                   <div className="h-4 w-12 bg-white/80 border border-white/50 rounded-lg" />
                   <div className="h-4 w-16 bg-white/80 border border-white/50 rounded-lg" />
                 </div>
