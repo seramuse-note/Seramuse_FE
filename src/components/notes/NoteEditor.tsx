@@ -1,15 +1,15 @@
 import clsx from 'clsx';
 import { Dropdown } from '@/components/common/Dropdown';
-import { PanelLeftClose, PanelLeftOpen, Plus, Save, TagIcon } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, Save } from 'lucide-react';
 import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { useCallback, useEffect, useState } from 'react';
 import { TagCompoment } from '../common/Tag';
-import { onKey } from '@/utils/keyDown.util';
 import { getRandomHexColor } from '@/utils/randomColor.util';
-import type { CreateBlockPayload, NoteRequest, Tag, TagRequest } from '@/types';
+import type { CreateBlockPayload, NoteRequest, TagRequest } from '@/types';
 import {
   useCreateTagMutation,
+  useDeleteTagMutation,
   useGetMoodsQuery,
   useGetNoteQuery,
   useUpdateNoteMutation,
@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { EditorSkeleton } from '../skeleton/EditorSkeleton';
 import { useAppDispatch, useAppSelector } from '@/store/store';
 import { selectNote, toggleNav } from '@/store/slices/noteUiSlice';
+import { TagInputWithDropdown } from '../common/TagInputWithDropdown';
 
 export interface DropdownOption {
   value: string;
@@ -27,6 +28,7 @@ export const NoteEditor = () => {
   const dispatch = useAppDispatch();
   const activeNoteId = useAppSelector((state) => state.uiNote.activeNoteId);
   const isNavCollapsed = useAppSelector((state) => state.uiNote.isNavCollapsed);
+  const allExistingTags = useAppSelector((state) => state.filter.tags);
 
   const { data: moodsData } = useGetMoodsQuery({ page: 1, limit: 10 });
   const {
@@ -37,6 +39,7 @@ export const NoteEditor = () => {
 
   const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
   const [createTag] = useCreateTagMutation();
+  const [deleteTag] = useDeleteTagMutation();
 
   const moods = moodsData?.data ?? [];
   const moodOptions = moods.map((m) => ({ value: m.id, label: m.name }));
@@ -61,10 +64,14 @@ export const NoteEditor = () => {
   const currentMoodId = formData.mood_id ?? initialMoodId;
   const currentBlocks = formData.blocks ?? initialBlocks;
 
-  const displayTags = [
-    ...initialTags.filter((tag) => !removedTagNames.includes(tag.name.toUpperCase())),
+  const rawDisplayTags = [
+    ...initialTags.filter((tag) => !removedTagNames.includes(tag.name.toLowerCase())),
     ...addedTags,
   ];
+
+  const displayTags = Array.from(
+    new Map(rawDisplayTags.map((tag) => [tag.name.trim().toLowerCase(), tag])).values()
+  );
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -73,12 +80,12 @@ export const NoteEditor = () => {
     }));
   };
 
-  const handleBlocksChange = useCallback((newBlocks: CreateBlockPayload[]) => {
+  const handleBlocksChange = (newBlocks: CreateBlockPayload[]) => {
     setFormData((prev) => ({
       ...prev,
       blocks: newBlocks,
     }));
-  }, []);
+  };
 
   const handleMoodChange = (moodId: string) => {
     setFormData((prev) => ({
@@ -87,15 +94,23 @@ export const NoteEditor = () => {
     }));
   };
 
-  const handleAddTag = () => {
-    const normalizedInput = tagInput.trim().toUpperCase();
+  function handleAddTag() {
+    const normalizedInput = tagInput.trim().toLowerCase();
     if (!normalizedInput) return;
 
-    const isExist = displayTags.some((tag) => normalizedInput === tag.name?.trim().toUpperCase());
-    if (isExist) {
-      toast.warn('The tag already exists');
+    const isExistOnUI = displayTags.some(
+      (tag) => normalizedInput === tag.name?.trim().toLowerCase()
+    );
+
+    if (isExistOnUI) {
+      toast.warn('Tag này đã được thêm vào ghi chú!');
+      setTagInput('');
       return;
     }
+
+    const existingDbTag = allExistingTags.find(
+      (t) => t.name.trim().toLowerCase() === normalizedInput
+    );
 
     if (removedTagNames.includes(normalizedInput)) {
       setRemovedTagNames((prev) => prev.filter((name) => name !== normalizedInput));
@@ -103,18 +118,70 @@ export const NoteEditor = () => {
       setAddedTags((prev) => [
         ...prev,
         {
-          name: normalizedInput,
-          color: getRandomHexColor(),
+          id: existingDbTag?.id,
+          name: existingDbTag?.name || normalizedInput,
+          color: existingDbTag?.color || getRandomHexColor(),
         },
       ]);
     }
+    console.log('2 ', { addedTags });
+
     setTagInput('');
+  }
+
+  const handleDeleteTag = async (deletedTag: string) => {
+    const normalized = deletedTag.trim().toLowerCase();
+
+    const tagExist = allExistingTags.find((t) => t.name.trim().toLowerCase() === normalized);
+    const tagId = tagExist?.id;
+
+    if (!tagId) return;
+
+    try {
+      await deleteTag({ id: tagId }).unwrap();
+      toast.success('Đã xóa tag thành công');
+    } catch (error) {
+      console.error('Lỗi khi xóa tag:', error);
+      toast.error('Không thể xóa tag này!');
+    }
   };
-  const handleRemoveTag = (targetTag: string) => {
-    const normalizedTarget = targetTag.trim().toUpperCase();
-    setAddedTags((prev) =>
-      prev.filter((tag) => tag.name.trim().toUpperCase() !== normalizedTarget)
+
+  const handleSelectTag = (selectedTag: string) => {
+    if (!selectedTag) return;
+
+    const normalizedTag = selectedTag.trim().toLocaleLowerCase();
+    const isExist = displayTags.some((tag) => normalizedTag === tag.name.trim().toLowerCase());
+
+    if (isExist) return;
+
+    const existingTagObj = allExistingTags.find(
+      (t) => t.name.trim().toLowerCase() === normalizedTag
     );
+
+    if (removedTagNames.includes(normalizedTag)) {
+      setRemovedTagNames((prev) => prev.filter((name) => name !== normalizedTag));
+    } else {
+      setAddedTags((prev) => [
+        ...prev,
+        {
+          id: existingTagObj?.id,
+          name: existingTagObj?.name || normalizedTag,
+          color: existingTagObj?.color || getRandomHexColor(),
+        } as TagRequest,
+      ]);
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveCurrentTag = (targetTag: string) => {
+    console.log('xóa');
+
+    const normalizedTarget = targetTag.trim().toLowerCase();
+
+    setAddedTags((prev) =>
+      prev.filter((tag) => tag.name.trim().toLowerCase() !== normalizedTarget)
+    );
+
     setRemovedTagNames((prev) => [...prev, normalizedTarget]);
   };
 
@@ -122,18 +189,25 @@ export const NoteEditor = () => {
     if (!activeNoteId) return null;
 
     const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
+    console.log({ addedTags });
 
-    const tagIds = await Promise.all(
+    const currentTagIds = await Promise.all(
       displayTags.map(async (tag) => {
-        if (typeof tag === 'object' && 'id' in tag) {
-          return tag.id;
+        const normalizedTagName = tag.name.trim().toLowerCase();
+        const dbTag = allExistingTags.find(
+          (t) => t.name.trim().toLowerCase() === normalizedTagName
+        );
+
+        if (dbTag?.id) {
+          return dbTag.id;
         }
 
         try {
           const tagRequest: TagRequest = {
-            name: tag.name,
-            color: tag.color,
+            name: tag.name.trim(),
+            color: tag.color || getRandomHexColor(),
           };
+
           const response = await createTag(tagRequest).unwrap();
           return response.data?.id || null;
         } catch (error) {
@@ -144,7 +218,7 @@ export const NoteEditor = () => {
     );
 
     const validTagIds = Array.from(
-      new Set(tagIds.filter((id): id is string => Boolean(id !== '')))
+      new Set(currentTagIds.filter((id): id is string => Boolean(id)))
     );
 
     const isValidMood = currentMoodId && currentMoodId !== '';
@@ -165,6 +239,16 @@ export const NoteEditor = () => {
   const handleToggleLayout = () => {
     dispatch(toggleNav());
   };
+
+  const handleEnterKey = useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddTag();
+      }
+    },
+    [handleAddTag]
+  );
 
   useEffect(() => {
     if (isError) {
@@ -236,50 +320,28 @@ export const NoteEditor = () => {
               />
             </div>
             <div className="flex flex-1 min-w-0 gap-2 rounded-2xl items-center shrink-0">
-              <div className="gap-3 shrink-0">
-                <div
-                  className="flex shrink-0 gap-2 items-center justify-center md:pl-2 md:py-.5 px-3 py-.5 text-brand-accent-primary font-medium
-                  outline-none backdrop-blur-md shadow-sm hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointerfocus-within:bg-white/70
-                  overflow-x-hidden"
-                >
-                  <TagIcon className="w-5 h-5 md:w-3.5 ml:h-3.5 text-brand-accent-secondary mr-1 self-center" />
-                  <div className="hidden md:flex shrink-0 gap-2 items-center">
-                    <input
-                      type="text"
-                      placeholder="Add tag..."
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={onKey('Enter', handleAddTag)}
-                      className="hidden md:block w-full bg-transparent outline-none  placeholder:text-brand-accent-tertiary"
-                    />
-                    <button
-                      type="button"
-                      className="rounded-lg cursor-pointer"
-                      title="Add"
-                      onClick={handleAddTag}
-                    >
-                      <Plus className="w-3.5 h-3.5 text-brand-accent-tertiary hover:text-brand-accent-primary transition-colors duration-300" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
+              <TagInputWithDropdown
+                tagInput={tagInput}
+                setTagInput={setTagInput}
+                handleAddTag={handleAddTag}
+                onSelectTag={handleSelectTag}
+                existingTags={allExistingTags.map((i) => i.name)}
+                currentTags={displayTags.map((i) => (typeof i === 'string' ? i : i.name))}
+                onKeyDown={handleEnterKey}
+                onDeleteItem={handleDeleteTag}
+              />
               <ScrollContainer
                 vertical={false}
-                className={`hidden sm:flex shrink-0 items-center gap-1.5 overflow-x-auto min-w-0 min-h-0 flex-1 box-border scrollbar-none transition-all duration-200
-            ${
-              displayTags.length > 0
-                ? 'p-0 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
-                : 'p-0 bg-transparent border-transparent shadow-none'
-            }`}
+                className={clsx(
+                  'flex flex-1 items-center gap-1.5 overflow-x-auto min-w-0 min-h-full box-border scrollbar-none transition-all duration-200',
+                  displayTags.length > 0
+                    ? 'p-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl hover:cursor-grab active:cursor-grabbing'
+                    : 'p-0 bg-transparent border-transparent shadow-none'
+                )}
               >
-                {displayTags.map((tag) => (
-                  <TagCompoment
-                    key={typeof tag === 'string' ? tag : (tag as Tag).id || tag.name}
-                    tag={tag}
-                    onRemove={handleRemoveTag}
-                  />
-                ))}
+                {displayTags.map((tag) => {
+                  return <TagCompoment tag={tag} onRemove={handleRemoveCurrentTag} />;
+                })}
               </ScrollContainer>
             </div>
           </div>

@@ -9,7 +9,7 @@ export const tagApi = baseApi.injectEndpoints({
         return {
           url: `/tags`,
           method: 'POST',
-          body: { name: newTag.name.toUpperCase().trim(), color: newTag.color.trim() },
+          body: { name: newTag.name.toLowerCase().trim(), color: newTag.color.trim() },
         };
       },
       invalidatesTags: [{ type: 'TAG', id: 'LIST_TAG' }],
@@ -56,6 +56,7 @@ export const tagApi = baseApi.injectEndpoints({
       invalidatesTags: (_, _error, { id }) => [
         { type: 'TAG', id: id },
         { type: 'TAG', id: 'LIST_TAG' },
+        'TAG',
       ],
     }),
   }),

@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Tag as TagIcon, Plus } from 'lucide-react';
-import { onKey } from '@/utils/keyDown.util';
+import React, { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { Tag as TagIcon, Plus, X } from 'lucide-react';
 
 interface TagInputDropdownProps {
   tagInput: string;
@@ -9,6 +8,8 @@ interface TagInputDropdownProps {
   onSelectTag: (tagName: string) => void;
   existingTags?: string[];
   currentTags?: string[];
+  onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
+  onDeleteItem: (deletedTag: string) => void;
 }
 
 export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
@@ -18,11 +19,12 @@ export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
   onSelectTag,
   existingTags = [],
   currentTags = [],
+  onKeyDown,
+  onDeleteItem,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Xử lý click ra ngoài container thì đóng dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -33,12 +35,13 @@ export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Lọc danh sách tag dựa trên keyword người dùng nhập và loại bỏ tag đã gắn vào note
   const filteredTags = existingTags.filter(
     (tag) => tag.toLowerCase().includes(tagInput.toLowerCase().trim()) && !currentTags.includes(tag)
   );
 
-  const handlePickTag = (tag: string) => {
+  const handlePickTag = (e: React.MouseEvent, tag: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     onSelectTag(tag);
     setTagInput('');
     setIsOpen(false);
@@ -63,12 +66,7 @@ export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
               setTagInput(e.target.value);
               setIsOpen(true);
             }}
-            onKeyDown={(e) => {
-              onKey('Enter', () => {
-                handleAddTag();
-                setIsOpen(false);
-              })(e);
-            }}
+            onKeyDown={onKeyDown}
             className="hidden md:block w-full bg-transparent outline-none placeholder:text-brand-accent-tertiary text-xs"
           />
           <button
@@ -85,7 +83,6 @@ export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
         </div>
       </div>
 
-      {/* Dropdown danh sách Tag */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-1.5 w-48 bg-white/95 backdrop-blur-xl border border-gray-100 shadow-xl rounded-2xl py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden">
           <div className="px-3 py-1 text-[10px] font-semibold text-brand-accent-tertiary uppercase tracking-wider">
@@ -98,10 +95,18 @@ export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
                 <button
                   key={tag}
                   type="button"
-                  onClick={() => handlePickTag(tag)}
+                  onClick={(e) => handlePickTag(e, tag)}
                   className="w-full text-left px-3 py-1.5 text-xs text-brand-accent-primary hover:bg-brand-accent-primary/10 hover:text-brand-accent-primary transition-colors flex items-center justify-between cursor-pointer"
                 >
                   <span className="truncate">#{tag}</span>
+                  <X
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      onDeleteItem(tag);
+                    }}
+                    className="w-3 h-3 opacity-40 hover:opacity-100 hover:to-brand-accent-primary transition-all "
+                  />
                 </button>
               ))
             ) : (
