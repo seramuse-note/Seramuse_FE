@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import React, { useState, useRef, useEffect, type KeyboardEvent, type FC } from 'react';
 import { Tag as TagIcon, Plus, X } from 'lucide-react';
 
 interface TagInputDropdownProps {
@@ -12,7 +12,7 @@ interface TagInputDropdownProps {
   onDeleteItem: (deletedTag: string) => void;
 }
 
-export const TagInputWithDropdown: React.FC<TagInputDropdownProps> = ({
+export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
   tagInput,
   setTagInput,
   handleAddTag,

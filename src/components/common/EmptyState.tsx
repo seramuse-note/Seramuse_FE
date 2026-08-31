@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import React from 'react';
+import React, { type FC } from 'react';
 
 interface EmptyStateProps {
   icon?: LucideIcon | React.ReactNode;
@@ -12,12 +12,7 @@ interface EmptyStateProps {
   };
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon: Icon,
-  title,
-  description,
-  action,
-}) => {
+export const EmptyState: FC<EmptyStateProps> = ({ icon: Icon, title, description, action }) => {
   const renderIcon = () => {
     if (!Icon) return null;
     if (typeof Icon === 'function') {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type FC } from 'react';
 import { createPortal } from 'react-dom';
 
 interface ConfirmModalProps {
@@ -12,7 +12,7 @@ interface ConfirmModalProps {
   isLoading?: boolean;
 }
 
-export const ConfirmModal: React.FC<ConfirmModalProps> = ({
+export const ConfirmModal: FC<ConfirmModalProps> = ({
   isOpen,
   title = 'Xác nhận hành động',
   description,
