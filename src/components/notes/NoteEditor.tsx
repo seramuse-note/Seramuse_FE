@@ -3,7 +3,7 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { PanelLeftClose, PanelLeftOpen, Save } from 'lucide-react';
 import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TagCompoment } from '../common/Tag';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import type { CreateBlockPayload, NoteRequest, TagRequest } from '@/types';
@@ -173,8 +173,6 @@ export const NoteEditor = () => {
   };
 
   const handleRemoveCurrentTag = (targetTag: string) => {
-    console.log('xóa');
-
     const normalizedTarget = targetTag.trim().toLowerCase();
 
     setAddedTags((prev) =>
@@ -188,7 +186,6 @@ export const NoteEditor = () => {
     if (!activeNoteId) return null;
 
     const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
-    console.log({ addedTags });
 
     const currentTagIds = await Promise.all(
       displayTags.map(async (tag) => {
@@ -238,16 +235,6 @@ export const NoteEditor = () => {
   const handleToggleLayout = () => {
     dispatch(toggleNav());
   };
-
-  const handleEnterKey = useCallback(
-    (e: React.KeyboardEvent<HTMLElement>) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleAddTag();
-      }
-    },
-    [handleAddTag]
-  );
 
   useEffect(() => {
     if (isError) {
@@ -322,11 +309,16 @@ export const NoteEditor = () => {
               <TagInputWithDropdown
                 tagInput={tagInput}
                 setTagInput={setTagInput}
-                handleAddTag={handleAddTag}
-                onSelectTag={handleSelectTag}
                 existingTags={allExistingTags.map((i) => i.name)}
                 currentTags={displayTags.map((i) => (typeof i === 'string' ? i : i.name))}
-                onKeyDown={handleEnterKey}
+                onAddTag={handleAddTag}
+                onSelectTag={handleSelectTag}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddTag();
+                  }
+                }}
                 onDeleteItem={handleDeleteTag}
               />
               <ScrollContainer

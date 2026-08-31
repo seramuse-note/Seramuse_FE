@@ -16,6 +16,7 @@ export interface UploadRequest {
   file: string;
 }
 
-export interface UploadListRequest {
-  file: string[];
+export interface GetUploadsRequest {
+  page?: number;
+  limit?: number;
 }

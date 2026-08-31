@@ -4,22 +4,22 @@ import { Tag as TagIcon, Plus, X } from 'lucide-react';
 interface TagInputDropdownProps {
   tagInput: string;
   setTagInput: (val: string) => void;
-  handleAddTag: () => void;
-  onSelectTag: (tagName: string) => void;
   existingTags?: string[];
   currentTags?: string[];
+  onAddTag: () => void;
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
+  onSelectTag: (tagName: string) => void;
   onDeleteItem: (deletedTag: string) => void;
 }
 
 export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
   tagInput,
   setTagInput,
-  handleAddTag,
-  onSelectTag,
   existingTags = [],
   currentTags = [],
+  onAddTag,
   onKeyDown,
+  onSelectTag,
   onDeleteItem,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +66,9 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
               setTagInput(e.target.value);
               setIsOpen(true);
             }}
-            onKeyDown={onKeyDown}
+            onKeyDown={(e) => {
+              onKeyDown(e);
+            }}
             className="hidden md:block w-full bg-transparent outline-none placeholder:text-brand-accent-tertiary text-xs"
           />
           <button
@@ -74,7 +76,7 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
             className="rounded-lg cursor-pointer"
             title="Add"
             onClick={() => {
-              handleAddTag();
+              onAddTag();
               setIsOpen(false);
             }}
           >

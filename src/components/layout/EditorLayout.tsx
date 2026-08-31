@@ -5,6 +5,7 @@ import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/compon
 import type { Block, CreateBlockPayload } from '@/types';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
+import { useUploadImageMutation } from '@/services';
 
 interface EditorProps {
   blocksNote: Block[];
@@ -20,6 +21,8 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
 
   const [showMenu] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
+
+  useUploadImageMutation();
 
   const editor = useEditor({
     extensions: EXTENSIONS,
