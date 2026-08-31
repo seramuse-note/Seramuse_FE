@@ -3,6 +3,8 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
 import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/components/editor';
 import type { Block, CreateBlockPayload } from '@/types';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 interface EditorProps {
   blocksNote: Block[];
@@ -12,12 +14,40 @@ interface EditorProps {
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [allImages, setAllImages] = useState<{ src: string }[]>([]);
+
   const [showMenu] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
 
   const editor = useEditor({
     extensions: EXTENSIONS,
     content: blocksNote[0]?.properties,
+
+    editorProps: {
+      handleClick: (view, pos, event) => {
+        const target = event.target as HTMLElement;
+
+        if (target && target.tagName === 'IMG') {
+          const clickedSrc = target.getAttribute('src');
+          if (!clickedSrc) return false;
+
+          const imgElements = Array.from(view.dom.querySelectorAll('img')) as HTMLImageElement[];
+
+          const imageList = imgElements.map((img) => ({ src: img.src }));
+          setAllImages(imageList);
+
+          // Tìm vị trí ảnh vừa bấm
+          const index = imgElements.findIndex((img) => img.src === clickedSrc);
+          setLightboxIndex(index !== -1 ? index : 0);
+
+          setLightboxOpen(true);
+          return true; // Ngăn sự kiện mặc định của Tiptap
+        }
+        return false;
+      },
+    },
 
     onUpdate: ({ editor }) => {
       const properties = editor.getJSON();
@@ -136,6 +166,12 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
           />
         </>
       )}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={allImages}
+      />
     </div>
   );
 };
