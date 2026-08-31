@@ -44,7 +44,7 @@ export const FormattingBubbleMenu = ({ editor, editorState }: Props) => {
 
   const executeCommand = (
     editor: TiptapEditor | null,
-    commandFn: (_chain: ChainedCommands) => ChainedCommands | boolean
+    commandFn: (chain: ChainedCommands) => ChainedCommands | boolean
   ): boolean | undefined => {
     if (!editor) return;
     const result = commandFn(editor.chain().focus());

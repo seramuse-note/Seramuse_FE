@@ -1,24 +1,27 @@
 import { useClickOutside } from '@/hooks/useClickOutside';
-import type { FilterPopoverProps } from '@/types';
+import { useAppSelector } from '@/store/store';
+import type { FilterState, Mood, Tag } from '@/types';
 import { RotateCcw, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
 
-export const FilterPopover = ({
-  tagOptions,
-  moodOptions,
-  initialTags = [],
-  initialMoods = [],
-  onClose,
-  onApply,
-}: FilterPopoverProps) => {
-  const [tempTags, setTempTags] = useState(initialTags);
-  const [tempMoods, setTempMoods] = useState(initialMoods);
-  const [tagQuery, setTagQuery] = useState<string>('');
-  const [moodQuery, setMoodQuery] = useState<string>('');
+interface FilterPopoverProps {
+  selectedFilter: FilterState;
+  onClose: () => void;
+  onApply: (data: FilterState) => void;
+}
 
+export const FilterPopover = ({ selectedFilter, onClose, onApply }: FilterPopoverProps) => {
+  const { moods, tags } = useAppSelector((state) => state.filter);
   const popoverRef = useRef<HTMLDivElement>(null);
   const tagDropdownRef = useRef<HTMLDivElement>(null);
   const moodDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [tempTags, setTempTags] = useState<Tag[]>(selectedFilter.tags);
+  const [tempMoods, setTempMoods] = useState<Mood[]>(selectedFilter.moods);
+
+  const [tagQuery, setTagQuery] = useState<string>('');
+  const [moodQuery, setMoodQuery] = useState<string>('');
+
   const [isTagOpen, setIsTagOpen] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
 
@@ -34,14 +37,14 @@ export const FilterPopover = ({
     onClose();
   };
 
-  const handleTag = (tag: string) => {
+  const handleTag = (tag: Tag) => {
     setTempTags((prev) =>
       prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
     );
     setTagQuery('');
   };
 
-  const handleMood = (mood: string) => {
+  const handleMood = (mood: Mood) => {
     setTempMoods((prev) =>
       prev.includes(mood) ? prev.filter((item) => item !== mood) : [...prev, mood]
     );
@@ -58,17 +61,10 @@ export const FilterPopover = ({
     setMoodQuery(e.target.value);
   };
 
-  const displayTags = tagOptions.filter((tag) =>
-    tag.name.toLocaleLowerCase().includes(tagQuery.toLocaleLowerCase().trim())
-  );
-
-  const displayMoods = moodOptions.filter((item) =>
-    item.name.toLowerCase().trim().includes(moodQuery.toLocaleLowerCase().trim())
-  );
-
   useClickOutside(tagDropdownRef, () => {
     setIsTagOpen(false);
   });
+
   useClickOutside(moodDropdownRef, () => {
     setIsMoodOpen(false);
   });
@@ -81,7 +77,13 @@ export const FilterPopover = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-35 bg-transparent cursor-default" />
+      <div
+        className="fixed inset-0 z-1 bg-transparent cursor-default"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
       <div
         ref={popoverRef}
         className="shrink-0 absolute top-10 right-0 w-100 flex flex-col px-4 py-4 gap-3 bg-white/65 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-md z-40 text-xs text-brand-accent-primary"
@@ -100,21 +102,18 @@ export const FilterPopover = ({
         </div>
 
         <div className="flex-1 -mr-1 flex flex-col gap-3">
-          {/* Section: TAG */}
-          <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 z-47">
+          <div ref={tagDropdownRef} className=" relative flex flex-col gap-1.5 47">
             <span className="text-[10px] font-bold text-brand-accent-fourth uppercase tracking-wider px-0.5">
               TAG
             </span>
+
             <div className="flex flex-col gap-2 p-2  bg-white/40 backdrop-blur-sm  ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
               {tempTags.length > 0 && (
                 <div className="p-1 pr-2 bg-white/40 backdrop-blur-sm ring-1 ring-brand-accent-secondary/20 rounded-xl focus-within:bg-white/70 focus-within:border-white focus-within:ring-2 focus-within:ring-brand-accent-secondary/20 transition-all shadow-inner">
                   <div className="flex gap-1 flex-wrap  overflow-y-auto max-h-10 pb-2 pr-1">
                     {tempTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
-                      >
-                        {tag}
+                      <span className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150">
+                        {tag.name}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -154,28 +153,28 @@ export const FilterPopover = ({
             {isTagOpen && (
               <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/95 bg-white/75 backdrop-blur-xl shadow-md/10 rounded-xl animate-in fade-in-0 zoom-in-95 duration-150">
                 <div className="max-h-18 overflow-y-auto flex flex-col gap-0.5">
-                  {displayTags.length > 0 ? (
-                    displayTags.map((tag) => (
+                  {tags.length > 0 ? (
+                    tags.map((tag) => (
                       <label
                         key={tag.id}
                         className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
-                          checked={tempTags.includes(tag.name)}
-                          onChange={() => handleTag(tag.name)}
+                          checked={tempTags.includes(tag)}
+                          onChange={() => handleTag(tag)}
                           className="sr-only"
                         />
                         <div
                           className={`w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                            tempTags.includes(tag.name)
+                            tempTags.includes(tag)
                               ? 'bg-brand-accent-secondary border-brand-accent-secondary text-white shadow-xs'
                               : 'border-gray-300/80 bg-white/40 group-hover:border-gray-400'
                           }`}
                         >
-                          {tempTags.includes(tag.name) && (
+                          {tempTags.includes(tag) && (
                             <svg
-                              className="w-2.5 h-2.5 stroke-[2]"
+                              className="w-2.5 h-2.5 stroke-2"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -212,10 +211,10 @@ export const FilterPopover = ({
                   <div className="flex gap-1 flex-wrap  overflow-y-auto max-h-10 pb-2 pr-1">
                     {tempMoods.map((mood) => (
                       <span
-                        key={mood}
+                        key={mood.id}
                         className="inline-flex items-center gap-1 bg-white/80 backdrop-blur-xs shadow-md text-brand-accent-primary text-xs px-2.5 py-1 rounded-xl border border-white/80 font-medium animate-in fade-in-50 duration-150"
                       >
-                        {mood}
+                        {mood.name}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -255,28 +254,28 @@ export const FilterPopover = ({
             {isMoodOpen && (
               <div className="absolute z-50 top-full left-0 right-0 mt-1.5 p-1.5 border border-white/95 bg-white/75 backdrop-blur-xl shadow-md/10 rounded-xl animate-in fade-in-0 zoom-in-95 duration-150">
                 <div className="max-h-18 overflow-y-auto flex flex-col gap-0.5">
-                  {displayMoods.length > 0 ? (
-                    displayMoods.map((mood) => (
+                  {moods.length > 0 ? (
+                    moods.map((mood) => (
                       <label
                         key={mood.id}
                         className="flex h-6 items-center gap-2.5 px-3 py-2 rounded-xl  hover:bg-brand-accent-secondary/10 active:scale-99 text-brand-accent-primary cursor-pointer transition-all duration-200"
                       >
                         <input
                           type="checkbox"
-                          checked={tempMoods.includes(mood.name)}
-                          onChange={() => handleMood(mood.name)}
+                          checked={tempMoods.includes(mood)}
+                          onChange={() => handleMood(mood)}
                           className="sr-only"
                         />
                         <div
                           className={`w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                            tempMoods.includes(mood.name)
+                            tempMoods.includes(mood)
                               ? 'bg-brand-accent-secondary border-brand-accent-secondary text-white shadow-xs'
                               : 'border-gray-300/80 bg-white/40 group-hover:border-gray-400'
                           }`}
                         >
-                          {tempMoods.includes(mood.name) && (
+                          {tempMoods.includes(mood) && (
                             <svg
-                              className="w-2.5 h-2.5 stroke-[2]"
+                              className="w-2.5 h-2.5 stroke-2"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -303,7 +302,6 @@ export const FilterPopover = ({
           </div>
         </div>
 
-        {/* Footer Buttons */}
         <div className="relative mt-auto z-10 pt-2.5 flex items-center justify-end gap-2 shrink-0 border-t border-white/40">
           <button
             onClick={onClose}

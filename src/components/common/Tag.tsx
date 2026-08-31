@@ -6,14 +6,13 @@ interface TagData {
 }
 
 interface TagProps {
-  key: string;
   tag: TagData;
-  onRemove: (_name: string) => void;
+  onRemove: (targetTag: string) => void;
 }
 
-export const TagCompoment = ({ key, tag, onRemove }: TagProps) => (
+export const TagCompoment = ({ tag, onRemove }: TagProps) => (
   <div
-    key={key}
+    key={tag.name}
     className={`group flex items-center gap-1 px-2.5 text-[8px]
     bg-white/90 border border-white/30 shadow-md font-medium
     hover:shadow-sm rounded-xl whitespace-nowrap 
@@ -26,6 +25,7 @@ export const TagCompoment = ({ key, tag, onRemove }: TagProps) => (
       type="button"
       onClick={(e) => {
         e.stopPropagation();
+        e.preventDefault();
         onRemove(tag.name);
       }}
       className=" rounded p-0.5 shrink-0 "

@@ -1,17 +1,12 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
 import { useEffect, useState } from 'react';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
-import {
-  EditorToolbar,
-  FormattingBubbleMenu,
-  ListBubbleMenu,
-  SlashCommandMenu,
-} from '@/components/editor';
+import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/components/editor';
 import type { Block, CreateBlockPayload } from '@/types';
 
 interface EditorProps {
   blocksNote: Block[];
-  onSetBlock: (_newBlock: CreateBlockPayload[]) => void;
+  onSetBlock: (newBlock: CreateBlockPayload[]) => void;
 }
 
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
@@ -70,7 +65,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     }),
   });
 
-  const handleExecuteCommand = (action: (_ed: TiptapEditor) => void) => {
+  const handleExecuteCommand = (action: (ed: TiptapEditor) => void) => {
     if (!editor) return;
     const { $from } = editor.state.selection;
     const currentLineText = $from.nodeBefore?.text || '';
@@ -97,7 +92,6 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
       >
         <EditorContent editor={editor} className="h-full " />
       </div>
-      <EditorToolbar editor={editor} editorState={editorState} />
       {editor && showMenu && (
         <>
           <FormattingBubbleMenu editor={editor} editorState={editorState} />

@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --background-image-modern-glow: linear-gradient(170deg, #e3aec2 1%, #fdeff4 29%, #e3aec2 58%);
+  --background-image-modern-glow: linear-gradient(170deg, #e3aec2 1%, #e3aec2 35%);
   /* --color-brand-primary: #e3aec2; */
   /* --color-brand-secondary: #fcd1db; */
   --color-brand-primary: rgba(255, 255, 255, 0.5);

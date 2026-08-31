@@ -1,13 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { type TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import notesApi from '../services/notesApi';
 import { setupListeners } from '@reduxjs/toolkit/query';
+import { baseApi } from '@/services';
+import tagReducer from './slices/filterSlice';
+import noteReducer from './slices/noteSlice';
+import uiNoteReducer from './slices/noteUiSlice';
 
 export const store = configureStore({
   reducer: {
-    [notesApi.reducerPath]: notesApi.reducer,
+    uiNote: uiNoteReducer,
+    filter: tagReducer,
+    notes: noteReducer,
+    [baseApi.reducerPath]: baseApi.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(notesApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
 });
 setupListeners(store.dispatch);
 

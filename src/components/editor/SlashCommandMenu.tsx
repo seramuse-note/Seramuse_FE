@@ -6,7 +6,7 @@ interface Props {
   editor: TiptapEditor;
   slashQuery: string;
   commands: CommandItem[];
-  onExecuteCommand: (_action: (_editor: TiptapEditor) => void) => void;
+  onExecuteCommand: (action: (editor: TiptapEditor) => void) => void;
 }
 
 export const SlashCommandMenu = ({ editor, slashQuery, commands, onExecuteCommand }: Props) => {
