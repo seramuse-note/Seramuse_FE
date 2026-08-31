@@ -1,5 +1,5 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
 import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/components/editor';
 import type { Block, CreateBlockPayload } from '@/types';
@@ -10,6 +10,8 @@ interface EditorProps {
 }
 
 export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [showMenu] = useState(true);
   const [slashQuery, setSlashQuery] = useState('');
 
@@ -40,9 +42,9 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     },
   });
 
-  useEffect(() => {
-    if (!editor || editor.isDestroyed) return;
-  }, [blocksNote, editor]);
+  const filteredCommands = COMMAND_ITEMS.filter((item) =>
+    item.title.toLowerCase().includes(slashQuery)
+  );
 
   const editorState = useEditorState({
     editor,
@@ -80,12 +82,41 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     setSlashQuery('');
   };
 
-  const filteredCommands = COMMAND_ITEMS.filter((item) =>
-    item.title.toLowerCase().includes(slashQuery)
-  );
+  const handleUploadImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        editor.chain().focus().setImage({ src: reader.result, alt: file.name }).run();
+      }
+    };
+
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const triggerImageUpload = () => {
+    handleExecuteCommand(() => {});
+    fileInputRef.current?.click();
+  };
+
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+  }, [blocksNote, editor]);
 
   return (
     <div className="flex flex-col h-full min-h-full w-full gap-2">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleUploadImage}
+        accept="image/*"
+        className="hidden"
+      />
       <div
         className="flex-1 min-h-0 w-full h-full overflow-y-auto
        bg-white rounded-xl border border-gray-100"
@@ -101,6 +132,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
             slashQuery={slashQuery}
             commands={filteredCommands}
             onExecuteCommand={handleExecuteCommand}
+            onUploadImage={triggerImageUpload}
           />
         </>
       )}

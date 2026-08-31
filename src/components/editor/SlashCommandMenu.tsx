@@ -7,9 +7,16 @@ interface Props {
   slashQuery: string;
   commands: CommandItem[];
   onExecuteCommand: (action: (editor: TiptapEditor) => void) => void;
+  onUploadImage: () => void;
 }
 
-export const SlashCommandMenu = ({ editor, slashQuery, commands, onExecuteCommand }: Props) => {
+export const SlashCommandMenu = ({
+  editor,
+  slashQuery,
+  commands,
+  onExecuteCommand,
+  onUploadImage,
+}: Props) => {
   return (
     <FloatingMenu
       editor={editor}
@@ -32,7 +39,13 @@ export const SlashCommandMenu = ({ editor, slashQuery, commands, onExecuteComman
           <button
             key={index}
             type="button"
-            onClick={() => onExecuteCommand(item.action)}
+            onClick={() => {
+              if (item.title.toLowerCase() === 'image') {
+                onUploadImage();
+              } else {
+                onExecuteCommand(item.action);
+              }
+            }}
             style={{
               display: 'block',
               width: '100%',

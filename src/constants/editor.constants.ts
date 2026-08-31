@@ -3,6 +3,7 @@ import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
+import Image from '@tiptap/extension-image';
 
 export interface CommandItem {
   title: string;
@@ -24,6 +25,10 @@ export const EXTENSIONS = [
     types: ['heading', 'paragraph'],
     alignments: ['left', 'center', 'right', 'justify'],
     defaultAlignment: 'left',
+  }),
+  Image.configure({
+    inline: false,
+    allowBase64: true,
   }),
 ];
 
@@ -52,5 +57,10 @@ export const COMMAND_ITEMS: CommandItem[] = [
     title: 'Code Block',
     description: 'Khối mã code',
     action: (ed) => ed.chain().focus().toggleCodeBlock().run(),
+  },
+  {
+    title: 'Image',
+    description: 'Upload image',
+    action: () => {},
   },
 ];

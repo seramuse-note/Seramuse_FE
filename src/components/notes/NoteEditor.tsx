@@ -124,7 +124,6 @@ export const NoteEditor = () => {
         },
       ]);
     }
-    console.log('2 ', { addedTags });
 
     setTagInput('');
   }
