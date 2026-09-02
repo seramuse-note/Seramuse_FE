@@ -1,6 +1,6 @@
 import { Heart, Trash } from 'lucide-react';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type MouseEvent } from 'react';
 import type { Note, Tag } from '@/types';
 import moment from 'moment';
 import { formatDate } from '@/utils/event.util';
@@ -31,7 +31,7 @@ export const NoteCard = ({
   const deleteBtnRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleHeartClick = (e: React.MouseEvent) => {
+  const handleHeartClick = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
 

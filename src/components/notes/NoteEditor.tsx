@@ -3,7 +3,7 @@ import { Dropdown } from '@/components/common/Dropdown';
 import { PanelLeftClose, PanelLeftOpen, Save } from 'lucide-react';
 import { Editor } from '@/components/layout/EditorLayout';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { TagCompoment } from '../common/Tag';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import type { CreateBlockPayload, NoteRequest, TagRequest } from '@/types';
@@ -73,7 +73,7 @@ export const NoteEditor = () => {
     new Map(rawDisplayTags.map((tag) => [tag.name.trim().toLowerCase(), tag])).values()
   );
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
       title: e.target.value,

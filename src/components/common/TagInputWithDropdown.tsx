@@ -1,4 +1,11 @@
-import React, { useState, useRef, useEffect, type KeyboardEvent, type FC } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  type KeyboardEvent,
+  type FC,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 import { Tag as TagIcon, Plus, X } from 'lucide-react';
 
 interface TagInputDropdownProps {
@@ -39,7 +46,7 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
     (tag) => tag.toLowerCase().includes(tagInput.toLowerCase().trim()) && !currentTags.includes(tag)
   );
 
-  const handlePickTag = (e: React.MouseEvent, tag: string) => {
+  const handlePickTag = (e: ReactMouseEvent, tag: string) => {
     e.preventDefault();
     e.stopPropagation();
     onSelectTag(tag);
