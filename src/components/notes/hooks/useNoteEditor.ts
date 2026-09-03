@@ -14,7 +14,7 @@ export const useNoteEditor = () => {
     isError,
   } = useGetNoteQuery({ id: activeNoteId ?? '' }, { skip: !activeNoteId });
 
-  const [updateNote, { isLoading: isSaving }] = useUpdateNoteMutation();
+  const [updateNote, { isLoading: isSavingNote }] = useUpdateNoteMutation();
   const [createTag] = useCreateTagMutation();
 
   const initialNote = noteData?.data ?? undefined;
@@ -100,7 +100,7 @@ export const useNoteEditor = () => {
     initialNote,
     isLoading,
     isError,
-    isSaving,
+    isSavingNote,
     currentTitle,
     handleTitleChange,
     currentMoodId,

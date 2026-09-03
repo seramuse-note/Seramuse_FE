@@ -4,7 +4,6 @@ import { Editor } from '@/components/layout/EditorLayout';
 import { useNoteEditor } from './hooks/useNoteEditor';
 import { NoteEditorHeader, NoteEditorTitle, NoteEditorMood, NoteEditorTags } from './editor';
 
-// Re-export DropdownOption for backward compatibility
 export type { DropdownOption } from '@/types';
 
 export const NoteEditor: FC = () => {
@@ -12,7 +11,7 @@ export const NoteEditor: FC = () => {
     activeNoteId,
     initialNote,
     isLoading,
-    isSaving,
+    isSavingNote,
     currentTitle,
     handleTitleChange,
     currentMoodId,
@@ -34,22 +33,22 @@ export const NoteEditor: FC = () => {
       className="flex-1 h-full min-h-0 min-w-0 overflow-auto transition-all duration-300"
     >
       <div className="flex-1 text-[10px] h-full min-w-0 min-h-0 flex flex-col overflow-x-auto overflow-y-auto z-0 bg-white/80 shadow-[0_20px_50px_-15px_rgba(134,0,60,0.12)]">
-        {/* Header: tự trị toggle nav, hiển thị preview title, nút save */}
-        <NoteEditorHeader title={initialNote?.title} isSaving={isSaving} onSave={handleSave} />
+        <NoteEditorHeader
+          title={initialNote?.title}
+          isSavingNote={isSavingNote}
+          onSave={handleSave}
+        />
 
         <div className="px-3 py-1 flex flex-col gap-1 h-full">
-          {/* Ô nhập tiêu đề ghi chú */}
           <NoteEditorTitle value={currentTitle} onChange={handleTitleChange} />
 
-          {/* Hàng chọn Mood & quản lý Tags */}
           <div className="flex z-20 gap-2 items-center w-full max-h-10 shrink-0">
             <NoteEditorMood value={currentMoodId} onChange={handleMoodChange} />
             <NoteEditorTags initialTags={initialTags} onChangeTags={handleTagsChange} />
           </div>
 
-          {/* Block Editor */}
           <div className="flex flex-col flex-1 min-h-0 h-full w-full z-1">
-            <Editor key={activeNoteId} blocksNote={currentBlocks} onSetBlock={handleBlocksChange} />
+            <Editor key={activeNoteId} value={currentBlocks} onSetBlock={handleBlocksChange} />
           </div>
         </div>
       </div>

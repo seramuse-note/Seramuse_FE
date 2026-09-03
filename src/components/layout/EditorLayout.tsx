@@ -8,11 +8,11 @@ import 'yet-another-react-lightbox/styles.css';
 import { useUploadImageMutation } from '@/services';
 
 interface EditorProps {
-  blocksNote: Block[];
+  value: Block[];
   onSetBlock: (newBlock: CreateBlockPayload[]) => void;
 }
 
-export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
+export const Editor = ({ value, onSetBlock }: EditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -26,7 +26,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
 
   const editor = useEditor({
     extensions: EXTENSIONS,
-    content: blocksNote[0]?.properties,
+    content: value[0]?.properties || { type: 'paragraph', content: [{ type: 'text', text: '' }] },
 
     editorProps: {
       handleClick: (view, _pos, event) => {
@@ -57,11 +57,11 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
 
       const newBlocks: CreateBlockPayload[] = [
         {
-          type: blocksNote[0]?.type ?? 'paragraph',
+          type: value[0]?.type ?? 'paragraph',
           properties: properties,
         },
       ];
-      const isUnchanged = JSON.stringify(blocksNote[0]?.properties) === JSON.stringify(properties);
+      const isUnchanged = JSON.stringify(value[0]?.properties) === JSON.stringify(properties);
 
       if (!isUnchanged) {
         onSetBlock(newBlocks);
@@ -139,7 +139,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
 
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
-  }, [blocksNote, editor]);
+  }, [value, editor]);
 
   return (
     <div className="flex flex-col h-full min-h-full w-full gap-2">

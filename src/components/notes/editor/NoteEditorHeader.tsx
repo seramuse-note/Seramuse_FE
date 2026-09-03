@@ -5,11 +5,11 @@ import { toggleNav } from '@/store/slices/noteUiSlice';
 
 interface NoteEditorHeaderProps {
   title?: string;
-  isSaving: boolean;
+  isSavingNote: boolean;
   onSave: () => void;
 }
 
-export const NoteEditorHeader: FC<NoteEditorHeaderProps> = ({ title, isSaving, onSave }) => {
+export const NoteEditorHeader: FC<NoteEditorHeaderProps> = ({ title, isSavingNote, onSave }) => {
   const dispatch = useAppDispatch();
   const isNavCollapsed = useAppSelector((state) => state.uiNote.isNavCollapsed);
 
@@ -39,11 +39,11 @@ export const NoteEditorHeader: FC<NoteEditorHeaderProps> = ({ title, isSaving, o
         type="button"
         className="flex items-center gap-1 text-[8px] h-fit shrink-0 bg-brand-accent-primary text-white rounded-xl px-3 cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
         onClick={onSave}
-        disabled={isSaving}
+        disabled={isSavingNote}
         title="Lưu ghi chú"
       >
         <Save size={8} />
-        <div>{isSaving ? 'Saving...' : 'Save'}</div>
+        <div>{isSavingNote ? 'Saving...' : 'Save'}</div>
       </button>
     </div>
   );
