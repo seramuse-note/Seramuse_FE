@@ -66,7 +66,7 @@ export const NoteSidebarList: FC<NoteSidebarListProps> = ({
               key={`${note.id}`}
               note={note}
               isActive={activeNoteId === note.id}
-              onActiveNote={() => handleActiveNote(note.id)}
+              onActiveNote={handleActiveNote}
               onToggleLike={handleToggleLike}
               onOpenDeleteModal={() => setDeletingNote(note)}
             />

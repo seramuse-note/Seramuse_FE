@@ -7,4 +7,3 @@ export * from './editor';
 export * from './hooks/useNoteSidebar';
 export * from './hooks/useNoteEditor';
 export * from './hooks/useNoteTags';
-export * from './NoteFilter/index';
