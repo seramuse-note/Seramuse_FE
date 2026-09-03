@@ -101,22 +101,30 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
           <div className="max-h-40 overflow-y-auto custom-scrollbar">
             {filteredTags.length > 0 ? (
               filteredTags.map((tag) => (
-                <button
+                <div
                   key={tag}
-                  type="button"
-                  onClick={(e) => handlePickTag(e, tag)}
-                  className="w-full text-left px-3 py-1.5 text-xs text-brand-accent-primary hover:bg-brand-accent-primary/10 hover:text-brand-accent-primary transition-colors flex items-center justify-between cursor-pointer"
+                  className="w-full px-3 py-1.5 text-xs text-brand-accent-primary hover:bg-brand-accent-primary/10 transition-colors flex items-center justify-between group"
                 >
-                  <span className="truncate">#{tag}</span>
-                  <X
+                  <button
+                    type="button"
+                    onClick={(e) => handlePickTag(e, tag)}
+                    className="flex-1 text-left truncate cursor-pointer hover:text-brand-accent-primary"
+                  >
+                    #{tag}
+                  </button>
+                  <button
+                    type="button"
+                    title={`Xóa tag #${tag}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       onDeleteItem(tag);
                     }}
-                    className="w-3 h-3 opacity-40 hover:opacity-100 hover:to-brand-accent-primary transition-all "
-                  />
-                </button>
+                    className="p-0.5 rounded cursor-pointer opacity-40 hover:opacity-100 hover:text-brand-accent-primary transition-all shrink-0"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
               ))
             ) : (
               <div className="px-3 py-2 text-xs text-brand-accent-tertiary italic text-center">

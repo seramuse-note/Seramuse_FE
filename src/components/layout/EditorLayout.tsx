@@ -29,7 +29,7 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     content: blocksNote[0]?.properties,
 
     editorProps: {
-      handleClick: (view, pos, event) => {
+      handleClick: (view, _pos, event) => {
         const target = event.target as HTMLElement;
 
         if (target && target.tagName === 'IMG') {
