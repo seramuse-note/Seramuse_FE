@@ -1,4 +1,5 @@
 export * from './FilterPopover';
+export * from './filter';
 export * from './NoteCard';
 export * from './NoteEditor';
 export * from './NoteSidebar';
@@ -7,3 +8,4 @@ export * from './editor';
 export * from './hooks/useNoteSidebar';
 export * from './hooks/useNoteEditor';
 export * from './hooks/useNoteTags';
+export * from './hooks/useFilterPopover';
