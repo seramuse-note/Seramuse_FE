@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import { useCreateTagMutation, useGetNoteQuery, useUpdateNoteMutation } from '@/services';
 import { useAppSelector } from '@/store/store';
@@ -30,105 +30,88 @@ export const useNoteEditor = () => {
   const debouncedFormData = useDebounce(formData, 1000);
   const debouncedTags = useDebounce(tags, 1200);
 
+  const isDirty = Object.keys(formData).length > 0 || tags !== null;
+
   const currentTitle = formData.title ?? initialTitle;
   const currentMoodId = formData.mood_id ?? initialMoodId;
   const currentBlocks = formData.blocks ?? initialBlocks;
   const currentTags = tags ?? initialTags.map((t) => ({ id: t.id, name: t.name, color: t.color }));
 
-  const handleTitleChange = useCallback((title: string) => {
+  const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
       ...prev,
       title,
     }));
-  }, []);
+  };
 
-  const handleMoodChange = useCallback((moodId: string) => {
+  const handleMoodChange = (moodId: string) => {
     setFormData((prev) => ({
       ...prev,
       mood_id: moodId,
     }));
-  }, []);
+  };
 
-  const handleBlocksChange = useCallback((newBlocks: CreateBlockPayload[]) => {
+  const handleBlocksChange = (newBlocks: CreateBlockPayload[]) => {
     setFormData((prev) => ({
       ...prev,
       blocks: newBlocks,
     }));
-  }, []);
+  };
 
-  const handleTagsChange = useCallback((newTags: NoteTagItem[]) => {
+  const handleTagsChange = (newTags: NoteTagItem[]) => {
     setTags(newTags);
-  }, []);
+  };
 
-  const handleSave = useCallback(
-    async (showToast: boolean = false) => {
-      if (!activeNoteId) return;
+  const handleSave = async (showToast: boolean = false) => {
+    if (!activeNoteId) return;
 
-      const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
+    const formattedTitle = currentTitle.trim() === '' ? 'Untitled' : currentTitle.trim();
 
-      const tagIdPromises = currentTags.map(async (tag) => {
-        if (tag.id) return tag.id;
-
-        try {
-          const response = await createTag({
-            name: tag.name.trim(),
-            color: tag.color || getRandomHexColor(),
-          }).unwrap();
-          return response.data?.id || null;
-        } catch (error) {
-          console.error('Lỗi tạo tag mới:', error);
-          return null;
-        }
-      });
-
-      const resolvedIds = await Promise.all(tagIdPromises);
-      const validTagIds = Array.from(
-        new Set(resolvedIds.filter((id): id is string => Boolean(id)))
-      );
-
-      const updatePayload: NoteRequest = {
-        title: formattedTitle,
-        blocks: currentBlocks ?? [],
-        tag_ids: validTagIds,
-        ...(currentMoodId ? { mood_id: currentMoodId } : {}),
-      };
+    const tagIdPromises = currentTags.map(async (tag) => {
+      if (tag.id) return tag.id;
 
       try {
-        await updateNote({ id: activeNoteId, body: updatePayload }).unwrap();
-        if (showToast) {
-          toast.success('Đã lưu ghi chú thành công!');
-        }
+        const response = await createTag({
+          name: tag.name.trim(),
+          color: tag.color || getRandomHexColor(),
+        }).unwrap();
+        return response.data?.id || null;
       } catch (error) {
-        console.error('Lỗi khi lưu ghi chú:', error);
-        if (showToast) {
-          toast.error('Lưu ghi chú thất bại!');
-        }
+        console.error('Lỗi tạo tag mới:', error);
+        return null;
       }
-    },
-    [activeNoteId, currentTitle, currentTags, createTag, currentBlocks, currentMoodId, updateNote]
-  );
+    });
 
-  const handleManualSave = useCallback(() => {
-    handleSave(true);
-  }, [handleSave]);
+    const resolvedIds = await Promise.all(tagIdPromises);
+    const validTagIds = Array.from(new Set(resolvedIds.filter((id): id is string => Boolean(id))));
 
-  const handleSaveRef = useRef(handleSave);
-  useEffect(() => {
-    handleSaveRef.current = handleSave;
-  });
+    const updatePayload: NoteRequest = {
+      title: formattedTitle,
+      blocks: currentBlocks ?? [],
+      tag_ids: validTagIds,
+      ...(currentMoodId ? { mood_id: currentMoodId } : {}),
+    };
 
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    try {
+      await updateNote({ id: activeNoteId, body: updatePayload }).unwrap();
+      if (showToast) {
+        toast.success('Đã lưu ghi chú thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lưu ghi chú:', error);
+      if (showToast) {
+        toast.error('Lưu ghi chú thất bại!');
+      }
     }
+  };
 
-    const isDirty = Object.keys(debouncedFormData).length > 0 || debouncedTags !== null;
+  const handleManualSave = () => {
+    handleSave(true);
+  };
+
+  useEffect(() => {
     if (!isDirty || !activeNoteId) return;
-
-    handleSaveRef.current(false);
+    handleSave(false);
   }, [debouncedFormData, debouncedTags, activeNoteId]);
 
   return {
