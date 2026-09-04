@@ -57,8 +57,8 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
   return (
     <div className="gap-3 shrink-0 relative" ref={containerRef}>
       <div
-        className="flex shrink-0 gap-2 items-center justify-center md:pl-2 md:py-0.5 px-3 py-0.5 text-brand-accent-primary font-medium
-        outline-none backdrop-blur-md shadow-sm hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointer focus-within:bg-white/70
+        className="flex shrink-0 gap-2 items-center justify-center px-3 py-1.5 text-brand-accent-primary font-medium
+        outline-none backdrop-blur-md shadow-sm` hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointer focus-within:bg-white/70
         overflow-x-hidden"
       >
         <TagIcon className="w-5 h-5 md:w-3.5 md:h-3.5 text-brand-accent-secondary mr-1 self-center shrink-0" />

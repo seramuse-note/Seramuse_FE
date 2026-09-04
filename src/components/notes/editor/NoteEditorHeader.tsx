@@ -44,10 +44,6 @@ export const NoteEditorHeader: FC<NoteEditorHeaderProps> = ({
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        <span className="text-[10px] text-brand-accent-primary transition-all duration-300 ease-in-out">
-          {isSavingNote ? 'Saving...' : ''}
-        </span>
-
         <button
           type="button"
           className="flex items-center gap-1 text-[8px] h-fit shrink-0 bg-brand-accent-primary text-white rounded-xl px-3 cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
@@ -56,7 +52,7 @@ export const NoteEditorHeader: FC<NoteEditorHeaderProps> = ({
           title="Lưu ghi chú"
         >
           <Save size={10} />
-          <div>{isSaveNoteSuccess ? 'Saved' : 'Save'}</div>
+          <div>{isSaveNoteSuccess ? 'Saved' : isSavingNote ? 'Saving...' : 'Save'}</div>
         </button>
       </div>
     </div>

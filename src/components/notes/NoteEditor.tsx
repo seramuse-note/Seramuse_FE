@@ -44,7 +44,7 @@ export const NoteEditor: FC = () => {
         <div className="px-3 py-3 flex flex-col gap-2 h-full  lg:max-h-[calc(100vh-40px)]">
           <NoteEditorTitle value={currentTitle} onChange={handleTitleChange} />
 
-          <div className="flex z-20 gap-3 items-center w-full max-h-10 shrink-0">
+          <div className="flex z-20 gap-3 items-center w-full h-12 shrink-0">
             <NoteEditorMood value={currentMoodId} onChange={handleMoodChange} />
             <NoteEditorTags initialTags={initialTags} onChangeTags={handleTagsChange} />
           </div>

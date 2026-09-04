@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getRandomHexColor } from '@/utils/randomColor.util';
 import { useCreateTagMutation, useGetNoteQuery, useUpdateNoteMutation } from '@/services';
 import { useAppSelector } from '@/store/store';
@@ -31,6 +31,7 @@ export const useNoteEditor = () => {
   const debouncedTags = useDebounce(tags, 1200);
 
   const isDirty = Object.keys(formData).length > 0 || tags !== null;
+  const isDirtyRef = useRef(isDirty);
 
   const currentTitle = formData.title ?? initialTitle;
   const currentMoodId = formData.mood_id ?? initialMoodId;
@@ -109,9 +110,19 @@ export const useNoteEditor = () => {
     handleSave(true);
   };
 
+  const handleSaveRef = useRef(handleSave);
+
   useEffect(() => {
-    if (!isDirty || !activeNoteId) return;
-    handleSave(false);
+    handleSaveRef.current = handleSave;
+  });
+
+  useEffect(() => {
+    isDirtyRef.current = isDirty;
+  }, [isDirty]);
+
+  useEffect(() => {
+    if (!isDirtyRef.current || !activeNoteId) return;
+    handleSaveRef.current(false);
   }, [debouncedFormData, debouncedTags, activeNoteId]);
 
   return {

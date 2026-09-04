@@ -14,14 +14,12 @@ export const useNoteTags = ({ initialTags = [], onChangeTags }: UseNoteTagsProps
   const allExistingTags = useAppSelector((state) => state.filter.tags);
   const [deleteTag] = useDeleteTagMutation();
 
-  // Prefetch/ensure tags list in cache
   useGetTagsQuery({ page: 1, limit: 50 });
 
   const [tagInput, setTagInput] = useState('');
   const [addedTags, setAddedTags] = useState<NoteTagItem[]>([]);
   const [removedTagNames, setRemovedTagNames] = useState<string[]>([]);
 
-  // Compute display tags
   const rawDisplayTags: NoteTagItem[] = [
     ...initialTags
       .filter((tag) => !removedTagNames.includes(tag.name.toLowerCase()))
