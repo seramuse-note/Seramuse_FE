@@ -1,13 +1,14 @@
-import { Mic, Plus } from 'lucide-react';
 import type { FC, MouseEvent } from 'react';
+import { Mic, Plus, TextAlignJustify } from 'lucide-react';
 import { useCreateNoteMutation } from '@/services';
-import { useAppDispatch } from '@/store/store';
-import { closeNote, selectNote } from '@/store/slices/noteUiSlice';
+import { useAppDispatch, useAppSelector } from '@/store/store';
+import { selectNote, toggleNav } from '@/store/slices/noteUiSlice';
 import { toast } from 'react-toastify';
 
 export const NoteSidebarHeader: FC = () => {
   const dispatch = useAppDispatch();
   const [createNote] = useCreateNoteMutation();
+  const isNavcollapse = useAppSelector((state) => state.uiNote.isNavCollapsed);
 
   const handleCreateNote = async (e: MouseEvent) => {
     e.preventDefault();
@@ -29,19 +30,18 @@ export const NoteSidebarHeader: FC = () => {
     }
   };
 
-  const handleCloseNote = () => {
-    dispatch(closeNote());
-  };
-
   return (
     <div className="flex justify-between items-center px-1 shrink-0">
-      <button
-        type="button"
-        onClick={handleCloseNote}
-        className="text-base font-bold text-brand-accent-primary cursor-pointer hover:opacity-85 transition-opacity"
-      >
-        Note List
-      </button>
+      <div className="flex gap-2 text-brand-accent-primary text-base">
+        <button
+          type="button"
+          onClick={() => dispatch(toggleNav())}
+          className={`cursor-pointer hover:opacity-85 transition-all duration-300 ${!isNavcollapse ? 'md:block-0 hidden' : 'block'} `}
+        >
+          <TextAlignJustify size={16} />
+        </button>
+        <div className=" font-bold ">Note List </div>
+      </div>{' '}
       <div className="flex gap-1.5">
         <button
           type="button"

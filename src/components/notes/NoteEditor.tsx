@@ -12,6 +12,7 @@ export const NoteEditor: FC = () => {
     initialNote,
     isLoading,
     isSavingNote,
+    isSaveNoteSuccess,
     currentTitle,
     handleTitleChange,
     currentMoodId,
@@ -36,13 +37,14 @@ export const NoteEditor: FC = () => {
         <NoteEditorHeader
           title={initialNote?.title}
           isSavingNote={isSavingNote}
+          isSaveNoteSuccess={isSaveNoteSuccess}
           onSave={handleSave}
         />
 
-        <div className="px-3 py-1 flex flex-col gap-1 h-full">
+        <div className="px-3 py-3 flex flex-col gap-2 h-full  lg:max-h-[calc(100vh-40px)]">
           <NoteEditorTitle value={currentTitle} onChange={handleTitleChange} />
 
-          <div className="flex z-20 gap-2 items-center w-full max-h-10 shrink-0">
+          <div className="flex z-20 gap-3 items-center w-full max-h-10 shrink-0">
             <NoteEditorMood value={currentMoodId} onChange={handleMoodChange} />
             <NoteEditorTags initialTags={initialTags} onChangeTags={handleTagsChange} />
           </div>

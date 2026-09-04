@@ -1,13 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
+export type NavTabId = 'note-list' | 'chart';
 
 export interface UIState {
   activeNoteId: string | null;
   isNavCollapsed: boolean;
+  activeNavContent: NavTabId;
 }
 
 const initialState: UIState = {
   activeNoteId: null,
   isNavCollapsed: false,
+  activeNavContent: 'note-list',
 };
 
 export const noteUiSlice = createSlice({
@@ -19,12 +23,16 @@ export const noteUiSlice = createSlice({
     },
     closeNote: (state) => {
       state.activeNoteId = null;
+      state.isNavCollapsed = false;
     },
     toggleNav: (state) => {
       state.isNavCollapsed = !state.isNavCollapsed;
     },
+    setActiveNavContent: (state, action: PayloadAction<NavTabId>) => {
+      state.activeNavContent = action.payload;
+    },
   },
 });
 
-export const { selectNote, closeNote, toggleNav } = noteUiSlice.actions;
+export const { selectNote, closeNote, toggleNav, setActiveNavContent } = noteUiSlice.actions;
 export default noteUiSlice.reducer;

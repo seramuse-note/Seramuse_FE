@@ -19,7 +19,6 @@ export const useNoteSidebar = () => {
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
-  // Prefetch tags and moods for popover filter
   useGetTagsQuery({
     page: PAGES,
     limit: LIMIT,

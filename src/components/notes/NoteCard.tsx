@@ -18,12 +18,10 @@ export const NoteCard: FC<NoteCardProps> = memo(
     const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Đồng bộ trạng thái like cục bộ khi note.is_favorite từ prop cập nhật
     useEffect(() => {
       setIsLocalLikes(note.is_favorite);
     }, [note.is_favorite]);
 
-    // Dọn dẹp timer khi component unmount để tránh memory leak
     useEffect(() => {
       return () => {
         if (timerRef.current) {

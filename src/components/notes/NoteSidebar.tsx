@@ -9,7 +9,6 @@ import {
 } from './sidebar';
 
 export const NoteSidebar = () => {
-  // Coordinator quản lý luồng dữ liệu & query params
   const {
     notes,
     pagination,
@@ -34,10 +33,8 @@ export const NoteSidebar = () => {
         <div className="h-full relative bg-white/45 backdrop-blur-lg p-4">
           <div className="h-full flex flex-col gap-6 w-full mx-auto">
             <div className="flex flex-col md:gap-4 gap-3 w-full">
-              {/* Header: tự tạo note, tự đóng note (0 props) */}
               <NoteSidebarHeader />
 
-              {/* Search: 4 props thiết yếu, tự quản lý isOpenFilter */}
               <NoteSidebarSearch
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -45,11 +42,9 @@ export const NoteSidebar = () => {
                 onFilterChange={setSelectedFilter}
               />
 
-              {/* Tabs: 2 props rõ ràng */}
               <NoteSidebarTabs activeTab={activeTab} onChangeTab={setActiveTab} />
             </div>
 
-            {/* List: 4 props, tự quản lý modal xóa, favorite, active selection */}
             <NoteSidebarList
               notes={notes}
               searchQuery={debouncedSearch}
@@ -57,7 +52,6 @@ export const NoteSidebar = () => {
               hasFilters={hasActiveFilters}
             />
 
-            {/* Footer: 3 props phân trang, tự đóng note khi bấm All post */}
             <NoteSidebarFooter
               currentPage={currentPage}
               totalPages={pagination?.totalPages ?? 1}

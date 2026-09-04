@@ -142,7 +142,7 @@ export const Editor = ({ value, onSetBlock }: EditorProps) => {
   }, [value, editor]);
 
   return (
-    <div className="flex flex-col h-full min-h-full w-full gap-2">
+    <div className="flex flex-col  h-full min-h-full w-full gap-2">
       <input
         type="file"
         ref={fileInputRef}
