@@ -1,34 +1,15 @@
 import type { FC, MouseEvent } from 'react';
 import { Mic, Plus, TextAlignJustify } from 'lucide-react';
-import { useCreateNoteMutation } from '@/services';
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import { selectNote, toggleNav } from '@/store/slices/noteUiSlice';
-import { toast } from 'react-toastify';
+import { toggleNav } from '@/store/slices/noteUiSlice';
 
-export const NoteSidebarHeader: FC = () => {
+interface NoteSidebarHeaderProps {
+  handleCreateNote: (e?: MouseEvent) => void;
+}
+
+export const NoteSidebarHeader: FC<NoteSidebarHeaderProps> = ({ handleCreateNote }) => {
   const dispatch = useAppDispatch();
-  const [createNote] = useCreateNoteMutation();
   const isNavcollapse = useAppSelector((state) => state.uiNote.isNavCollapsed);
-
-  const handleCreateNote = async (e: MouseEvent) => {
-    e.preventDefault();
-    try {
-      const response = await createNote({
-        title: '',
-        blocks: [],
-      }).unwrap();
-
-      const noteId = response?.data?.id;
-      if (!noteId) {
-        console.warn('Không tìm thấy noteId trong response:', response);
-        return;
-      }
-      dispatch(selectNote(noteId));
-    } catch (err) {
-      console.error('Lỗi khi tạo note:', err);
-      toast.error('Tạo ghi chú thất bại!');
-    }
-  };
 
   return (
     <div className="flex justify-between items-center px-1 shrink-0">
@@ -36,7 +17,7 @@ export const NoteSidebarHeader: FC = () => {
         <button
           type="button"
           onClick={() => dispatch(toggleNav())}
-          className={`cursor-pointer hover:opacity-85 transition-all duration-300 ${!isNavcollapse ? 'md:block-0 hidden' : 'block'} `}
+          className={`block cursor-pointer hover:opacity-85 transition-all duration-300 ${!isNavcollapse ? ' md:hidden' : 'md:block'} `}
         >
           <TextAlignJustify size={16} />
         </button>

@@ -1,16 +1,27 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useGetMoodsQuery, useGetTagsQuery, useGetNotesQuery } from '@/services';
+import {
+  useGetMoodsQuery,
+  useGetTagsQuery,
+  useGetNotesQuery,
+  useCreateNoteMutation,
+} from '@/services';
 import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 import type { FilterState } from '@/types';
+import { useAppDispatch } from '@/store/store';
+import { selectNote } from '@/store/slices/noteUiSlice';
+import { toast } from 'react-toastify';
 
 const LIMIT = 10;
 const PAGES = 1;
 
 export const useNoteSidebar = () => {
+  const dispatch = useAppDispatch();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>(ACTIVE_TAB.ALL);
+  const [createNote] = useCreateNoteMutation();
 
   const [selectedFilter, setSelectedFilter] = useState<FilterState>({
     moods: [],
@@ -43,7 +54,12 @@ export const useNoteSidebar = () => {
     setCurrentPage(1);
   };
 
-  const { data: notesData, isLoading } = useGetNotesQuery({
+  const {
+    data: notesData,
+    isLoading,
+    isError,
+    error,
+  } = useGetNotesQuery({
     page: currentPage,
     limit: LIMIT,
     search: debouncedSearch.trim() || undefined,
@@ -71,14 +87,35 @@ export const useNoteSidebar = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCreateNote = async (e?: MouseEvent) => {
+    e?.preventDefault();
+    try {
+      const response = await createNote({
+        title: '',
+        blocks: [],
+      }).unwrap();
+
+      const noteId = response?.data?.id;
+      if (!noteId) {
+        console.warn('Không tìm thấy noteId trong response:', response);
+        return;
+      }
+      dispatch(selectNote(noteId));
+    } catch (err) {
+      console.error('Lỗi khi tạo note:', err);
+      toast.error('Tạo ghi chú thất bại!');
+    }
+  };
+
   return {
-    // Data & Status
     notes: displayNotes,
     totalNotesCount,
     pagination,
     isLoading,
+    error,
+    isError,
+    handleCreateNote,
 
-    // Search & Filter State
     searchQuery,
     setSearchQuery: handleSearchChange,
     debouncedSearch,
@@ -86,7 +123,6 @@ export const useNoteSidebar = () => {
     setSelectedFilter: handleFilterChange,
     hasActiveFilters,
 
-    // Tabs & Pagination
     activeTab,
     setActiveTab: handleTabChange,
     currentPage,

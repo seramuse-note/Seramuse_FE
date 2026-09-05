@@ -43,7 +43,7 @@ export const HomePage = () => {
       bg-white/30 backdrop-blur-md  box-border overflow-hidden"
     >
       {!isNavCollapsed && (
-        <div className="min-w-0 min-h-0 w-53 p-4 px-2 z-20 shrink-0 border-r border-white/65 overflow-hidden">
+        <div className=" md:block min-w-0 min-h-0 md:w-53 p-4 px-2 z-20 shrink-0 border-r border-white/65 overflow-hidden">
           <TabNavbar onClick={handleNavClick} />
         </div>
       )}

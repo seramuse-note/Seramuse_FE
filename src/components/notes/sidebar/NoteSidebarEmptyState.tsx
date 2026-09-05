@@ -3,9 +3,10 @@ import { ACTIVE_TAB, type ActiveTab } from '@/constants/tab.constants';
 import { useCreateNoteMutation } from '@/services';
 import { selectNote } from '@/store/slices/noteUiSlice';
 import { useAppDispatch } from '@/store/store';
-import { Plus } from 'lucide-react';
+import { Plus, RotateCw } from 'lucide-react';
 import type { FC, MouseEvent } from 'react';
 import { toast } from 'react-toastify';
+import { useNoteSidebar } from '../hooks/useNoteSidebar';
 
 interface NoteSidebarEmptyStateProps {
   searchQuery: string;
@@ -20,6 +21,8 @@ export const NoteSidebarEmptyState: FC<NoteSidebarEmptyStateProps> = ({
   activeTab,
   onCreateNote,
 }) => {
+  const { isError, error } = useNoteSidebar();
+
   const dispatch = useAppDispatch();
   const [createNote] = useCreateNoteMutation();
 
@@ -50,7 +53,69 @@ export const NoteSidebarEmptyState: FC<NoteSidebarEmptyStateProps> = ({
   const isSearchingOrFiltering = Boolean(searchQuery.trim() || hasActiveFilters);
 
   const renderEmptyContent = () => {
-    // 1. Case: Search or filter has no results
+    if (isError && error) {
+      if ('status' in error && error.status === 'FETCH_ERROR') {
+        return (
+          <EmptyState
+            title="Mất kết nối mạng"
+            description="Kiểm tra kết nối mạng, vui lòng thử lại"
+            action={{
+              label: 'Thử lại',
+              onClick: () => {
+                console.log('12');
+              },
+              icon: RotateCw,
+            }}
+          />
+        );
+      }
+
+      if ('status' in error && error.status === 'TIMEOUT_ERROR') {
+        return (
+          <EmptyState
+            title="Kết nối quá thời gian chờ (Timeout)"
+            description="Kiểm tra kết nối mạng, vui lòng thử lại"
+            action={{
+              label: 'Thử lại',
+              onClick: () => {
+                console.log('12');
+              },
+              icon: RotateCw,
+            }}
+          />
+        );
+      }
+
+      if ('status' in error && typeof error.status === 'number') {
+        return (
+          <EmptyState
+            title={`Máy chủ lỗi (HTTP ${error.status})`}
+            description="Máy chủ lỗi, vui lòng thử lại"
+            action={{
+              label: 'Thử lại',
+              onClick: () => {
+                console.log('12');
+              },
+              icon: RotateCw,
+            }}
+          />
+        );
+      }
+      return (
+        <EmptyState
+          title="Đã xảy ra lỗi không xác định"
+          description="Vui lòng thử lại"
+          action={{
+            label: 'Thử lại',
+            onClick: () => {
+              console.log('12');
+            },
+            icon: RotateCw,
+          }}
+        />
+      );
+    }
+
     if (isSearchingOrFiltering) {
       return (
         <EmptyState
@@ -60,7 +125,6 @@ export const NoteSidebarEmptyState: FC<NoteSidebarEmptyStateProps> = ({
       );
     }
 
-    // 2. Case: In favorites tab and no favorites found
     if (activeTab === ACTIVE_TAB.FAVORITE) {
       return (
         <EmptyState
@@ -70,7 +134,6 @@ export const NoteSidebarEmptyState: FC<NoteSidebarEmptyStateProps> = ({
       );
     }
 
-    // 3. Case: Entire note list is empty
     return (
       <EmptyState
         title="Chưa có ghi chú"

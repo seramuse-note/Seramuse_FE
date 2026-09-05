@@ -61,7 +61,7 @@ export const NoteCard: FC<NoteCardProps> = memo(
         tabIndex={0}
         onClick={() => onActiveNote(note.id)}
         onKeyDown={handleKeyDown}
-        className={`group flex flex-col relative p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
+        className={`group flex flex-col relative p-5 pb-1 h-50 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
           hover:bg-white/85 hover:shadow-xs active:shadow-xs duration-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-primary/40`}
       >
         <div className="flex">
