@@ -72,16 +72,6 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
     action: (ed) => ed.chain().focus().toggleHeading({ level: 3 }).run(),
   },
   {
-    id: 'quote',
-    title: 'Quote',
-    description: 'Khối trích dẫn nội dung',
-    icon: Quote,
-    category: 'text',
-    keywords: ['quote', 'trích dẫn', 'trich dan', 'blockquote', 'cau noi', 'trich'],
-    badge: '”',
-    action: (ed) => ed.chain().focus().toggleBlockquote().run(),
-  },
-  {
     id: 'code-block',
     title: 'Code Block',
     description: 'Khối mã nguồn lập trình',
@@ -90,6 +80,16 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
     keywords: ['code', 'code block', 'mã', 'ma nguon', 'snippet', 'lap trinh', 'developer', 'pre'],
     badge: '<>',
     action: (ed) => ed.chain().focus().toggleCodeBlock().run(),
+  },
+  {
+    id: 'quote',
+    title: 'Quote',
+    description: 'Khối trích dẫn nội dung',
+    icon: Quote,
+    category: 'text',
+    keywords: ['quote', 'trích dẫn', 'trich dan', 'blockquote', 'cau noi', 'trich'],
+    badge: '”',
+    action: (ed) => ed.chain().focus().toggleBlockquote().run(),
   },
   {
     id: 'todo',
@@ -107,7 +107,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
       'check',
       'tasklist',
     ],
-    badge: '[ ]',
+    badge: '',
     action: (ed) => ed.chain().focus().toggleTaskList().run(),
   },
   {
@@ -126,7 +126,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
       'ul',
       'list',
     ],
-    badge: '•',
+    badge: '',
     action: (ed) => ed.chain().focus().toggleBulletList().run(),
   },
   {
@@ -145,7 +145,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
       'ol',
       '1.',
     ],
-    badge: '1.',
+    badge: '',
     action: (ed) => ed.chain().focus().toggleOrderedList().run(),
   },
   {
@@ -165,7 +165,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
       'horizontal rule',
       'gach ngang',
     ],
-    badge: '---',
+    badge: '',
     action: (ed) => ed.chain().focus().setHorizontalRule().run(),
   },
   {
@@ -175,7 +175,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
     icon: Calendar,
     category: 'insert',
     keywords: ['date', 'today', 'ngày', 'ngay', 'hom nay', 'hôm nay', 'time', 'thời gian'],
-    badge: '📅',
+    badge: '',
     action: (ed) => ed.chain().focus().insertContent(new Date().toLocaleDateString('vi-VN')).run(),
   },
   {
@@ -196,7 +196,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
       'pic',
       'img',
     ],
-    badge: 'IMG',
+    badge: '',
     action: () => {},
   },
 ];
