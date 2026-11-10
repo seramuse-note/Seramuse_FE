@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import type { DropdownOption } from '../notes';
+import type { DropdownOption } from '@/types';
 
 interface DropdownProps {
   options: DropdownOption[];
@@ -20,16 +20,18 @@ export const Dropdown = ({ options, value, onChange, placeholder = 'Lựa chọn
   const selectedLabel = options.find((opt) => opt.value === value)?.label || placeholder;
 
   return (
-    <div className="relative flex gap-2 min-h-0 shrink-0 " onClick={() => setIsOpen(!isOpen)}>
+    <div className="relative flex gap-2 min-h-0 shrink-0">
       <button
-        className="flex shrink-0 items-center px-3 py-.5  text-brand-accent-primary font-medium
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex shrink-0 items-center px-3 py-.5 text-brand-accent-primary font-medium
        bg-white/50 backdrop-blur-md hover:bg-white/70
         border border-white/60 shadow-sm rounded-xl active:scale-95 active:shadow-md
         box-border transition-all duration-200 cursor-pointer"
       >
-        <div className=" w-15"> {selectedLabel}</div>
+        <div className="w-15"> {selectedLabel}</div>
         <ChevronDown
-          className={`w-3.5 h-3.5  text-gray-400  min-w-0 transition-transform duration-300 ${
+          className={`w-3.5 h-3.5 text-gray-400 min-w-0 transition-transform duration-300 ${
             isOpen ? 'rotate-180 text-brand-accent-primary' : ''
           }`}
         />

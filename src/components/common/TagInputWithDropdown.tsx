@@ -1,25 +1,32 @@
-import React, { useState, useRef, useEffect, type KeyboardEvent, type FC } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  type KeyboardEvent,
+  type FC,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 import { Tag as TagIcon, Plus, X } from 'lucide-react';
 
 interface TagInputDropdownProps {
   tagInput: string;
   setTagInput: (val: string) => void;
-  handleAddTag: () => void;
-  onSelectTag: (tagName: string) => void;
   existingTags?: string[];
   currentTags?: string[];
+  onAddTag: () => void;
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
+  onSelectTag: (tagName: string) => void;
   onDeleteItem: (deletedTag: string) => void;
 }
 
 export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
   tagInput,
   setTagInput,
-  handleAddTag,
-  onSelectTag,
   existingTags = [],
   currentTags = [],
+  onAddTag,
   onKeyDown,
+  onSelectTag,
   onDeleteItem,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +46,7 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
     (tag) => tag.toLowerCase().includes(tagInput.toLowerCase().trim()) && !currentTags.includes(tag)
   );
 
-  const handlePickTag = (e: React.MouseEvent, tag: string) => {
+  const handlePickTag = (e: ReactMouseEvent, tag: string) => {
     e.preventDefault();
     e.stopPropagation();
     onSelectTag(tag);
@@ -50,8 +57,8 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
   return (
     <div className="gap-3 shrink-0 relative" ref={containerRef}>
       <div
-        className="flex shrink-0 gap-2 items-center justify-center md:pl-2 md:py-0.5 px-3 py-0.5 text-brand-accent-primary font-medium
-        outline-none backdrop-blur-md shadow-sm hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointer focus-within:bg-white/70
+        className="flex shrink-0 gap-2 items-center justify-center px-3 py-1.5 text-brand-accent-primary font-medium
+        outline-none backdrop-blur-md shadow-sm` hover:bg-white/70 rounded-xl active:scale-98 box-border transition-all duration-300 cursor-pointer focus-within:bg-white/70
         overflow-x-hidden"
       >
         <TagIcon className="w-5 h-5 md:w-3.5 md:h-3.5 text-brand-accent-secondary mr-1 self-center shrink-0" />
@@ -66,7 +73,9 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
               setTagInput(e.target.value);
               setIsOpen(true);
             }}
-            onKeyDown={onKeyDown}
+            onKeyDown={(e) => {
+              onKeyDown(e);
+            }}
             className="hidden md:block w-full bg-transparent outline-none placeholder:text-brand-accent-tertiary text-xs"
           />
           <button
@@ -74,7 +83,7 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
             className="rounded-lg cursor-pointer"
             title="Add"
             onClick={() => {
-              handleAddTag();
+              onAddTag();
               setIsOpen(false);
             }}
           >
@@ -92,22 +101,30 @@ export const TagInputWithDropdown: FC<TagInputDropdownProps> = ({
           <div className="max-h-40 overflow-y-auto custom-scrollbar">
             {filteredTags.length > 0 ? (
               filteredTags.map((tag) => (
-                <button
+                <div
                   key={tag}
-                  type="button"
-                  onClick={(e) => handlePickTag(e, tag)}
-                  className="w-full text-left px-3 py-1.5 text-xs text-brand-accent-primary hover:bg-brand-accent-primary/10 hover:text-brand-accent-primary transition-colors flex items-center justify-between cursor-pointer"
+                  className="w-full px-3 py-1.5 text-xs text-brand-accent-primary hover:bg-brand-accent-primary/10 transition-colors flex items-center justify-between group"
                 >
-                  <span className="truncate">#{tag}</span>
-                  <X
+                  <button
+                    type="button"
+                    onClick={(e) => handlePickTag(e, tag)}
+                    className="flex-1 text-left truncate cursor-pointer hover:text-brand-accent-primary"
+                  >
+                    #{tag}
+                  </button>
+                  <button
+                    type="button"
+                    title={`Xóa tag #${tag}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       onDeleteItem(tag);
                     }}
-                    className="w-3 h-3 opacity-40 hover:opacity-100 hover:to-brand-accent-primary transition-all "
-                  />
-                </button>
+                    className="p-0.5 rounded cursor-pointer opacity-40 hover:opacity-100 hover:text-brand-accent-primary transition-all shrink-0"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
               ))
             ) : (
               <div className="px-3 py-2 text-xs text-brand-accent-tertiary italic text-center">

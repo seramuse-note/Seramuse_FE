@@ -1,13 +1,13 @@
 import type { LucideIcon } from 'lucide-react';
-import React, { type FC } from 'react';
+import type { FC, ReactNode, MouseEvent } from 'react';
 
 interface EmptyStateProps {
-  icon?: LucideIcon | React.ReactNode;
+  icon?: LucideIcon | ReactNode;
   title: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
   action?: {
     label: string;
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onClick: (e: MouseEvent<HTMLButtonElement>) => void;
     icon?: LucideIcon;
   };
 }

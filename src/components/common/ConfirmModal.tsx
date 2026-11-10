@@ -1,10 +1,10 @@
-import React, { type FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 interface ConfirmModalProps {
   isOpen: boolean;
   title?: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onClose: () => void;

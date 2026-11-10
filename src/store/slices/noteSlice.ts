@@ -16,8 +16,8 @@ export const noteSlice = createSlice({
   name: 'note',
   initialState,
   reducers: {
-    setNotes: (state, action) => {
-      state = action.payload;
+    setNotes: (_state, action) => {
+      return action.payload;
     },
   },
 });

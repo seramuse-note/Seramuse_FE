@@ -16,7 +16,6 @@ import {
   AlignJustify,
   Quote,
   Table,
-  Image,
   FileText,
 } from 'lucide-react';
 import { BUBBLE_MENU_OPTIONS } from '@/constants/editor.constants';
@@ -214,12 +213,6 @@ export const FormattingBubbleMenu = ({ editor, editorState }: Props) => {
             className="cursor-pointer rounded-md border border-transparent hover:backdrop-blur-lg hover:border-brand-accent-fourth"
           >
             <Table size={20} className={`p-1`} />
-          </button>
-          <button
-            title="Image"
-            className="cursor-pointer rounded-md border border-transparent hover:backdrop-blur-lg hover:border-brand-accent-fourth"
-          >
-            <Image size={20} className={`p-1`} />
           </button>
           <button
             title="FileText"

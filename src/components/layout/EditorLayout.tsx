@@ -1,48 +1,118 @@
 import { EditorContent, useEditor, useEditorState, Editor as TiptapEditor } from '@tiptap/react';
-import { useEffect, useState } from 'react';
-import { COMMAND_ITEMS, EXTENSIONS } from '@/constants/editor.constants';
-import { FormattingBubbleMenu, ListBubbleMenu, SlashCommandMenu } from '@/components/editor';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { EXTENSIONS } from '@/constants/editor.constants';
+import {
+  FormattingBubbleMenu,
+  ListBubbleMenu,
+  SlashCommandMenu,
+  useSlashCommand,
+} from '@/components/editor';
 import type { Block, CreateBlockPayload } from '@/types';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 interface EditorProps {
-  blocksNote: Block[];
+  value: Block[];
   onSetBlock: (newBlock: CreateBlockPayload[]) => void;
 }
 
-export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
+export const Editor = ({ value, onSetBlock }: EditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [allImages, setAllImages] = useState<{ src: string }[]>([]);
   const [showMenu] = useState(true);
-  const [slashQuery, setSlashQuery] = useState('');
+
+  const handleTriggerImageUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleKeyDownRef = useRef<(event: KeyboardEvent) => boolean>(() => false);
+  const slashHandlersRef = useRef<{
+    handleSelectionUpdate: (editor: TiptapEditor) => void;
+    handleTransaction: (editor: TiptapEditor) => void;
+  }>({
+    handleSelectionUpdate: () => {},
+    handleTransaction: () => {},
+  });
 
   const editor = useEditor({
     extensions: EXTENSIONS,
-    content: blocksNote[0]?.properties,
+    content: value[0]?.properties || { type: 'paragraph', content: [{ type: 'text', text: '' }] },
+
+    editorProps: {
+      handleClick: (view, _pos, event) => {
+        const target = event.target as HTMLElement;
+
+        if (target && target.tagName === 'IMG') {
+          const clickedSrc = target.getAttribute('src');
+          if (!clickedSrc) return false;
+
+          const imgElements = Array.from(view.dom.querySelectorAll('img')) as HTMLImageElement[];
+
+          const imageList = imgElements.map((img) => ({ src: img.src }));
+          setAllImages(imageList);
+
+          const index = imgElements.findIndex((img) => img.src === clickedSrc);
+          setLightboxIndex(index !== -1 ? index : 0);
+          setLightboxOpen(true);
+          return true;
+        }
+        return false;
+      },
+      handleKeyDown: (_view, event) => handleKeyDownRef.current(event),
+    },
+
+    onSelectionUpdate: ({ editor }) => {
+      slashHandlersRef.current.handleSelectionUpdate(editor);
+    },
+
+    onTransaction: ({ editor }) => {
+      slashHandlersRef.current.handleTransaction(editor);
+    },
 
     onUpdate: ({ editor }) => {
       const properties = editor.getJSON();
-
-      const newBlocks: CreateBlockPayload[] = [
+      onSetBlock([
         {
-          type: blocksNote[0]?.type ?? 'paragraph',
+          type: value[0]?.type ?? 'paragraph',
           properties: properties,
         },
-      ];
-      const isUnchanged = JSON.stringify(blocksNote[0]?.properties) === JSON.stringify(properties);
-
-      if (!isUnchanged) {
-        onSetBlock(newBlocks);
-      }
-
-      const { $from } = editor.state.selection;
-      const currentLineText = $from.nodeBefore?.text || '';
-      const match = currentLineText.match(/(?:^|\s)\/(\w*)$/);
-
-      setSlashQuery(match ? match[1].toLowerCase() : '');
+      ]);
     },
   });
 
+  const slash = useSlashCommand({
+    editor,
+    onUploadImage: handleTriggerImageUpload,
+  });
+
+  // Đồng bộ handlers của slash command sau render mà không vi phạm rule react-hooks/refs
   useEffect(() => {
-    if (!editor || editor.isDestroyed) return;
-  }, [blocksNote, editor]);
+    handleKeyDownRef.current = slash.handleKeyDown;
+    slashHandlersRef.current = {
+      handleSelectionUpdate: slash.handleSelectionUpdate,
+      handleTransaction: slash.handleTransaction,
+    };
+  }, [slash.handleKeyDown, slash.handleSelectionUpdate, slash.handleTransaction]);
+
+  const handleUploadImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        editor?.chain().focus().setImage({ src: reader.result, alt: file.name }).run();
+      }
+    };
+
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const editorState = useEditorState({
     editor,
@@ -65,32 +135,17 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
     }),
   });
 
-  const handleExecuteCommand = (action: (ed: TiptapEditor) => void) => {
-    if (!editor) return;
-    const { $from } = editor.state.selection;
-    const currentLineText = $from.nodeBefore?.text || '';
-    const match = currentLineText.match(/(?:^|\s)\/(\w*)$/);
-
-    if (match && match.index !== undefined) {
-      const deleteFrom = $from.pos - match[0].length;
-      editor.chain().focus().deleteRange({ from: deleteFrom, to: $from.pos }).run();
-    }
-
-    action(editor);
-    setSlashQuery('');
-  };
-
-  const filteredCommands = COMMAND_ITEMS.filter((item) =>
-    item.title.toLowerCase().includes(slashQuery)
-  );
-
   return (
     <div className="flex flex-col h-full min-h-full w-full gap-2">
-      <div
-        className="flex-1 min-h-0 w-full h-full overflow-y-auto
-       bg-white rounded-xl border border-gray-100"
-      >
-        <EditorContent editor={editor} className="h-full " />
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleUploadImage}
+        accept="image/*"
+        className="hidden"
+      />
+      <div className="flex-1 min-h-0 w-full h-full overflow-y-auto bg-white rounded-xl border border-gray-100">
+        <EditorContent editor={editor} className="h-full" />
       </div>
       {editor && showMenu && (
         <>
@@ -98,12 +153,22 @@ export const Editor = ({ blocksNote, onSetBlock }: EditorProps) => {
           <ListBubbleMenu editor={editor} />
           <SlashCommandMenu
             editor={editor}
-            slashQuery={slashQuery}
-            commands={filteredCommands}
-            onExecuteCommand={handleExecuteCommand}
+            slashQuery={slash.slashQuery}
+            commands={slash.filteredCommands}
+            groupedCommands={slash.groupedCommands}
+            selectedIndex={slash.selectedIndex}
+            onSelectIndex={slash.setSelectedIndex}
+            onExecuteCommand={slash.handleExecuteCommand}
+            onUploadImage={handleTriggerImageUpload}
           />
         </>
       )}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={allImages}
+      />
     </div>
   );
 };

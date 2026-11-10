@@ -40,3 +40,14 @@ export type FilterState = {
   tags: Tag[];
   moods: Mood[];
 };
+
+export interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+export interface NoteTagItem {
+  id?: string;
+  name: string;
+  color?: string;
+}

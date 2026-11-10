@@ -1,13 +1,9 @@
 import { Heart, Trash } from 'lucide-react';
-
-import { useRef, useState } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
+import type { FC, MouseEvent, KeyboardEvent } from 'react';
 import type { Note, Tag } from '@/types';
-import moment from 'moment';
 import { formatDate } from '@/utils/event.util';
 import { getFirstBlockText } from '@/utils/block.util';
-import { useClickOutside } from '@/hooks/useClickOutside';
-import { useAppSelector } from '@/store/store';
-moment.locale('vi');
 
 interface NoteCardProps {
   note: Note;
@@ -16,54 +12,63 @@ interface NoteCardProps {
   onToggleLike: (id: string) => Promise<void>;
   onOpenDeleteModal: () => void;
 }
-export const NoteCard = ({
-  note,
-  isActive,
-  onActiveNote,
-  onToggleLike,
-  onOpenDeleteModal,
-}: NoteCardProps) => {
-  const activeNoteId = useAppSelector((state) => state.uiNote.activeNoteId);
 
-  const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
-  const [isOpenDelete, setIsOpenDelete] = useState(false);
+export const NoteCard: FC<NoteCardProps> = memo(
+  ({ note, isActive, onActiveNote, onToggleLike, onOpenDeleteModal }) => {
+    const [isLocalLikes, setIsLocalLikes] = useState(note.is_favorite);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const deleteBtnRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => {
+      setIsLocalLikes(note.is_favorite);
+    }, [note.is_favorite]);
 
-  const handleHeartClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+    useEffect(() => {
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
+    }, []);
 
-    const nextState = !isLocalLikes;
-    setIsLocalLikes(nextState);
+    const handleHeartClick = (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
+      const nextState = !isLocalLikes;
+      setIsLocalLikes(nextState);
 
-    timerRef.current = setTimeout(() => {
-      if (nextState !== note.is_favorite) {
-        onToggleLike(note.id);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
       }
-    }, 500);
-  };
 
-  useClickOutside(deleteBtnRef, () => {
-    setIsOpenDelete(false);
-  });
-  return (
-    <>
+      timerRef.current = setTimeout(() => {
+        if (nextState !== note.is_favorite) {
+          onToggleLike(note.id);
+        }
+      }, 500);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onActiveNote(note.id);
+      }
+    };
+
+    return (
       <div
-        onClick={() => {
-          onActiveNote(note.id);
-        }}
-        className={`group flex flex-col relative  p-5 pb-1 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
-      hover:bg-white/85 hover:shadow-xs active:shadow-xs duration-100 cursor-pointer ${activeNoteId ? 'pointer-events-none' : ''}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => onActiveNote(note.id)}
+        onKeyDown={handleKeyDown}
+        className={`group flex flex-col relative p-5 pb-1 h-50 gap-3 rounded-2xl bg-white/65 backdrop-blur-md border border-transparent
+          hover:bg-white/85 hover:shadow-xs active:shadow-xs duration-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-primary/40`}
       >
         <div className="flex">
           <h3
-            className={`font-semibold text-sm transition-colors line-clamp-1 ${isActive ? 'text-brand-accent-secondary' : 'text-brand-accent-primary'} `}
+            className={`font-semibold text-sm transition-colors line-clamp-1 ${
+              isActive ? 'text-brand-accent-secondary' : 'text-brand-accent-primary'
+            }`}
           >
             {note.title || 'Untitled'}
           </h3>
@@ -93,7 +98,7 @@ export const NoteCard = ({
         </div>
 
         <div className="flex items-center justify-between border-t border-brand-accent-tertiary/10">
-          <div className="text-[10px] text-brand-accent-tertiary font-medium active:text-brand-accent-secondary">
+          <div className="text-[10px] text-brand-accent-tertiary font-medium">
             {formatDate(note.created_at)}
           </div>
 
@@ -101,8 +106,9 @@ export const NoteCard = ({
             <button
               type="button"
               onClick={handleHeartClick}
-              className="p-2 cursor-pointer transition-transform active:scale-75  "
-              title={isLocalLikes ? 'Unlike' : 'Like'}
+              className="p-2 cursor-pointer transition-transform active:scale-75"
+              title={isLocalLikes ? 'Bỏ thích' : 'Yêu thích'}
+              aria-label={isLocalLikes ? 'Bỏ thích' : 'Yêu thích'}
             >
               <Heart
                 className={`w-3.5 h-3.5 transition-all duration-200 ${
@@ -113,28 +119,23 @@ export const NoteCard = ({
               />
             </button>
 
-            <div ref={deleteBtnRef} className="relative">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenDeleteModal();
-                  setIsOpenDelete((prev) => !prev);
-                }}
-                className="p-1 cursor-pointer transition-transform  "
-              >
-                <div
-                  className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-red-50  hover:text-red-600 rounded-lg transition-colors cursor-pointer font-medium
-                  ${isOpenDelete ? 'text-red-600' : ''}`}
-                  title="Delete"
-                >
-                  <Trash className="w-3 h-3" />
-                </div>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDeleteModal();
+              }}
+              className="p-2 text-brand-accent-tertiary hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors cursor-pointer active:scale-75"
+              title="Xóa ghi chú"
+              aria-label="Xóa ghi chú"
+            >
+              <Trash className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
-    </>
-  );
-};
+    );
+  }
+);
+
+NoteCard.displayName = 'NoteCard';
